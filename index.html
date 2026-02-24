@@ -1,0 +1,1155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MiniDesk — Mac Mini M4 Workstation Bundles</title>
+<style>
+  :root {
+    --bg: #000000;
+    --surface: #111111;
+    --surface2: #1a1a1a;
+    --border: rgba(255,255,255,0.1);
+    --accent: #0071e3;
+    --accent2: #2997ff;
+    --text: #f5f5f7;
+    --muted: #86868b;
+    --warn: #2997ff;
+    --radius: 16px;
+    --radius-sm: 10px;
+    --font: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font);
+    font-size: 16px;
+    line-height: 1.6;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* ── NOISE OVERLAY ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
+    opacity: 0.03;
+    pointer-events: none;
+    z-index: 9999;
+  }
+
+  h1, h2, h3, h4 { font-family: var(--font); line-height: 1.15; }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 48px;
+    background: rgba(8,11,16,0.85);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .logo {
+    font-family: var(--font);
+    font-weight: 800;
+    font-size: 1.3rem;
+    letter-spacing: -0.5px;
+    color: var(--text);
+  }
+  .logo span { color: var(--accent); }
+
+  nav a {
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: color 0.2s;
+  }
+  nav a:hover { color: var(--text); }
+
+  .nav-cta {
+    background: var(--accent);
+    color: #000 !important;
+    padding: 10px 22px;
+    border-radius: 50px;
+    font-weight: 600 !important;
+    transition: opacity 0.2s !important;
+  }
+  .nav-cta:hover { opacity: 0.85; }
+
+  /* ── HERO ── */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 140px 24px 80px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-glow {
+    position: absolute;
+    top: -200px; left: 50%;
+    transform: translateX(-50%);
+    width: 700px; height: 700px;
+    background: radial-gradient(circle, rgba(0,113,227,0.15) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(0,113,227,0.1);
+    border: 1px solid rgba(0,113,227,0.3);
+    color: var(--accent);
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 8px 18px;
+    border-radius: 50px;
+    margin-bottom: 32px;
+  }
+
+  .hero-badge::before {
+    content: '';
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 8px var(--accent);
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  .hero h1 {
+    font-size: clamp(2.8rem, 6vw, 5.5rem);
+    font-weight: 800;
+    letter-spacing: -2px;
+    max-width: 820px;
+    margin-bottom: 24px;
+    background: linear-gradient(135deg, #fff 40%, rgba(255,255,255,0.5));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .hero p {
+    font-size: 1.2rem;
+    color: var(--muted);
+    max-width: 520px;
+    margin-bottom: 48px;
+    font-weight: 300;
+  }
+
+  .hero-btns {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    color: #000;
+    border: none;
+    padding: 16px 36px;
+    border-radius: 50px;
+    font-family: var(--font);
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    text-decoration: none;
+    display: inline-block;
+  }
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 40px rgba(0,113,227,0.3);
+  }
+
+  .btn-ghost {
+    background: transparent;
+    color: var(--text);
+    border: 1px solid var(--border);
+    padding: 16px 36px;
+    border-radius: 50px;
+    font-family: var(--font);
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+    text-decoration: none;
+    display: inline-block;
+  }
+  .btn-ghost:hover {
+    border-color: rgba(255,255,255,0.3);
+    background: rgba(255,255,255,0.04);
+  }
+
+  .hero-stats {
+    display: flex;
+    gap: 48px;
+    margin-top: 80px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .stat { text-align: center; }
+  .stat-num {
+    font-family: var(--font);
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--accent);
+  }
+  .stat-label { font-size: 0.85rem; color: var(--muted); margin-top: 4px; }
+
+  /* ── STORY SECTION ── */
+  .section {
+    padding: 100px 24px;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .section-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 16px;
+  }
+
+  .story-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 64px;
+    align-items: center;
+  }
+
+  .story-grid h2 {
+    font-size: clamp(1.8rem, 3vw, 2.8rem);
+    font-weight: 800;
+    letter-spacing: -1px;
+    margin-bottom: 20px;
+  }
+
+  .story-grid p { color: var(--muted); font-size: 1.05rem; margin-bottom: 16px; }
+
+  .mac-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    padding: 40px;
+    position: relative;
+    overflow: hidden;
+  }
+  .mac-card::before {
+    content: '';
+    position: absolute;
+    top: -60px; right: -60px;
+    width: 200px; height: 200px;
+    background: radial-gradient(circle, rgba(0,113,227,0.12), transparent 70%);
+    pointer-events: none;
+  }
+
+  .mac-icon {
+    font-size: 3.5rem;
+    margin-bottom: 20px;
+    display: block;
+  }
+
+  .mac-card h3 {
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+
+  .mac-card p { color: var(--muted); font-size: 0.95rem; margin-bottom: 20px; }
+
+  .spec-list { list-style: none; }
+  .spec-list li {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.9rem;
+  }
+  .spec-list li:last-child { border-bottom: none; }
+  .spec-list .val { color: var(--accent); font-weight: 600; }
+
+  /* ── CONFIGURATOR ── */
+  .configurator-wrap {
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    padding: 100px 24px;
+  }
+
+  .configurator-inner {
+    max-width: 960px;
+    margin: 0 auto;
+  }
+
+  .config-header {
+    text-align: center;
+    margin-bottom: 64px;
+  }
+  .config-header h2 {
+    font-size: clamp(2rem, 4vw, 3.2rem);
+    font-weight: 800;
+    letter-spacing: -1.5px;
+    margin-bottom: 12px;
+  }
+  .config-header p { color: var(--muted); font-size: 1.1rem; }
+
+  /* STEP */
+  .step {
+    margin-bottom: 48px;
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+  .step.visible { opacity: 1; transform: translateY(0); }
+
+  .step-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 20px;
+  }
+
+  .step-num {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: rgba(0,113,227,0.1);
+    border: 1px solid rgba(0,113,227,0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font);
+    font-weight: 700;
+    font-size: 0.85rem;
+    color: var(--accent);
+    flex-shrink: 0;
+  }
+
+  .step-title {
+    font-family: var(--font);
+    font-size: 1.15rem;
+    font-weight: 700;
+  }
+
+  .step-note {
+    font-size: 0.82rem;
+    color: var(--muted);
+    margin-left: auto;
+    background: rgba(255,255,255,0.04);
+    padding: 4px 12px;
+    border-radius: 50px;
+    border: 1px solid var(--border);
+  }
+
+  /* OPTIONS GRID */
+  .options-grid {
+    display: grid;
+    gap: 14px;
+  }
+  .options-grid.cols-2 { grid-template-columns: 1fr 1fr; }
+  .options-grid.cols-3 { grid-template-columns: repeat(3, 1fr); }
+
+  .option-card {
+    background: var(--surface2);
+    border: 2px solid var(--border);
+    border-radius: var(--radius);
+    padding: 22px;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s, transform 0.2s;
+    position: relative;
+    user-select: none;
+  }
+  .option-card:hover {
+    border-color: rgba(255,255,255,0.2);
+    transform: translateY(-2px);
+  }
+  .option-card.selected {
+    border-color: var(--accent);
+    background: rgba(0,113,227,0.05);
+  }
+
+  .option-card input[type="radio"],
+  .option-card input[type="checkbox"] {
+    display: none;
+  }
+
+  .option-check {
+    position: absolute;
+    top: 14px; right: 14px;
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    border: 2px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+  }
+
+  .option-card.selected .option-check {
+    background: var(--accent);
+    border-color: var(--accent);
+  }
+
+  .option-check::after {
+    content: '✓';
+    font-size: 0.7rem;
+    color: #000;
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+  .option-card.selected .option-check::after { opacity: 1; }
+
+  .option-emoji { font-size: 1.8rem; margin-bottom: 10px; display: block; }
+  .option-name {
+    font-family: var(--font);
+    font-weight: 700;
+    font-size: 1rem;
+    margin-bottom: 4px;
+  }
+  .option-desc { font-size: 0.83rem; color: var(--muted); margin-bottom: 10px; line-height: 1.5; }
+  .option-price {
+    font-family: var(--font);
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--accent);
+  }
+
+  .option-tag {
+    display: inline-block;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    border-radius: 50px;
+    margin-bottom: 8px;
+  }
+  .tag-entry { background: rgba(0,113,227,0.08); color: var(--accent2); }
+  .tag-mid { background: rgba(0,113,227,0.12); color: var(--accent2); }
+  .tag-top { background: rgba(0,113,227,0.12); color: var(--accent); }
+  .tag-full { background: rgba(0,113,227,0.12); color: var(--accent); }
+
+  /* KEYBOARD AUTO NOTE */
+  .kb-note {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(0,113,227,0.08);
+    border: 1px solid rgba(0,113,227,0.25);
+    border-radius: var(--radius-sm);
+    padding: 14px 18px;
+    font-size: 0.88rem;
+    color: var(--accent2);
+    margin-top: 12px;
+    transition: all 0.3s;
+  }
+  .kb-note.hidden { display: none; }
+
+  /* ADD-ONS */
+  .addons-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+
+  /* DIVIDER */
+  .config-divider {
+    height: 1px;
+    background: var(--border);
+    margin: 48px 0;
+  }
+
+  /* SUMMARY */
+  .summary-box {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 32px;
+    position: sticky;
+    top: 90px;
+  }
+
+  .summary-title {
+    font-family: var(--font);
+    font-weight: 700;
+    font-size: 1.1rem;
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .summary-line {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.9rem;
+    padding: 7px 0;
+    color: var(--muted);
+  }
+  .summary-line .item-name { color: var(--text); }
+  .summary-line .item-price { color: var(--accent); font-weight: 600; }
+
+  .summary-total {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 16px;
+    margin-top: 12px;
+    border-top: 1px solid var(--border);
+    font-family: var(--font);
+    font-weight: 800;
+    font-size: 1.3rem;
+  }
+  .summary-total .total-price { color: var(--accent); }
+
+  /* CONTACT FORM */
+  .contact-section {
+    max-width: 640px;
+    margin: 64px auto 0;
+    padding: 0 24px;
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+  .contact-section.visible { opacity: 1; transform: translateY(0); }
+
+  .contact-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    padding: 40px;
+  }
+
+  .contact-card h3 {
+    font-size: 1.5rem;
+    font-weight: 800;
+    margin-bottom: 8px;
+  }
+  .contact-card > p { color: var(--muted); margin-bottom: 28px; font-size: 0.95rem; }
+
+  .form-group { margin-bottom: 18px; }
+  .form-group label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--muted);
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  .form-group input,
+  .form-group textarea {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 14px 18px;
+    color: var(--text);
+    font-family: var(--font);
+    font-size: 0.95rem;
+    outline: none;
+    transition: border-color 0.2s;
+    resize: vertical;
+  }
+  .form-group input:focus,
+  .form-group textarea:focus {
+    border-color: rgba(61,255,192,0.4);
+  }
+  .form-group input::placeholder,
+  .form-group textarea::placeholder { color: var(--muted); }
+
+  .btn-order {
+    width: 100%;
+    background: var(--accent);
+    color: #000;
+    border: none;
+    padding: 18px;
+    border-radius: 50px;
+    font-family: var(--font);
+    font-weight: 800;
+    font-size: 1.05rem;
+    cursor: pointer;
+    margin-top: 8px;
+    transition: transform 0.2s, box-shadow 0.2s, opacity 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+  }
+  .btn-order:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 16px 48px rgba(0,113,227,0.3);
+  }
+  .btn-order:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  .order-warning {
+    font-size: 0.82rem;
+    color: var(--accent2);
+    text-align: center;
+    margin-top: 12px;
+    display: none;
+  }
+
+  /* MAIN LAYOUT */
+  .main-layout {
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: 40px;
+    align-items: start;
+  }
+
+  /* FOOTER */
+  footer {
+    text-align: center;
+    padding: 40px 24px 60px;
+    color: var(--muted);
+    font-size: 0.85rem;
+    border-top: 1px solid var(--border);
+    margin-top: 80px;
+  }
+
+  /* SCROLL ANIMATION */
+  .reveal {
+    opacity: 0;
+    transform: translateY(40px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+
+  /* RESPONSIVE */
+  @media (max-width: 768px) {
+    nav { padding: 16px 24px; }
+    .options-grid.cols-2,
+    .options-grid.cols-3,
+    .addons-grid { grid-template-columns: 1fr; }
+    .story-grid { grid-template-columns: 1fr; gap: 32px; }
+    .main-layout { grid-template-columns: 1fr; }
+    .summary-box { position: static; }
+    nav .nav-links { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="logo">Mini<span>Desk</span></div>
+  <div class="nav-links" style="display:flex;gap:32px;">
+    <a href="#story">The Story</a>
+    <a href="#configurator">Configure</a>
+    <a href="#order">Order</a>
+  </div>
+  <a href="#configurator" class="nav-cta">Build Your Setup →</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-glow"></div>
+  <div class="hero-badge">Mac Mini M4 · Lagos, Nigeria</div>
+  <h1>Your Dream Workstation,<br>Finally Affordable.</h1>
+  <p>Professional-grade setups built around the Mac Mini M4 — at a price that makes sense.</p>
+  <div class="hero-btns">
+    <a href="#configurator" class="btn-primary">Build My Setup →</a>
+    <a href="#story" class="btn-ghost">How It Started</a>
+  </div>
+  <div class="hero-stats">
+    <div class="stat">
+      <div class="stat-num">2</div>
+      <div class="stat-label">Curated Bundles</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">M4</div>
+      <div class="stat-label">Apple Silicon</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">∞</div>
+      <div class="stat-label">Combos Available</div>
+    </div>
+  </div>
+</section>
+
+<!-- STORY -->
+<section id="story" style="padding:100px 24px; background: var(--surface); border-top:1px solid var(--border); border-bottom:1px solid var(--border);">
+  <div class="story-grid section">
+    <div class="reveal">
+      <div class="section-label">The Origin Story</div>
+      <h2>A Video Editor's Eureka Moment</h2>
+      <p>Our co-founder is a seasoned video editor who was ready to spend a fortune building a custom PC to handle his demanding workflow — until he tried the Mac Mini M4.</p>
+      <p>Same price. Insane performance. And it fit in the palm of his hand. He got more done in less time than ever before.</p>
+      <p>That's when we asked: <em>How many creators, freelancers, and professionals out there want a powerful workstation but can't justify the cost?</em> This is for them.</p>
+    </div>
+    <div class="reveal" style="transition-delay:0.15s">
+      <div class="mac-card">
+        <span class="mac-icon">🖥️</span>
+        <h3>Mac Mini M4</h3>
+        <p>Base Configuration — the star of every bundle.</p>
+        <ul class="spec-list">
+          <li><span>Chip</span><span class="val">Apple M4</span></li>
+          <li><span>RAM</span><span class="val">16GB Unified</span></li>
+          <li><span>Storage</span><span class="val">256GB SSD</span></li>
+          <li><span>Ports</span><span class="val">3× USB-C, HDMI, USB-A</span></li>
+          <li><span>Performance</span><span class="val">Extraordinary</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONFIGURATOR -->
+<section id="configurator" class="configurator-wrap">
+  <div class="configurator-inner">
+    <div class="config-header reveal">
+      <div class="section-label">Build Your Bundle</div>
+      <h2>Choose Every Detail.<br>We Handle the Rest.</h2>
+      <p>Pick your bundle, customise your peripherals, and add what you need.</p>
+    </div>
+
+    <div class="main-layout">
+      <!-- LEFT: CONFIG STEPS -->
+      <div>
+
+        <!-- STEP 1: BUNDLE -->
+        <div class="step" id="step1">
+          <div class="step-header">
+            <div class="step-num">1</div>
+            <div class="step-title">Choose Your Bundle</div>
+          </div>
+          <div class="options-grid cols-2">
+            <label class="option-card" id="card-basic" onclick="selectBundle('basic')">
+              <input type="radio" name="bundle" value="basic">
+              <div class="option-check"></div>
+              <span class="option-emoji">💼</span>
+              <div class="option-name">Basic Work Bundle</div>
+              <div class="option-desc">Mac Mini M4 + Monitor + Keyboard + Mouse + USB-C Dongle. Everything to get to work.</div>
+              <div class="option-price">From ₦850,000</div>
+            </label>
+            <label class="option-card" id="card-full" onclick="selectBundle('full')">
+              <input type="radio" name="bundle" value="full">
+              <div class="option-check"></div>
+              <span class="option-emoji">🏢</span>
+              <div class="option-tag tag-full">Best Value</div>
+              <div class="option-name">Full Workspace Bundle</div>
+              <div class="option-desc">Everything in Basic + Workstation Desk + Chair + Keyboard Mat + Fancy Side Light.</div>
+              <div class="option-price">From ₦1,350,000</div>
+            </label>
+          </div>
+        </div>
+
+        <div class="config-divider"></div>
+
+        <!-- STEP 2: MONITOR -->
+        <div class="step" id="step2">
+          <div class="step-header">
+            <div class="step-num">2</div>
+            <div class="step-title">Select Your Monitor</div>
+            <div class="step-note">Sets your keyboard tier</div>
+          </div>
+          <div class="options-grid cols-3">
+            <label class="option-card" id="card-monitor-entry" onclick="selectMonitor('entry')">
+              <input type="radio" name="monitor" value="entry">
+              <div class="option-check"></div>
+              <div class="option-tag tag-entry">Entry Level</div>
+              <div class="option-emoji">🖥️</div>
+              <div class="option-name">Entry Monitor</div>
+              <div class="option-desc">24" FHD IPS, 75Hz. Perfect for everyday work and office tasks.</div>
+              <div class="option-price">₦95,000</div>
+            </label>
+            <label class="option-card" id="card-monitor-mid" onclick="selectMonitor('mid')">
+              <input type="radio" name="monitor" value="mid">
+              <div class="option-check"></div>
+              <div class="option-tag tag-mid">Mid Range</div>
+              <div class="option-emoji">🖥️</div>
+              <div class="option-name">Mid Monitor</div>
+              <div class="option-desc">27" QHD IPS, 144Hz. Ideal for video editing and creative work.</div>
+              <div class="option-price">₦185,000</div>
+            </label>
+            <label class="option-card" id="card-monitor-top" onclick="selectMonitor('top')">
+              <input type="radio" name="monitor" value="top">
+              <div class="option-check"></div>
+              <div class="option-tag tag-top">Top Tier</div>
+              <div class="option-emoji">🖥️</div>
+              <div class="option-name">Pro Monitor</div>
+              <div class="option-desc">32" 4K OLED, 144Hz HDR. The ultimate content creation display.</div>
+              <div class="option-price">₦380,000</div>
+            </label>
+          </div>
+          <div class="kb-note hidden" id="kb-auto-note">
+            ⌨️ <strong>Entry monitor selected</strong> — paired automatically with a Windows keyboard.
+          </div>
+          <div class="kb-note hidden" id="kb-upgrade-note">
+            ⌨️ <strong>Mid/Top monitor selected</strong> — you can upgrade to a Mac keyboard below.
+          </div>
+        </div>
+
+        <div class="config-divider"></div>
+
+        <!-- STEP 3: KEYBOARD -->
+        <div class="step" id="step3">
+          <div class="step-header">
+            <div class="step-num">3</div>
+            <div class="step-title">Your Keyboard</div>
+          </div>
+          <div class="options-grid cols-2" id="keyboard-options">
+            <label class="option-card" id="card-kb-windows" onclick="selectKeyboard('windows')">
+              <input type="radio" name="keyboard" value="windows">
+              <div class="option-check"></div>
+              <span class="option-emoji">⌨️</span>
+              <div class="option-name">Windows Keyboard</div>
+              <div class="option-desc">Wireless compact layout, compatible with any system. Clean and reliable.</div>
+              <div class="option-price">₦28,000</div>
+            </label>
+            <label class="option-card" id="card-kb-mac" onclick="selectKeyboard('mac')">
+              <input type="radio" name="keyboard" value="mac">
+              <div class="option-check"></div>
+              <span class="option-emoji">⌨️</span>
+              <div class="option-name">Apple Magic Keyboard</div>
+              <div class="option-desc">Slim, rechargeable, Touch ID — the native Mac experience. Unlocked with Mid/Top monitor.</div>
+              <div class="option-price">₦72,000</div>
+            </label>
+          </div>
+          <div class="kb-note hidden" id="kb-locked-note">
+            🔒 Apple Magic Keyboard is available with a Mid or Top tier monitor. Select Mid or Top above to unlock it.
+          </div>
+        </div>
+
+        <div class="config-divider"></div>
+
+        <!-- STEP 4: ADD-ONS -->
+        <div class="step" id="step4">
+          <div class="step-header">
+            <div class="step-num">4</div>
+            <div class="step-title">Optional Add-ons</div>
+            <div class="step-note">Add to either bundle</div>
+          </div>
+          <div class="addons-grid">
+            <label class="option-card" id="card-stand" onclick="toggleAddon('stand', this)">
+              <input type="checkbox" name="addon" value="stand">
+              <div class="option-check"></div>
+              <span class="option-emoji">📐</span>
+              <div class="option-name">Laptop Stand</div>
+              <div class="option-desc">Ergonomic aluminium stand. Works with MacBooks too.</div>
+              <div class="option-price">₦22,000</div>
+            </label>
+            <label class="option-card" id="card-ssd" onclick="toggleAddon('ssd', this)">
+              <input type="checkbox" name="addon" value="ssd">
+              <div class="option-check"></div>
+              <span class="option-emoji">💾</span>
+              <div class="option-name">SanDisk External SSD</div>
+              <div class="option-desc">1,024 MB/s transfer speed. Never worry about storage again.</div>
+              <div class="option-price">₦68,000</div>
+            </label>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- RIGHT: STICKY SUMMARY -->
+      <div>
+        <div class="summary-box reveal">
+          <div class="summary-title">📋 Your Configuration</div>
+          <div id="summary-lines">
+            <div style="color:var(--muted);font-size:0.88rem;text-align:center;padding:20px 0;">Select options to see your build here.</div>
+          </div>
+          <div class="summary-total" id="summary-total" style="display:none;">
+            <span>Total</span>
+            <span class="total-price" id="total-price">₦0</span>
+          </div>
+          <div style="margin-top:20px;">
+            <a href="#order" class="btn-primary" style="display:block;text-align:center;width:100%;font-size:0.95rem;padding:14px;">
+              Proceed to Order →
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ORDER FORM -->
+<section id="order" class="contact-section">
+  <div class="contact-card">
+    <h3>Almost There! 🎉</h3>
+    <p>Fill in your details below and we'll get back to you with payment info and delivery timeline.</p>
+
+    <div class="form-group">
+      <label>Full Name</label>
+      <input type="text" id="fname" placeholder="e.g. Chukwuemeka Obi" />
+    </div>
+    <div class="form-group">
+      <label>Email Address</label>
+      <input type="email" id="femail" placeholder="you@example.com" />
+    </div>
+    <div class="form-group">
+      <label>Phone Number</label>
+      <input type="tel" id="fphone" placeholder="+234 801 234 5678" />
+    </div>
+    <div class="form-group">
+      <label>Delivery Address</label>
+      <input type="text" id="faddress" placeholder="Street, City, State" />
+    </div>
+    <div class="form-group">
+      <label>Any special requests? (optional)</label>
+      <textarea id="fnotes" rows="3" placeholder="e.g. colour preferences, delivery window..."></textarea>
+    </div>
+
+    <button class="btn-order" id="order-btn" onclick="sendOrder()">
+      <span>📧</span> Send My Order
+    </button>
+    <div class="order-warning" id="order-warning">⚠️ Please complete your bundle configuration above first.</div>
+    <p style="font-size:0.8rem;color:var(--muted);text-align:center;margin-top:16px;">We respond within 24 hours · Delivery across Lagos & beyond</p>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="logo" style="margin-bottom:12px;font-size:1.2rem;">Mini<span style="color:var(--accent)">Desk</span></div>
+  <p>Built for Nigerian professionals who deserve world-class tools.</p>
+  <p style="margin-top:8px;">© 2025 MiniDesk. All rights reserved.</p>
+</footer>
+
+<script>
+  // ── STATE ──
+  const state = {
+    bundle: null,
+    monitor: null,
+    keyboard: null,
+    addons: []
+  };
+
+  const prices = {
+    bundle: { basic: 450000, full: 950000 },
+    monitor: { entry: 95000, mid: 185000, top: 380000 },
+    keyboard: { windows: 28000, mac: 72000 },
+    addon: { stand: 22000, ssd: 68000 },
+    // Included items (mouse + dongle)
+    included: 45000
+  };
+
+  const names = {
+    bundle: { basic: 'Basic Work Bundle', full: 'Full Workspace Bundle' },
+    monitor: { entry: 'Entry Monitor (24" FHD)', mid: 'Mid Monitor (27" QHD)', top: 'Pro Monitor (32" 4K OLED)' },
+    keyboard: { windows: 'Windows Keyboard', mac: 'Apple Magic Keyboard' },
+    addon: { stand: 'Laptop Stand', ssd: 'SanDisk External SSD' }
+  };
+
+  // ── BUNDLE SELECT ──
+  function selectBundle(val) {
+    state.bundle = val;
+    document.querySelectorAll('[id^="card-basic"],[id^="card-full"]').forEach(c => c.classList.remove('selected'));
+    document.getElementById('card-' + val).classList.add('selected');
+    updateSummary();
+  }
+
+  // ── MONITOR SELECT ──
+  function selectMonitor(val) {
+    state.monitor = val;
+    ['entry','mid','top'].forEach(m => document.getElementById('card-monitor-'+m).classList.remove('selected'));
+    document.getElementById('card-monitor-'+val).classList.add('selected');
+
+    // keyboard logic
+    const kbAutoNote = document.getElementById('kb-auto-note');
+    const kbUpNote = document.getElementById('kb-upgrade-note');
+    const kbLockedNote = document.getElementById('kb-locked-note');
+    const macCard = document.getElementById('card-kb-mac');
+
+    if (val === 'entry') {
+      // auto-select windows keyboard, lock mac
+      selectKeyboard('windows');
+      macCard.style.opacity = '0.35';
+      macCard.style.pointerEvents = 'none';
+      kbAutoNote.classList.remove('hidden');
+      kbUpNote.classList.add('hidden');
+      kbLockedNote.classList.remove('hidden');
+    } else {
+      macCard.style.opacity = '1';
+      macCard.style.pointerEvents = 'auto';
+      kbAutoNote.classList.add('hidden');
+      kbUpNote.classList.remove('hidden');
+      kbLockedNote.classList.add('hidden');
+      // default to windows if nothing selected
+      if (!state.keyboard) selectKeyboard('windows');
+    }
+    updateSummary();
+  }
+
+  // ── KEYBOARD SELECT ──
+  function selectKeyboard(val) {
+    if (val === 'mac' && state.monitor === 'entry') return;
+    state.keyboard = val;
+    ['windows','mac'].forEach(k => {
+      const c = document.getElementById('card-kb-'+k);
+      if (c) c.classList.remove('selected');
+    });
+    const el = document.getElementById('card-kb-'+val);
+    if (el) el.classList.add('selected');
+    updateSummary();
+  }
+
+  // ── ADDON TOGGLE ──
+  function toggleAddon(val, cardEl) {
+    const idx = state.addons.indexOf(val);
+    if (idx > -1) {
+      state.addons.splice(idx, 1);
+      cardEl.classList.remove('selected');
+    } else {
+      state.addons.push(val);
+      cardEl.classList.add('selected');
+    }
+    updateSummary();
+  }
+
+  // ── UPDATE SUMMARY ──
+  function updateSummary() {
+    const lines = document.getElementById('summary-lines');
+    const totalEl = document.getElementById('summary-total');
+    const priceEl = document.getElementById('total-price');
+
+    if (!state.bundle && !state.monitor) {
+      lines.innerHTML = '<div style="color:var(--muted);font-size:0.88rem;text-align:center;padding:20px 0;">Select options to see your build here.</div>';
+      totalEl.style.display = 'none';
+      return;
+    }
+
+    let total = 0;
+    let html = '';
+
+    if (state.bundle) {
+      const p = prices.bundle[state.bundle];
+      total += p;
+      html += summaryLine(names.bundle[state.bundle], p);
+    }
+    if (state.monitor) {
+      const p = prices.monitor[state.monitor];
+      total += p;
+      html += summaryLine(names.monitor[state.monitor], p);
+    }
+    if (state.keyboard) {
+      const p = prices.keyboard[state.keyboard];
+      total += p;
+      html += summaryLine(names.keyboard[state.keyboard], p);
+    }
+    // Mouse + Dongle always included
+    if (state.bundle) {
+      total += prices.included;
+      html += summaryLine('Mouse + USB-C Dongle', prices.included);
+    }
+    state.addons.forEach(a => {
+      const p = prices.addon[a];
+      total += p;
+      html += summaryLine(names.addon[a], p);
+    });
+
+    lines.innerHTML = html;
+    totalEl.style.display = 'flex';
+    priceEl.textContent = '₦' + total.toLocaleString();
+  }
+
+  function summaryLine(name, price) {
+    return `<div class="summary-line"><span class="item-name">${name}</span><span class="item-price">₦${price.toLocaleString()}</span></div>`;
+  }
+
+  // ── SEND ORDER ──
+  function sendOrder() {
+    if (!state.bundle || !state.monitor || !state.keyboard) {
+      document.getElementById('order-warning').style.display = 'block';
+      setTimeout(() => document.getElementById('order-warning').style.display = 'none', 4000);
+      return;
+    }
+
+    const name = document.getElementById('fname').value || 'Not provided';
+    const email = document.getElementById('femail').value || 'Not provided';
+    const phone = document.getElementById('fphone').value || 'Not provided';
+    const address = document.getElementById('faddress').value || 'Not provided';
+    const notes = document.getElementById('fnotes').value || 'None';
+
+    // calc total
+    let total = prices.bundle[state.bundle] + prices.monitor[state.monitor] + prices.keyboard[state.keyboard] + prices.included;
+    state.addons.forEach(a => total += prices.addon[a]);
+
+    const addonsText = state.addons.length > 0 ? state.addons.map(a => names.addon[a]).join(', ') : 'None';
+
+    const body = `
+NEW ORDER — MiniDesk
+
+CUSTOMER DETAILS
+----------------
+Name: ${name}
+Email: ${email}
+Phone: ${phone}
+Delivery Address: ${address}
+
+ORDER SUMMARY
+-------------
+Bundle: ${names.bundle[state.bundle]}
+Monitor: ${names.monitor[state.monitor]}
+Keyboard: ${names.keyboard[state.keyboard]}
+Mouse + USB-C Dongle: Included
+Add-ons: ${addonsText}
+
+TOTAL: ₦${total.toLocaleString()}
+
+Special Requests: ${notes}
+
+---
+Sent via MiniDesk Configurator
+`.trim();
+
+    const to = 'eyituoyo.agbeyegbe@gmail.com,danieljesusegun@gmail.com';
+    const subject = encodeURIComponent(`New MiniDesk Order — ${names.bundle[state.bundle]} — ${name}`);
+    const encodedBody = encodeURIComponent(body);
+
+    window.location.href = `mailto:${to}?subject=${subject}&body=${encodedBody}`;
+  }
+
+  // ── SCROLL ANIMATIONS ──
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+      }
+    });
+  }, { threshold: 0.12 });
+
+  document.querySelectorAll('.reveal, .step, .contact-section').forEach(el => {
+    observer.observe(el);
+  });
+
+  // Stagger steps
+  document.querySelectorAll('.step').forEach((el, i) => {
+    el.style.transitionDelay = (i * 0.1) + 's';
+  });
+</script>
+
+</body>
+</html>
