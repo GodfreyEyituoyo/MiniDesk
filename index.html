@@ -19,6 +19,17 @@
             --radius: 16px;
             --radius-sm: 10px;
             --font: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+            --nav-bg: rgba(8, 11, 16, 0.85);
+        }
+
+        [data-theme="light"] {
+            --bg: #f5f5f7;
+            --surface: #ffffff;
+            --surface2: #e8e8ed;
+            --border: rgba(0, 0, 0, 0.1);
+            --text: #1d1d1f;
+            --muted: #6e6e73;
+            --nav-bg: rgba(245, 245, 247, 0.85);
         }
 
         *,
@@ -74,9 +85,32 @@
             align-items: center;
             justify-content: space-between;
             padding: 20px 48px;
-            background: rgba(8, 11, 16, 0.85);
+            background: var(--nav-bg);
             backdrop-filter: blur(20px);
             border-bottom: 1px solid var(--border);
+        }
+
+        /* ── THEME TOGGLE ── */
+        .theme-toggle {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: rgba(128, 128, 128, 0.12);
+            border: 1px solid var(--border);
+            color: var(--text);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            transition: background 0.2s, transform 0.3s;
+            margin-left: 16px;
+            flex-shrink: 0;
+        }
+
+        .theme-toggle:hover {
+            background: rgba(128, 128, 128, 0.22);
+            transform: rotate(20deg);
         }
 
         .logo {
@@ -124,9 +158,18 @@
             align-items: center;
             justify-content: flex-start;
             text-align: center;
-            padding: 100px 24px 80px;
+            padding: 140px 24px 80px;
             position: relative;
             overflow: hidden;
+        }
+
+        .hero-badge,
+        .hero h1,
+        .hero p,
+        .hero-btns,
+        .hero-stats {
+            position: relative;
+            z-index: 2;
         }
 
         /* ── HERO SLIDESHOW ── */
@@ -153,38 +196,77 @@
             content: '';
             position: absolute;
             inset: 0;
-            background: rgba(0, 0, 0, 0.6);
+            background: rgba(0, 0, 0, 0.55);
             z-index: 1;
         }
 
-        .hero>*:not(.hero-slideshow) {
-            position: relative;
-            z-index: 2;
-        }
-
-        .slideshow-dots {
+        /* ── SLIDESHOW CONTROLS (Apple style) ── */
+        .slideshow-controls {
             position: absolute;
             bottom: 40px;
             left: 50%;
             transform: translateX(-50%);
             display: flex;
-            gap: 12px;
+            align-items: center;
+            gap: 10px;
             z-index: 3;
         }
 
-        .dot {
+        /* Left pill — play/pause button */
+        .slideshow-playpause {
+            background: rgba(60, 60, 60, 0.72);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border: none;
+            border-radius: 50px;
+            width: 44px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: #fff;
+            transition: background 0.2s;
+        }
+
+        .slideshow-playpause:hover {
+            background: rgba(90, 90, 90, 0.82);
+        }
+
+        .slideshow-playpause svg {
             width: 12px;
             height: 12px;
+            fill: #fff;
+        }
+
+        /* Right pill — navigation dots */
+        .slideshow-dots {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(60, 60, 60, 0.72);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border-radius: 50px;
+            padding: 7px 12px;
+        }
+
+        .dot {
+            width: 7px;
+            height: 7px;
             border-radius: 50%;
-            background: rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.35);
             border: none;
             cursor: pointer;
-            transition: background 0.3s, transform 0.3s;
+            transition: background 0.3s ease, width 0.35s ease, border-radius 0.35s ease;
+            padding: 0;
+            flex-shrink: 0;
         }
 
         .dot.active {
-            background: var(--accent);
-            transform: scale(1.2);
+            background: #fff;
+            width: 26px;
+            border-radius: 50px;
         }
 
         .dot:hover {
@@ -240,10 +322,11 @@
         }
 
         .hero h1 {
-            font-size: clamp(2.4rem, 5vw, 4.2rem);
+            font-size: clamp(2rem, 4vw, 3.5rem);
             font-weight: 800;
-            letter-spacing: -2px;
-            max-width: 900px;
+            letter-spacing: -1.5px;
+            max-width: 800px;
+            margin-top: 48px;
             margin-bottom: 24px;
             background: linear-gradient(135deg, #fff 40%, rgba(255, 255, 255, 0.5));
             -webkit-background-clip: text;
@@ -253,7 +336,7 @@
 
         .hero p {
             font-size: 1.2rem;
-            color: var(--muted);
+            color: #a1a1aa;
             max-width: 520px;
             margin-bottom: 48px;
             font-weight: 300;
@@ -435,7 +518,7 @@
         }
 
         .configurator-inner {
-            max-width: 960px;
+            max-width: 1200px;
             margin: 0 auto;
         }
 
@@ -604,6 +687,23 @@
             font-weight: 700;
             font-size: 1rem;
             color: var(--accent);
+        }
+
+        .product-img-tray {
+            background: #f0f0f0;
+            border-radius: 12px;
+            padding: 14px;
+            margin: 12px 0 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .product-img-tray img {
+            width: 100%;
+            max-height: 110px;
+            object-fit: contain;
+            border-radius: 6px;
         }
 
         .option-tag {
@@ -900,12 +1000,13 @@
     <!-- NAV -->
     <nav>
         <div class="logo">Mini<span>Desk</span></div>
-        <div class="nav-links" style="display:flex;gap:32px;">
+        <div style="display:flex;align-items:center;gap:28px;">
             <a href="#story">The Story</a>
             <a href="#configurator">Configure</a>
             <a href="#order">Order</a>
+            <button class="theme-toggle" id="theme-toggle" onclick="toggleTheme()"
+                title="Toggle light / dark mode">🌙</button>
         </div>
-        <a href="#configurator" class="nav-cta">Build Your Setup →</a>
     </nav>
 
     <!-- HERO -->
@@ -915,14 +1016,9 @@
             <div class="slide" style="background-image: url('images/hero2.jpg')"></div>
             <div class="slide" style="background-image: url('images/hero3.jpg')"></div>
         </div>
-        <div class="slideshow-dots">
-            <button class="dot active" onclick="goToSlide(0)"></button>
-            <button class="dot" onclick="goToSlide(1)"></button>
-            <button class="dot" onclick="goToSlide(2)"></button>
-        </div>
         <div class="hero-glow"></div>
         <div class="hero-badge">Mac Mini M4 · Lagos, Nigeria</div>
-        <h1><span style="white-space:nowrap">Your Dream Workstation,</span><br>Finally Affordable.</h1>
+        <h1>Your Dream Workstation,<br>Finally Affordable.</h1>
         <p>Professional-grade setups built around the Mac Mini M4 — at a price that makes sense.</p>
         <div class="hero-btns">
             <a href="#configurator" class="btn-primary">Build My Setup →</a>
@@ -940,6 +1036,20 @@
             <div class="stat">
                 <div class="stat-num">∞</div>
                 <div class="stat-label">Combos Available</div>
+            </div>
+        </div>
+        <!-- Slideshow controls (Apple style: separate pills) -->
+        <div class="slideshow-controls">
+            <button class="slideshow-playpause" id="playpause-btn" onclick="togglePlayPause()" title="Pause">
+                <svg viewBox="0 0 12 12" width="12" height="12" fill="#fff">
+                    <rect x="1" y="0" width="3.5" height="12" rx="1" />
+                    <rect x="7.5" y="0" width="3.5" height="12" rx="1" />
+                </svg>
+            </button>
+            <div class="slideshow-dots">
+                <button class="dot active" onclick="goToSlide(0)"></button>
+                <button class="dot" onclick="goToSlide(1)"></button>
+                <button class="dot" onclick="goToSlide(2)"></button>
             </div>
         </div>
     </section>
@@ -960,7 +1070,8 @@
             </div>
             <div class="reveal" style="transition-delay:0.15s">
                 <div class="mac-card">
-                    <span class="mac-icon">🖥️</span>
+                    <img src="images/macmini-m4.jpg" alt="Mac Mini M4"
+                        style="width:100%;max-width:280px;border-radius:16px;margin-bottom:20px;">
                     <h3>Mac Mini M4</h3>
                     <p>Base Configuration — the star of every bundle.</p>
                     <ul class="spec-list">
@@ -993,12 +1104,17 @@
                         <div class="step-header">
                             <div class="step-num">1</div>
                             <div class="step-title">Choose Your Bundle</div>
+                            <button id="clear-bundle-btn" onclick="clearBundle()"
+                                style="display:none;margin-left:auto;background:none;border:1px solid var(--border);color:var(--muted);font-size:0.78rem;padding:4px 12px;border-radius:50px;cursor:pointer;font-family:var(--font);transition:color 0.2s,border-color 0.2s;"
+                                onmouseover="this.style.color='var(--text)';this.style.borderColor='rgba(255,255,255,0.3)';"
+                                onmouseout="this.style.color='var(--muted)';this.style.borderColor='var(--border)';">✕
+                                Clear</button>
                         </div>
                         <div class="options-grid cols-2">
                             <label class="option-card" id="card-basic" onclick="selectBundle('basic')">
                                 <input type="radio" name="bundle" value="basic">
                                 <div class="option-check"></div>
-                                <span class="option-emoji">💼</span>
+                                <span class="option-emoji">⚡</span>
                                 <div class="option-name">Basic Work Bundle</div>
                                 <div class="option-desc">Mac Mini M4 + Monitor + Keyboard + Mouse + USB-C Dongle.
                                     Everything to get to work.</div>
@@ -1007,7 +1123,7 @@
                             <label class="option-card" id="card-full" onclick="selectBundle('full')">
                                 <input type="radio" name="bundle" value="full">
                                 <div class="option-check"></div>
-                                <span class="option-emoji">🏢</span>
+                                <span class="option-emoji">🚀</span>
                                 <div class="option-tag tag-full">Best Value</div>
                                 <div class="option-name">Full Workspace Bundle</div>
                                 <div class="option-desc">Everything in Basic + Workstation Desk + Chair + Keyboard Mat +
@@ -1025,36 +1141,98 @@
                             <div class="step-num">2</div>
                             <div class="step-title">Select Your Monitor</div>
                             <div class="step-note">Sets your keyboard tier</div>
+                            <button id="clear-monitor-btn" onclick="clearMonitor()"
+                                style="display:none;margin-left:8px;background:none;border:1px solid var(--border);color:var(--muted);font-size:0.78rem;padding:4px 12px;border-radius:50px;cursor:pointer;font-family:var(--font);transition:color 0.2s,border-color 0.2s;"
+                                onmouseover="this.style.color='var(--text)';this.style.borderColor='rgba(255,255,255,0.3)';"
+                                onmouseout="this.style.color='var(--muted)';this.style.borderColor='var(--border)';">✕
+                                Clear</button>
                         </div>
                         <div class="options-grid cols-3">
                             <label class="option-card" id="card-monitor-entry" onclick="selectMonitor('entry')">
                                 <input type="radio" name="monitor" value="entry">
                                 <div class="option-check"></div>
                                 <div class="option-tag tag-entry">Entry Level</div>
-                                <div class="option-emoji">🖥️</div>
-                                <div class="option-name">Entry Monitor</div>
-                                <div class="option-desc">24" FHD IPS, 75Hz. Perfect for everyday work and office tasks.
+                                <div class="product-img-tray">
+                                    <img src="images/monitor-entry.png" alt="Dell SE2726HG">
                                 </div>
+                                <div class="option-name">Dell SE2726HG</div>
+                                <div class="option-desc">Perfect for all your entertainment and gaming, this 27-inch FHD
+                                    monitor features a high 240Hz refresh rate, fast IPS panel, and is certified by TÜV
+                                    Rheinland® for 3-star eye comfort.</div>
+                                <ul
+                                    style="list-style:none;font-size:0.78rem;color:var(--muted);margin:8px 0 10px;line-height:1.7;">
+                                    <li><svg width="13" height="13" viewBox="0 0 14 14" fill="none"
+                                            style="vertical-align:middle;margin-right:4px;">
+                                            <polyline points="8,2 12,2 12,6" stroke="#c0601a" stroke-width="1.6"
+                                                fill="none" stroke-linecap="round" stroke-linejoin="round" />
+                                            <line x1="12" y1="2" x2="7" y2="7" stroke="#c0601a" stroke-width="1.6"
+                                                stroke-linecap="round" />
+                                            <polyline points="6,12 2,12 2,8" stroke="#c0601a" stroke-width="1.6"
+                                                fill="none" stroke-linecap="round" stroke-linejoin="round" />
+                                            <line x1="2" y1="12" x2="7" y2="7" stroke="#c0601a" stroke-width="1.6"
+                                                stroke-linecap="round" />
+                                        </svg>27" · 1920×1080 FHD · 240Hz</li>
+                                    <li>🖼 IPS Panel · HDR · VRR</li>
+                                    <li>🔌 2× HDMI 2.1 · 1× DisplayPort 1.4</li>
+                                </ul>
                                 <div class="option-price">₦95,000</div>
                             </label>
                             <label class="option-card" id="card-monitor-mid" onclick="selectMonitor('mid')">
                                 <input type="radio" name="monitor" value="mid">
                                 <div class="option-check"></div>
                                 <div class="option-tag tag-mid">Mid Range</div>
-                                <div class="option-emoji">🖥️</div>
-                                <div class="option-name">Mid Monitor</div>
-                                <div class="option-desc">27" QHD IPS, 144Hz. Ideal for video editing and creative work.
+                                <div class="product-img-tray">
+                                    <img src="images/monitor-mid.png" alt="Dell S2725DS">
                                 </div>
+                                <div class="option-name">Dell S2725DS</div>
+                                <div class="option-desc">A stunning 27-inch QHD display with height-adjustable stand,
+                                    built-in stereo speakers, and wide colour coverage — ideal for creative work and
+                                    multitasking.</div>
+                                <ul
+                                    style="list-style:none;font-size:0.78rem;color:var(--muted);margin:8px 0 10px;line-height:1.7;">
+                                    <li><svg width="13" height="13" viewBox="0 0 14 14" fill="none"
+                                            style="vertical-align:middle;margin-right:4px;">
+                                            <polyline points="8,2 12,2 12,6" stroke="#c0601a" stroke-width="1.6"
+                                                fill="none" stroke-linecap="round" stroke-linejoin="round" />
+                                            <line x1="12" y1="2" x2="7" y2="7" stroke="#c0601a" stroke-width="1.6"
+                                                stroke-linecap="round" />
+                                            <polyline points="6,12 2,12 2,8" stroke="#c0601a" stroke-width="1.6"
+                                                fill="none" stroke-linecap="round" stroke-linejoin="round" />
+                                            <line x1="2" y1="12" x2="7" y2="7" stroke="#c0601a" stroke-width="1.6"
+                                                stroke-linecap="round" />
+                                        </svg>27" · 2560×1440 QHD · 100Hz</li>
+                                    <li>🔊 2× 5W Built-in Speakers · VRR</li>
+                                    <li>🔌 2× HDMI 2.1 · 1× DisplayPort 1.2</li>
+                                </ul>
                                 <div class="option-price">₦185,000</div>
                             </label>
                             <label class="option-card" id="card-monitor-top" onclick="selectMonitor('top')">
                                 <input type="radio" name="monitor" value="top">
                                 <div class="option-check"></div>
                                 <div class="option-tag tag-top">Top Tier</div>
-                                <div class="option-emoji">🖥️</div>
-                                <div class="option-name">Pro Monitor</div>
-                                <div class="option-desc">32" 4K OLED, 144Hz HDR. The ultimate content creation display.
+                                <div class="product-img-tray">
+                                    <img src="images/monitor-top.png" alt="Dell S2725QS">
                                 </div>
+                                <div class="option-name">Dell S2725QS</div>
+                                <div class="option-desc">Breathtaking 4K clarity on a 27-inch IPS display with
+                                    height-adjustable stand and impeccable colour accuracy — the ultimate screen for
+                                    professionals.</div>
+                                <ul
+                                    style="list-style:none;font-size:0.78rem;color:var(--muted);margin:8px 0 10px;line-height:1.7;">
+                                    <li><svg width="13" height="13" viewBox="0 0 14 14" fill="none"
+                                            style="vertical-align:middle;margin-right:4px;">
+                                            <polyline points="8,2 12,2 12,6" stroke="#c0601a" stroke-width="1.6"
+                                                fill="none" stroke-linecap="round" stroke-linejoin="round" />
+                                            <line x1="12" y1="2" x2="7" y2="7" stroke="#c0601a" stroke-width="1.6"
+                                                stroke-linecap="round" />
+                                            <polyline points="6,12 2,12 2,8" stroke="#c0601a" stroke-width="1.6"
+                                                fill="none" stroke-linecap="round" stroke-linejoin="round" />
+                                            <line x1="2" y1="12" x2="7" y2="7" stroke="#c0601a" stroke-width="1.6"
+                                                stroke-linecap="round" />
+                                        </svg>27" · 3840×2160 4K UHD · 120Hz</li>
+                                    <li>🔊 Built-in Audio · HDR · VRR</li>
+                                    <li>🔌 2× HDMI 2.1 · USB-C 65W PD · USB Hub</li>
+                                </ul>
                                 <div class="option-price">₦380,000</div>
                             </label>
                         </div>
@@ -1110,23 +1288,28 @@
                             <div class="step-note">Add to either bundle</div>
                         </div>
                         <div class="addons-grid">
-                            <label class="option-card" id="card-stand" onclick="toggleAddon('stand', this)">
-                                <input type="checkbox" name="addon" value="stand">
+                            <div class="option-card" id="card-stand" onclick="toggleAddon('stand', this)"
+                                style="cursor:pointer;">
                                 <div class="option-check"></div>
-                                <span class="option-emoji">📐</span>
-                                <div class="option-name">Laptop Stand</div>
-                                <div class="option-desc">Ergonomic aluminium stand. Works with MacBooks too.</div>
-                                <div class="option-price">₦22,000</div>
-                            </label>
-                            <label class="option-card" id="card-ssd" onclick="toggleAddon('ssd', this)">
-                                <input type="checkbox" name="addon" value="ssd">
-                                <div class="option-check"></div>
-                                <span class="option-emoji">💾</span>
-                                <div class="option-name">SanDisk External SSD</div>
-                                <div class="option-desc">1,024 MB/s transfer speed. Never worry about storage again.
+                                <div class="product-img-tray">
+                                    <img src="images/addon-stand.jpg" alt="Laptop Stand">
                                 </div>
+                                <div class="option-name">Laptop Stand</div>
+                                <div class="option-desc">Foldable, adjustable-height aluminium stand. Elevates your
+                                    screen for better ergonomics. Works with MacBooks too.</div>
+                                <div class="option-price">₦22,000</div>
+                            </div>
+                            <div class="option-card" id="card-ssd" onclick="toggleAddon('ssd', this)"
+                                style="cursor:pointer;">
+                                <div class="option-check"></div>
+                                <div class="product-img-tray">
+                                    <img src="images/addon-ssd.jpg" alt="SanDisk Extreme SSD">
+                                </div>
+                                <div class="option-name">SanDisk 1TB Extreme Portable SSD</div>
+                                <div class="option-desc">Blazing-fast 1,050MB/s read speeds. Rugged, pocket-sized, and
+                                    USB-C ready. Never worry about storage again.</div>
                                 <div class="option-price">₦68,000</div>
-                            </label>
+                            </div>
                         </div>
                     </div>
 
@@ -1221,9 +1404,9 @@
 
         const names = {
             bundle: { basic: 'Basic Work Bundle', full: 'Full Workspace Bundle' },
-            monitor: { entry: 'Entry Monitor (24" FHD)', mid: 'Mid Monitor (27" QHD)', top: 'Pro Monitor (32" 4K OLED)' },
+            monitor: { entry: 'Dell SE2726HG (27" FHD 240Hz)', mid: 'Dell S2725DS (27" QHD 100Hz)', top: 'Dell S2725QS (27" 4K UHD)' },
             keyboard: { windows: 'Windows Keyboard', mac: 'Apple Magic Keyboard' },
-            addon: { stand: 'Laptop Stand', ssd: 'SanDisk External SSD' }
+            addon: { stand: 'Laptop Stand', ssd: 'SanDisk 1TB Extreme Portable SSD' }
         };
 
         // ── BUNDLE SELECT ──
@@ -1231,6 +1414,9 @@
             state.bundle = val;
             document.querySelectorAll('[id^="card-basic"],[id^="card-full"]').forEach(c => c.classList.remove('selected'));
             document.getElementById('card-' + val).classList.add('selected');
+            // Show the clear button
+            const clearBtn = document.getElementById('clear-bundle-btn');
+            if (clearBtn) clearBtn.style.display = 'inline-flex';
             updateSummary();
         }
 
@@ -1240,6 +1426,10 @@
             ['entry', 'mid', 'top'].forEach(m => document.getElementById('card-monitor-' + m).classList.remove('selected'));
             document.getElementById('card-monitor-' + val).classList.add('selected');
 
+            // Show clear button
+            const clearMonBtn = document.getElementById('clear-monitor-btn');
+            if (clearMonBtn) clearMonBtn.style.display = 'inline-flex';
+
             // keyboard logic
             const kbAutoNote = document.getElementById('kb-auto-note');
             const kbUpNote = document.getElementById('kb-upgrade-note');
@@ -1247,7 +1437,6 @@
             const macCard = document.getElementById('card-kb-mac');
 
             if (val === 'entry') {
-                // auto-select windows keyboard, lock mac
                 selectKeyboard('windows');
                 macCard.style.opacity = '0.35';
                 macCard.style.pointerEvents = 'none';
@@ -1260,11 +1449,32 @@
                 kbAutoNote.classList.add('hidden');
                 kbUpNote.classList.remove('hidden');
                 kbLockedNote.classList.add('hidden');
-                // default to windows if nothing selected
                 if (!state.keyboard) selectKeyboard('windows');
             }
             updateSummary();
         }
+
+        window.clearMonitor = function () {
+            state.monitor = null;
+            state.keyboard = null;
+            ['entry', 'mid', 'top'].forEach(m => {
+                const c = document.getElementById('card-monitor-' + m);
+                if (c) c.classList.remove('selected');
+            });
+            ['windows', 'mac'].forEach(k => {
+                const c = document.getElementById('card-kb-' + k);
+                if (c) c.classList.remove('selected');
+            });
+            // Reset keyboard UI
+            const macCard = document.getElementById('card-kb-mac');
+            if (macCard) { macCard.style.opacity = '1'; macCard.style.pointerEvents = 'auto'; }
+            ['kb-auto-note', 'kb-upgrade-note', 'kb-locked-note'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.classList.add('hidden');
+            });
+            document.getElementById('clear-monitor-btn').style.display = 'none';
+            updateSummary();
+        };
 
         // ── KEYBOARD SELECT ──
         function selectKeyboard(val) {
@@ -1417,6 +1627,11 @@ Sent via MiniDesk Configurator
         const slides = document.querySelectorAll('.hero-slideshow .slide');
         const dots = document.querySelectorAll('.dot');
         let currentSlide = 0;
+        let isPlaying = true;
+        let slideshowTimer = null;
+
+        const pauseSVG = `<svg id="pp-icon" viewBox="0 0 12 12" width="12" height="12" fill="#fff"><rect x="1" y="0" width="3.5" height="12" rx="1"/><rect x="7.5" y="0" width="3.5" height="12" rx="1"/></svg>`;
+        const playSVG = `<svg id="pp-icon" viewBox="0 0 12 12" width="12" height="12" fill="#fff"><polygon points="1,0 11,6 1,12"/></svg>`;
 
         window.goToSlide = function (index) {
             slides[currentSlide].classList.remove('active');
@@ -1424,6 +1639,57 @@ Sent via MiniDesk Configurator
             currentSlide = index;
             slides[currentSlide].classList.add('active');
             dots[currentSlide].classList.add('active');
+        };
+
+        function advanceSlide() {
+            goToSlide((currentSlide + 1) % slides.length);
+        }
+
+        function startAutoPlay() {
+            clearInterval(slideshowTimer);
+            slideshowTimer = setInterval(advanceSlide, 4000);
+        }
+
+        window.togglePlayPause = function () {
+            const btn = document.getElementById('playpause-btn');
+            if (isPlaying) {
+                clearInterval(slideshowTimer);
+                btn.innerHTML = playSVG;
+                btn.title = 'Play';
+            } else {
+                startAutoPlay();
+                btn.innerHTML = pauseSVG;
+                btn.title = 'Pause';
+            }
+            isPlaying = !isPlaying;
+        };
+
+        // Start auto-play on load
+        startAutoPlay();
+
+        // ── BUNDLE CLEAR ──
+        window.clearBundle = function () {
+            state.bundle = null;
+            ['basic', 'full'].forEach(v => {
+                const c = document.getElementById('card-' + v);
+                if (c) c.classList.remove('selected');
+            });
+            document.getElementById('clear-bundle-btn').style.display = 'none';
+            updateSummary();
+        };
+
+        // ── THEME TOGGLE ──
+        let isDark = true;
+        window.toggleTheme = function () {
+            isDark = !isDark;
+            const btn = document.getElementById('theme-toggle');
+            if (isDark) {
+                document.documentElement.removeAttribute('data-theme');
+                btn.textContent = '🌙';
+            } else {
+                document.documentElement.setAttribute('data-theme', 'light');
+                btn.textContent = '☀️';
+            }
         };
     </script>
 
