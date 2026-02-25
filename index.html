@@ -220,8 +220,8 @@
             -webkit-backdrop-filter: blur(14px);
             border: none;
             border-radius: 50px;
-            width: 44px;
-            height: 30px;
+            width: 56px;
+            height: 40px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -235,8 +235,8 @@
         }
 
         .slideshow-playpause svg {
-            width: 12px;
-            height: 12px;
+            width: 16px;
+            height: 16px;
             fill: #fff;
         }
 
@@ -244,17 +244,17 @@
         .slideshow-dots {
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 10px;
             background: rgba(60, 60, 60, 0.72);
             backdrop-filter: blur(14px);
             -webkit-backdrop-filter: blur(14px);
             border-radius: 50px;
-            padding: 7px 12px;
+            padding: 10px 18px;
         }
 
         .dot {
-            width: 7px;
-            height: 7px;
+            width: 10px;
+            height: 10px;
             border-radius: 50%;
             background: rgba(255, 255, 255, 0.35);
             border: none;
@@ -266,7 +266,7 @@
 
         .dot.active {
             background: #fff;
-            width: 26px;
+            width: 34px;
             border-radius: 50px;
         }
 
@@ -289,9 +289,9 @@
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            background: rgba(0, 113, 227, 0.1);
-            border: 1px solid rgba(0, 113, 227, 0.3);
-            color: var(--accent);
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
             font-size: 0.8rem;
             font-weight: 600;
             letter-spacing: 0.08em;
@@ -299,6 +299,7 @@
             padding: 8px 18px;
             border-radius: 50px;
             margin-bottom: 32px;
+            backdrop-filter: blur(10px);
         }
 
         .hero-badge::before {
@@ -333,6 +334,14 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
+        }
+
+        .hero-gradient-text {
+            background: none;
+            -webkit-background-clip: unset;
+            background-clip: unset;
+            -webkit-text-fill-color: #5b2de4;
+            color: #5b2de4;
         }
 
         .hero p {
@@ -390,6 +399,16 @@
             background: rgba(255, 255, 255, 0.04);
         }
 
+        [data-theme="light"] .btn-ghost {
+            color: #1d1d1f;
+            border-color: #1d1d1f;
+        }
+
+        [data-theme="light"] .btn-ghost:hover {
+            background: rgba(0, 0, 0, 0.06);
+            border-color: #1d1d1f;
+        }
+
         .hero-stats {
             display: flex;
             gap: 48px;
@@ -404,15 +423,16 @@
 
         .stat-num {
             font-family: var(--font);
-            font-size: 2rem;
+            font-size: 2.2rem;
             font-weight: 800;
             color: var(--accent);
         }
 
         .stat-label {
-            font-size: 0.85rem;
-            color: var(--muted);
+            font-size: 0.95rem;
+            color: #a1a1aa;
             margin-top: 4px;
+            font-weight: 500;
         }
 
         /* ── STORY SECTION ── */
@@ -693,7 +713,7 @@
         .product-img-tray {
             background: #f0f0f0;
             border-radius: 12px;
-            padding: 14px;
+            padding: 8px;
             margin: 12px 0 10px;
             display: flex;
             align-items: center;
@@ -702,7 +722,7 @@
 
         .product-img-tray img {
             width: 100%;
-            max-height: 110px;
+            max-height: 130px;
             object-fit: contain;
             border-radius: 6px;
         }
@@ -1293,7 +1313,7 @@
                                 style="cursor:pointer;">
                                 <div class="option-check"></div>
                                 <div class="product-img-tray">
-                                    <img src="images/addon-stand.jpg" alt="Laptop Stand">
+                                    <img src="images/addon-stand.png" alt="Laptop Stand">
                                 </div>
                                 <div class="option-name">Laptop Stand</div>
                                 <div class="option-desc">Foldable, adjustable-height aluminium stand. Elevates your
@@ -1304,7 +1324,7 @@
                                 style="cursor:pointer;">
                                 <div class="option-check"></div>
                                 <div class="product-img-tray">
-                                    <img src="images/addon-ssd.jpg" alt="SanDisk Extreme SSD">
+                                    <img src="images/addon-ssd.png" alt="SanDisk Extreme SSD">
                                 </div>
                                 <div class="option-name">SanDisk 1TB Extreme Portable SSD</div>
                                 <div class="option-desc">Blazing-fast 1,050MB/s read speeds. Rugged, pocket-sized, and
