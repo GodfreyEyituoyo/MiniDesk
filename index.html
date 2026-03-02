@@ -357,6 +357,7 @@
             gap: 16px;
             flex-wrap: wrap;
             justify-content: center;
+            margin-top: 24px;
         }
 
         .btn-primary {
@@ -713,7 +714,7 @@
         .product-img-tray {
             background: #f0f0f0;
             border-radius: 12px;
-            padding: 8px;
+            padding: 4px;
             margin: 12px 0 10px;
             display: flex;
             align-items: center;
@@ -722,9 +723,13 @@
 
         .product-img-tray img {
             width: 100%;
-            max-height: 130px;
+            max-height: 120px;
             object-fit: contain;
             border-radius: 6px;
+        }
+
+        .addons-grid .product-img-tray img {
+            object-fit: cover;
         }
 
         .option-tag {
@@ -756,6 +761,31 @@
         .tag-full {
             background: rgba(0, 113, 227, 0.12);
             color: var(--accent);
+        }
+
+        .tag-creator {
+            background: rgba(212, 175, 55, 0.15);
+            color: #d4af37;
+        }
+
+        /* Disabled step overlay */
+        .step-disabled {
+            opacity: 0.4;
+            pointer-events: none;
+            position: relative;
+        }
+
+        .step-disabled-note {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 14px 18px;
+            font-size: 0.88rem;
+            color: var(--muted);
+            margin-top: 12px;
         }
 
         /* KEYBOARD AUTO NOTE */
@@ -1020,7 +1050,7 @@
 
     <!-- NAV -->
     <nav>
-        <div class="logo">Mini<span>Desk</span></div>
+        <a href="#" class="logo" style="text-decoration:none;">Mini<span>Desk</span></a>
         <div style="display:flex;align-items:center;gap:28px;">
             <a href="#story">The Story</a>
             <a href="#configurator">Configure</a>
@@ -1168,7 +1198,7 @@
                                 onmouseout="this.style.color='var(--muted)';this.style.borderColor='var(--border)';">✕
                                 Clear</button>
                         </div>
-                        <div class="options-grid cols-3">
+                        <div class="options-grid cols-2">
                             <label class="option-card" id="card-monitor-entry" onclick="selectMonitor('entry')">
                                 <input type="radio" name="monitor" value="entry">
                                 <div class="option-check"></div>
@@ -1256,19 +1286,49 @@
                                 </ul>
                                 <div class="option-price">₦380,000</div>
                             </label>
+                            <label class="option-card" id="card-monitor-creator" onclick="selectMonitor('creator')">
+                                <input type="radio" name="monitor" value="creator">
+                                <div class="option-check"></div>
+                                <div class="option-tag tag-creator">Creator's Choice</div>
+                                <div class="product-img-tray">
+                                    <img src="images/monitor-creator.png" alt="ASUS ProArt Display PA278CV">
+                                </div>
+                                <div class="option-name">ASUS ProArt PA278CV</div>
+                                <div class="option-desc">27-inch Calman Verified display for creative professionals.
+                                    Factory calibrated with ΔE < 2 colour accuracy, 100% sRGB / Rec. 709 coverage, and
+                                        USB-C with 65W power delivery for a single-cable workflow.</div>
+                                        <ul
+                                            style="list-style:none;font-size:0.78rem;color:var(--muted);margin:8px 0 10px;line-height:1.7;">
+                                            <li><svg width="13" height="13" viewBox="0 0 14 14" fill="none"
+                                                    style="vertical-align:middle;margin-right:4px;">
+                                                    <polyline points="8,2 12,2 12,6" stroke="#c0601a" stroke-width="1.6"
+                                                        fill="none" stroke-linecap="round" stroke-linejoin="round" />
+                                                    <line x1="12" y1="2" x2="7" y2="7" stroke="#c0601a"
+                                                        stroke-width="1.6" stroke-linecap="round" />
+                                                    <polyline points="6,12 2,12 2,8" stroke="#c0601a" stroke-width="1.6"
+                                                        fill="none" stroke-linecap="round" stroke-linejoin="round" />
+                                                    <line x1="2" y1="12" x2="7" y2="7" stroke="#c0601a"
+                                                        stroke-width="1.6" stroke-linecap="round" />
+                                                </svg>27" · 2560×1440 QHD · IPS</li>
+                                            <li>🎨 Calman Verified · ΔE < 2 · 100% sRGB</li>
+                                            <li>🔌 USB-C 65W PD · HDMI · DisplayPort</li>
+                                        </ul>
+                                        <div class="option-price">₦280,000</div>
+                            </label>
                         </div>
                         <div class="kb-note hidden" id="kb-auto-note">
                             ⌨️ <strong>Entry monitor selected</strong> — paired automatically with a Windows keyboard.
                         </div>
                         <div class="kb-note hidden" id="kb-upgrade-note">
-                            ⌨️ <strong>Mid/Top monitor selected</strong> — you can upgrade to a Mac keyboard below.
+                            ⌨️ <strong>Mid/Top/Creator monitor selected</strong> — you can upgrade to a Mac keyboard
+                            below.
                         </div>
                     </div>
 
                     <div class="config-divider"></div>
 
                     <!-- STEP 3: KEYBOARD -->
-                    <div class="step" id="step3">
+                    <div class="step step-disabled" id="step3">
                         <div class="step-header">
                             <div class="step-num">3</div>
                             <div class="step-title">Your Keyboard</div>
@@ -1292,6 +1352,9 @@
                                     Unlocked with Mid/Top monitor.</div>
                                 <div class="option-price">₦72,000</div>
                             </label>
+                        </div>
+                        <div class="step-disabled-note" id="kb-select-monitor-note">
+                            🔒 Select a monitor above to unlock keyboard options.
                         </div>
                         <div class="kb-note hidden" id="kb-locked-note">
                             🔒 Apple Magic Keyboard is available with a Mid or Top tier monitor. Select Mid or Top above
@@ -1416,7 +1479,7 @@
 
         const prices = {
             bundle: { basic: 450000, full: 950000 },
-            monitor: { entry: 95000, mid: 185000, top: 380000 },
+            monitor: { entry: 95000, mid: 185000, top: 380000, creator: 280000 },
             keyboard: { windows: 28000, mac: 72000 },
             addon: { stand: 22000, ssd: 68000 },
             // Included items (mouse + dongle)
@@ -1425,7 +1488,7 @@
 
         const names = {
             bundle: { basic: 'Basic Work Bundle', full: 'Full Workspace Bundle' },
-            monitor: { entry: 'Dell SE2726HG (27" FHD 240Hz)', mid: 'Dell S2725DS (27" QHD 100Hz)', top: 'Dell S2725QS (27" 4K UHD)' },
+            monitor: { entry: 'Dell SE2726HG (27" FHD 240Hz)', mid: 'Dell S2725DS (27" QHD 100Hz)', top: 'Dell S2725QS (27" 4K UHD)', creator: 'ASUS ProArt PA278CV (27" QHD)' },
             keyboard: { windows: 'Windows Keyboard', mac: 'Apple Magic Keyboard' },
             addon: { stand: 'Laptop Stand', ssd: 'SanDisk 1TB Extreme Portable SSD' }
         };
@@ -1444,12 +1507,18 @@
         // ── MONITOR SELECT ──
         function selectMonitor(val) {
             state.monitor = val;
-            ['entry', 'mid', 'top'].forEach(m => document.getElementById('card-monitor-' + m).classList.remove('selected'));
+            ['entry', 'mid', 'top', 'creator'].forEach(m => document.getElementById('card-monitor-' + m).classList.remove('selected'));
             document.getElementById('card-monitor-' + val).classList.add('selected');
 
             // Show clear button
             const clearMonBtn = document.getElementById('clear-monitor-btn');
             if (clearMonBtn) clearMonBtn.style.display = 'inline-flex';
+
+            // Enable keyboard step
+            const step3 = document.getElementById('step3');
+            step3.classList.remove('step-disabled');
+            const selectMonNote = document.getElementById('kb-select-monitor-note');
+            if (selectMonNote) selectMonNote.style.display = 'none';
 
             // keyboard logic
             const kbAutoNote = document.getElementById('kb-auto-note');
@@ -1478,7 +1547,7 @@
         window.clearMonitor = function () {
             state.monitor = null;
             state.keyboard = null;
-            ['entry', 'mid', 'top'].forEach(m => {
+            ['entry', 'mid', 'top', 'creator'].forEach(m => {
                 const c = document.getElementById('card-monitor-' + m);
                 if (c) c.classList.remove('selected');
             });
@@ -1493,6 +1562,11 @@
                 const el = document.getElementById(id);
                 if (el) el.classList.add('hidden');
             });
+            // Re-disable keyboard step
+            const step3 = document.getElementById('step3');
+            step3.classList.add('step-disabled');
+            const selectMonNote = document.getElementById('kb-select-monitor-note');
+            if (selectMonNote) selectMonNote.style.display = '';
             document.getElementById('clear-monitor-btn').style.display = 'none';
             updateSummary();
         };
