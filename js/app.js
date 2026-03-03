@@ -6,13 +6,21 @@ const state = {
     addons: []
 };
 
+// Product data loaded from API
+let productData = {
+    bundles: [],
+    monitors: [],
+    keyboards: [],
+    addons: [],
+    staticItems: []
+};
+
 // Default prices (fallback if API unavailable)
 const prices = {
-    bundle: { basic: 450000, full: 950000 },
-    monitor: { entry: 95000, mid: 185000, top: 380000, creator: 280000 },
-    keyboard: { windows: 28000, mac: 72000 },
-    addon: { stand: 22000, ssd: 68000 },
-    included: 45000
+    bundle: { basic: 1138000, full: 1443000 },
+    monitor: { entry: 428400, mid: 540400, top: 658000, creator: 658000 },
+    keyboard: { windows: 84000, mac: 154000 },
+    addon: { stand: 22000, ssd: 68000 }
 };
 
 // Default names (fallback if API unavailable)
@@ -29,30 +37,82 @@ const names = {
         const res = await fetch('/api/products');
         if (!res.ok) return;
         const data = await res.json();
+        const products = data.products || [];
+
+        // Categorise products
+        productData.bundles = products.filter(p => p.category === 'bundle');
+        productData.monitors = products.filter(p => p.category === 'monitor');
+        productData.keyboards = products.filter(p => p.category === 'keyboard');
+        productData.addons = products.filter(p => p.category === 'addon' && p.role === 'addon');
+        productData.staticItems = products.filter(p => p.role === 'static' && p.category !== 'bundle');
 
         // Rebuild prices and names from DB
-        for (const product of data.products || []) {
+        for (const product of products) {
             const cat = product.category;
-            if (cat === 'addon' && product.slug === 'included') {
-                prices.included = product.price;
-                continue;
-            }
+            if (product.role === 'static' && cat !== 'bundle') continue;
             if (!prices[cat]) prices[cat] = {};
             if (!names[cat]) names[cat] = {};
             prices[cat][product.slug] = product.price;
             names[cat][product.slug] = product.name;
         }
 
-        // Update any visible prices on the page
-        updateDisplayedPrices(data.products || []);
+        // Update card content and prices
+        updateDisplayedPrices(products);
     } catch (e) {
-        // API unavailable (static file mode) — use hardcoded defaults
         console.log('Using default product data (API unavailable)');
+        updateBundleRanges();
     }
 })();
 
-// Update card content (prices, names, descriptions, images, tags, emojis) from DB
+// ── PRICE RANGE CALCULATION ──
+function getBundleRange(bundleSlug) {
+    const staticTotal = prices.bundle[bundleSlug] || 0;
+
+    const monitors = productData.monitors.length > 0
+        ? productData.monitors.filter(m => !m.bundle_ids || m.bundle_ids.includes(bundleSlug))
+        : Object.values(prices.monitor).map(p => ({ price: p }));
+    const monitorPrices = monitors.map(m => m.price || 0);
+
+    const keyboards = productData.keyboards.length > 0
+        ? productData.keyboards.filter(k => !k.bundle_ids || k.bundle_ids.includes(bundleSlug))
+        : Object.values(prices.keyboard).map(p => ({ price: p }));
+    const kbPrices = keyboards.map(k => k.price || 0);
+
+    if (monitorPrices.length === 0 || kbPrices.length === 0) {
+        return { low: staticTotal, high: staticTotal };
+    }
+
+    return {
+        low: staticTotal + Math.min(...monitorPrices) + Math.min(...kbPrices),
+        high: staticTotal + Math.max(...monitorPrices) + Math.max(...kbPrices)
+    };
+}
+
+function updateBundleRanges() {
+    const bundleSlugs = productData.bundles.length > 0
+        ? productData.bundles.map(b => b.slug)
+        : ['basic', 'full'];
+
+    for (const slug of bundleSlugs) {
+        const card = document.getElementById('card-' + slug);
+        if (!card) continue;
+        const priceEl = card.querySelector('.option-price');
+        if (!priceEl) continue;
+        const range = getBundleRange(slug);
+        const bundle = productData.bundles.find(b => b.slug === slug);
+        const discountBadge = bundle && bundle.discount_percent
+            ? ` <span class="discount-badge">${bundle.discount_percent}% OFF</span>`
+            : '';
+        priceEl.innerHTML = `₦${range.low.toLocaleString()} – ₦${range.high.toLocaleString()}${discountBadge}`;
+    }
+}
+
+// ── UPDATE CARD CONTENT (Godfrey's dynamic syncing + Apple-style pricing) ──
 function updateDisplayedPrices(products) {
+    // First: update bundle ranges
+    updateBundleRanges();
+
+    // Then: update all card content from DB
     for (const p of products) {
         let card = null;
 
@@ -62,29 +122,23 @@ function updateDisplayedPrices(products) {
             card = document.getElementById('card-monitor-' + p.slug);
         } else if (p.category === 'keyboard') {
             card = document.getElementById('card-kb-' + p.slug);
-        } else if (p.category === 'addon' && p.slug !== 'included') {
+        } else if (p.category === 'addon' && p.role === 'addon') {
             card = document.getElementById('card-' + p.slug);
         }
 
         if (!card) continue;
 
-        // Price
-        const priceEl = card.querySelector('.option-price');
-        if (priceEl) {
-            priceEl.textContent = (p.category === 'bundle' ? 'From ' : '') + '₦' + p.price.toLocaleString();
-        }
-
-        // Name
+        // Name (from DB)
         const nameEl = card.querySelector('.option-name');
         if (nameEl && p.name) nameEl.textContent = p.name;
 
-        // Description
+        // Description (from DB)
         const descEl = card.querySelector('.option-desc');
         if (descEl && p.description !== undefined && p.description !== null) {
             descEl.textContent = p.description;
         }
 
-        // Image
+        // Image (from DB)
         const imgTray = card.querySelector('.product-img-tray');
         if (imgTray) {
             const img = imgTray.querySelector('img');
@@ -97,12 +151,11 @@ function updateDisplayedPrices(products) {
                 }
                 imgTray.style.display = '';
             } else {
-                // No image in DB — hide the tray
                 imgTray.style.display = 'none';
             }
         }
 
-        // Emoji (bundles/keyboards)
+        // Emoji (from DB)
         const emojiEl = card.querySelector('.option-emoji');
         if (emojiEl && p.emoji !== undefined) {
             if (p.emoji) {
@@ -113,7 +166,7 @@ function updateDisplayedPrices(products) {
             }
         }
 
-        // Tag
+        // Tag (from DB)
         const tagEl = card.querySelector('.option-tag');
         if (tagEl && p.tag !== undefined) {
             if (p.tag) {
@@ -123,7 +176,40 @@ function updateDisplayedPrices(products) {
                 tagEl.style.display = 'none';
             }
         }
+
+        // Apple-style: hide individual prices on monitors and keyboards
+        if (p.category === 'monitor' || p.category === 'keyboard') {
+            const priceEl = card.querySelector('.option-price');
+            if (priceEl) priceEl.style.display = 'none';
+        }
+
+        // Add-ons: show individual prices
+        if (p.category === 'addon' && p.role === 'addon') {
+            const priceEl = card.querySelector('.option-price');
+            if (priceEl) priceEl.textContent = '₦' + p.price.toLocaleString();
+        }
     }
+
+    // Hide cards for inactive products (not returned by API)
+    ['entry', 'mid', 'top', 'creator'].forEach(slug => {
+        const card = document.getElementById('card-monitor-' + slug);
+        if (card && !products.find(p => p.category === 'monitor' && p.slug === slug)) {
+            card.style.display = 'none';
+        }
+    });
+    ['windows', 'mac'].forEach(slug => {
+        const card = document.getElementById('card-kb-' + slug);
+        if (card && !products.find(p => p.category === 'keyboard' && p.slug === slug)) {
+            card.style.display = 'none';
+        }
+    });
+    ['stand', 'ssd'].forEach(slug => {
+        const card = document.getElementById('card-' + slug);
+        if (card && !products.find(p => p.slug === slug && p.role === 'addon')) {
+            card.style.display = 'none';
+        }
+    });
+
     // Re-render summary if user has selections
     if (state.bundle || state.monitor) updateSummary();
 }
@@ -133,7 +219,6 @@ function selectBundle(val) {
     state.bundle = val;
     document.querySelectorAll('[id^="card-basic"],[id^="card-full"]').forEach(c => c.classList.remove('selected'));
     document.getElementById('card-' + val).classList.add('selected');
-    // Show the clear button
     const clearBtn = document.getElementById('clear-bundle-btn');
     if (clearBtn) clearBtn.style.display = 'inline-flex';
     updateSummary();
@@ -142,10 +227,12 @@ function selectBundle(val) {
 // ── MONITOR SELECT ──
 function selectMonitor(val) {
     state.monitor = val;
-    ['entry', 'mid', 'top', 'creator'].forEach(m => document.getElementById('card-monitor-' + m).classList.remove('selected'));
+    ['entry', 'mid', 'top', 'creator'].forEach(m => {
+        const c = document.getElementById('card-monitor-' + m);
+        if (c) c.classList.remove('selected');
+    });
     document.getElementById('card-monitor-' + val).classList.add('selected');
 
-    // Show clear button
     const clearMonBtn = document.getElementById('clear-monitor-btn');
     if (clearMonBtn) clearMonBtn.style.display = 'inline-flex';
 
@@ -155,18 +242,17 @@ function selectMonitor(val) {
     const selectMonNote = document.getElementById('kb-select-monitor-note');
     if (selectMonNote) selectMonNote.style.display = 'none';
 
-    // keyboard logic
+    // All keyboards unlocked (no tier locking)
     const kbAutoNote = document.getElementById('kb-auto-note');
     const kbUpNote = document.getElementById('kb-upgrade-note');
     const kbLockedNote = document.getElementById('kb-locked-note');
     const macCard = document.getElementById('card-kb-mac');
 
-    // All monitors unlock both keyboard options
-    macCard.style.opacity = '1';
-    macCard.style.pointerEvents = 'auto';
-    kbAutoNote.classList.add('hidden');
-    kbUpNote.classList.remove('hidden');
-    kbLockedNote.classList.add('hidden');
+    if (kbAutoNote) kbAutoNote.classList.add('hidden');
+    if (kbUpNote) kbUpNote.classList.remove('hidden');
+    if (kbLockedNote) kbLockedNote.classList.add('hidden');
+    if (macCard) { macCard.style.opacity = '1'; macCard.style.pointerEvents = 'auto'; }
+
     if (!state.keyboard) selectKeyboard('windows');
     updateSummary();
 }
@@ -182,14 +268,12 @@ window.clearMonitor = function () {
         const c = document.getElementById('card-kb-' + k);
         if (c) c.classList.remove('selected');
     });
-    // Reset keyboard UI
     const macCard = document.getElementById('card-kb-mac');
     if (macCard) { macCard.style.opacity = '1'; macCard.style.pointerEvents = 'auto'; }
     ['kb-auto-note', 'kb-upgrade-note', 'kb-locked-note'].forEach(id => {
         const el = document.getElementById(id);
         if (el) el.classList.add('hidden');
     });
-    // Re-disable keyboard step
     const step3 = document.getElementById('step3');
     step3.classList.add('step-disabled');
     const selectMonNote = document.getElementById('kb-select-monitor-note');
@@ -200,7 +284,6 @@ window.clearMonitor = function () {
 
 // ── KEYBOARD SELECT ──
 function selectKeyboard(val) {
-    // Both keyboards available for all monitors
     state.keyboard = val;
     ['windows', 'mac'].forEach(k => {
         const c = document.getElementById('card-kb-' + k);
@@ -224,7 +307,7 @@ function toggleAddon(val, cardEl) {
     updateSummary();
 }
 
-// ── UPDATE SUMMARY ──
+// ── UPDATE SUMMARY (Apple-style: item names, no individual prices, just total) ──
 function updateSummary() {
     const lines = document.getElementById('summary-lines');
     const totalEl = document.getElementById('summary-total');
@@ -240,39 +323,109 @@ function updateSummary() {
     let html = '';
 
     if (state.bundle) {
-        const p = prices.bundle[state.bundle];
-        total += p;
-        html += summaryLine(names.bundle[state.bundle], p);
+        total += prices.bundle[state.bundle] || 0;
+        html += summaryItem(names.bundle[state.bundle] || state.bundle);
     }
     if (state.monitor) {
-        const p = prices.monitor[state.monitor];
-        total += p;
-        html += summaryLine(names.monitor[state.monitor], p);
+        total += prices.monitor[state.monitor] || 0;
+        html += summaryItem(names.monitor[state.monitor] || state.monitor);
     }
     if (state.keyboard) {
-        const p = prices.keyboard[state.keyboard];
-        total += p;
-        html += summaryLine(names.keyboard[state.keyboard], p);
+        total += prices.keyboard[state.keyboard] || 0;
+        html += summaryItem(names.keyboard[state.keyboard] || state.keyboard);
     }
-    // Mouse + Dongle always included
-    if (state.bundle) {
-        total += prices.included;
-        html += summaryLine('Mouse + USB-C Dongle', prices.included);
-    }
+    // Add-ons show WITH price
     state.addons.forEach(a => {
-        const p = prices.addon[a];
+        const p = prices.addon[a] || 0;
         total += p;
-        html += summaryLine(names.addon[a], p);
+        html += summaryLine(names.addon[a] || a, p);
     });
 
     lines.innerHTML = html;
     totalEl.style.display = 'flex';
-    priceEl.textContent = '₦' + total.toLocaleString();
+
+    // 20% OFF badge
+    const bundle = productData.bundles.find(b => b.slug === state.bundle);
+    const discountPercent = bundle ? bundle.discount_percent : 20;
+
+    if (discountPercent > 0) {
+        priceEl.innerHTML = `₦${total.toLocaleString()} <span class="discount-badge" style="margin-left:8px;">${discountPercent}% OFF</span>`;
+    } else {
+        priceEl.textContent = '₦' + total.toLocaleString();
+    }
 }
 
-function summaryLine(name, price) {
-    return `<div class="summary-line"><span class="item-name">${name}</span><span class="item-price">₦${price.toLocaleString()}</span></div>`;
+// Summary line without price (for bundle items — Apple-style)
+function summaryItem(name) {
+    return `<div class="summary-line"><span class="item-name">${name}</span><span class="item-price" style="color:var(--muted);font-size:0.8rem;">✓</span></div>`;
 }
+
+// Summary line with price (for add-ons)
+function summaryLine(name, price) {
+    return `<div class="summary-line"><span class="item-name">${name}</span><span class="item-price">+ ₦${price.toLocaleString()}</span></div>`;
+}
+
+// ── FORM VALIDATION ──
+function validateField(input, rules) {
+    const val = input.value.trim();
+    let error = '';
+
+    if (rules.required && !val) {
+        error = 'This field is required';
+    } else if (val) {
+        if (rules.type === 'name') {
+            if (!/^[a-zA-ZÀ-ÿ\s'\-]+$/.test(val)) error = 'Letters, spaces, and hyphens only';
+            else if (val.length < 2) error = 'At least 2 characters';
+        }
+        if (rules.type === 'email') {
+            if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(val)) error = 'Enter a valid email address';
+        }
+        if (rules.type === 'phone') {
+            const cleaned = val.replace(/[\s\-()]/g, '');
+            if (!/^[+0]\d{9,14}$/.test(cleaned)) error = 'Enter a valid phone number (start with + or 0, 10-15 digits)';
+        }
+        if (rules.type === 'address') {
+            if (val.length < 5) error = 'Enter a full delivery address';
+        }
+    }
+
+    let errEl = input.parentElement.querySelector('.field-error');
+    if (error) {
+        input.style.borderColor = '#ff453a';
+        if (!errEl) {
+            errEl = document.createElement('div');
+            errEl.className = 'field-error';
+            errEl.style.cssText = 'color:#ff453a;font-size:0.75rem;margin-top:4px;';
+            input.parentElement.appendChild(errEl);
+        }
+        errEl.textContent = error;
+    } else {
+        input.style.borderColor = '';
+        if (errEl) errEl.remove();
+    }
+
+    return !error;
+}
+
+// Set up real-time validation
+document.addEventListener('DOMContentLoaded', () => {
+    const fields = [
+        { id: 'fname', rules: { required: true, type: 'name' } },
+        { id: 'femail', rules: { required: true, type: 'email' } },
+        { id: 'fphone', rules: { required: true, type: 'phone' } },
+        { id: 'faddress', rules: { required: true, type: 'address' } }
+    ];
+
+    for (const field of fields) {
+        const input = document.getElementById(field.id);
+        if (!input) continue;
+        input.addEventListener('blur', () => validateField(input, field.rules));
+        input.addEventListener('input', () => {
+            const errEl = input.parentElement.querySelector('.field-error');
+            if (errEl) { errEl.remove(); input.style.borderColor = ''; }
+        });
+    }
+});
 
 // ── SEND ORDER ──
 async function sendOrder() {
@@ -286,34 +439,36 @@ async function sendOrder() {
         return;
     }
 
-    // Validate form fields
-    const name = document.getElementById('fname').value.trim();
-    const email = document.getElementById('femail').value.trim();
-    const phone = document.getElementById('fphone').value.trim();
-    const address = document.getElementById('faddress').value.trim();
+    // Validate all form fields
+    const nameInput = document.getElementById('fname');
+    const emailInput = document.getElementById('femail');
+    const phoneInput = document.getElementById('fphone');
+    const addressInput = document.getElementById('faddress');
+
+    const validations = [
+        validateField(nameInput, { required: true, type: 'name' }),
+        validateField(emailInput, { required: true, type: 'email' }),
+        validateField(phoneInput, { required: true, type: 'phone' }),
+        validateField(addressInput, { required: true, type: 'address' })
+    ];
+
+    if (validations.some(v => !v)) {
+        warning.style.display = 'block';
+        warning.textContent = '⚠️ Please fix the errors in the form above.';
+        setTimeout(() => warning.style.display = 'none', 4000);
+        return;
+    }
+
+    const name = nameInput.value.trim();
+    const email = emailInput.value.trim();
+    const phone = phoneInput.value.trim();
+    const address = addressInput.value.trim();
     const notes = document.getElementById('fnotes').value.trim();
 
-    if (!name || !email || !phone || !address) {
-        warning.style.display = 'block';
-        warning.textContent = '⚠️ Please fill in all required fields (name, email, phone, address).';
-        setTimeout(() => warning.style.display = 'none', 4000);
-        return;
-    }
-
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-        warning.style.display = 'block';
-        warning.textContent = '⚠️ Please enter a valid email address.';
-        setTimeout(() => warning.style.display = 'none', 4000);
-        return;
-    }
-
-    // Show loading state
     orderBtn.disabled = true;
     orderBtn.innerHTML = '<span>⏳</span> Processing...';
 
     try {
-        // Step 1: Create the order
         const orderResponse = await fetch('/api/orders', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -336,7 +491,6 @@ async function sendOrder() {
             throw new Error(orderData.error || 'Failed to create order');
         }
 
-        // Step 2: Initialize payment
         orderBtn.innerHTML = '<span>💳</span> Redirecting to payment...';
 
         const paymentResponse = await fetch('/api/payments', {
@@ -352,11 +506,8 @@ async function sendOrder() {
         const paymentData = await paymentResponse.json();
 
         if (paymentResponse.ok && paymentData.authorization_url) {
-            // Redirect to payment page
             window.location.href = paymentData.authorization_url;
         } else {
-            // Payment init failed — show order success without payment
-            // (Order was still created, payment can be done later)
             window.location.href = `/order-success.html?order=${orderData.order.order_number}&status=pending`;
         }
 
@@ -366,7 +517,6 @@ async function sendOrder() {
         warning.textContent = `❌ ${err.message}. Please try again.`;
         setTimeout(() => warning.style.display = 'none', 6000);
 
-        // Reset button
         orderBtn.disabled = false;
         orderBtn.innerHTML = '<span>📧</span> Send My Order';
     }
@@ -385,7 +535,6 @@ document.querySelectorAll('.reveal, .step, .contact-section').forEach(el => {
     observer.observe(el);
 });
 
-// Stagger steps
 document.querySelectorAll('.step').forEach((el, i) => {
     el.style.transitionDelay = (i * 0.1) + 's';
 });
@@ -431,7 +580,6 @@ window.togglePlayPause = function () {
     isPlaying = !isPlaying;
 };
 
-// Start auto-play on load
 startAutoPlay();
 
 // ── BUNDLE CLEAR ──
