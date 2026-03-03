@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.49.1",
+    "nodemailer": "^8.0.1",
     "resend": "^4.1.2"
   },
   "devDependencies": {

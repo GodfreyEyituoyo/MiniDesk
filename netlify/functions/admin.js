@@ -161,11 +161,17 @@ exports.handler = async (event) => {
  * Send status update email to customer
  */
 async function sendStatusUpdateEmail(order, newStatus) {
-    const apiKey = process.env.RESEND_API_KEY;
-    if (!apiKey) return;
+    const smtpUser = process.env.SMTP_USER;
+    const smtpPass = process.env.SMTP_PASS;
+    if (!smtpUser || !smtpPass) return;
 
-    const { Resend } = require('resend');
-    const resend = new Resend(apiKey);
+    const nodemailer = require('nodemailer');
+    const transporter = nodemailer.createTransport({
+        host: process.env.SMTP_HOST || 'smtp.gmail.com',
+        port: parseInt(process.env.SMTP_PORT || '587'),
+        secure: false,
+        auth: { user: smtpUser, pass: smtpPass }
+    });
 
     const statusMessages = {
         confirmed: 'Your order has been confirmed! We\'re preparing your bundle.',
@@ -177,8 +183,8 @@ async function sendStatusUpdateEmail(order, newStatus) {
 
     const message = statusMessages[newStatus] || `Your order status has been updated to: ${newStatus}`;
 
-    await resend.emails.send({
-        from: 'MiniDesk <orders@minidesk.ng>',
+    await transporter.sendMail({
+        from: `MiniDesk <${smtpUser}>`,
         to: order.customer_email,
         subject: `Order ${order.order_number} — ${newStatus.charAt(0).toUpperCase() + newStatus.slice(1)}`,
         html: `

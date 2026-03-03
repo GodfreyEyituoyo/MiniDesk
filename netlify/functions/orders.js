@@ -177,18 +177,22 @@ exports.handler = async (event) => {
     }
 };
 
-/**
- * Send order confirmation + admin notification emails
- */
 async function sendOrderEmails(order) {
-    const apiKey = process.env.RESEND_API_KEY;
-    if (!apiKey) {
-        console.warn('RESEND_API_KEY not set — skipping email');
+    const smtpUser = process.env.SMTP_USER;
+    const smtpPass = process.env.SMTP_PASS;
+    if (!smtpUser || !smtpPass) {
+        console.warn('SMTP credentials not set — skipping email');
         return;
     }
 
-    const { Resend } = require('resend');
-    const resend = new Resend(apiKey);
+    const nodemailer = require('nodemailer');
+    const transporter = nodemailer.createTransport({
+        host: process.env.SMTP_HOST || 'smtp.gmail.com',
+        port: parseInt(process.env.SMTP_PORT || '587'),
+        secure: false,
+        auth: { user: smtpUser, pass: smtpPass }
+    });
+
     const adminEmails = (process.env.ADMIN_EMAILS || '').split(',').filter(Boolean);
 
     // Fetch product names from DB
@@ -206,9 +210,11 @@ async function sendOrderEmails(order) {
         ? order.addons.map(a => nameMap[a] || a).join(', ')
         : 'None';
 
+    const fromAddress = `MiniDesk <${smtpUser}>`;
+
     // Customer confirmation email
-    await resend.emails.send({
-        from: 'MiniDesk <orders@minidesk.ng>',
+    await transporter.sendMail({
+        from: fromAddress,
         to: order.customer_email,
         subject: `Order Confirmed — ${order.order_number}`,
         html: `
@@ -240,9 +246,9 @@ async function sendOrderEmails(order) {
 
     // Admin notification email
     if (adminEmails.length > 0) {
-        await resend.emails.send({
-            from: 'MiniDesk <orders@minidesk.ng>',
-            to: adminEmails,
+        await transporter.sendMail({
+            from: fromAddress,
+            to: adminEmails.join(','),
             subject: `🛒 New Order: ${order.order_number} — ₦${order.total_price.toLocaleString()}`,
             html: `
                 <div style="font-family: -apple-system, sans-serif; padding: 24px;">
