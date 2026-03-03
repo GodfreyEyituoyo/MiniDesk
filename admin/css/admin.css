@@ -1,0 +1,210 @@
+/* ── ADMIN STYLES ── */
+
+.login-wrap {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+}
+
+.login-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    padding: 48px;
+    max-width: 400px;
+    width: 100%;
+}
+
+/* Dashboard layout */
+.admin-wrap {
+    padding: 90px 48px 48px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.admin-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 32px;
+}
+
+.admin-header h1 {
+    font-size: 1.8rem;
+    font-weight: 800;
+}
+
+.admin-user {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: var(--muted);
+    font-size: 0.85rem;
+}
+
+.btn-logout {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    padding: 8px 16px;
+    border-radius: 50px;
+    cursor: pointer;
+    font-family: var(--font);
+    font-size: 0.8rem;
+    transition: all 0.2s;
+}
+
+.btn-logout:hover {
+    border-color: #ff453a;
+    color: #ff453a;
+}
+
+/* Stats grid */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 32px;
+}
+
+.stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px;
+}
+
+.stat-card .stat-label {
+    font-size: 0.8rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.stat-card .stat-value {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: var(--text);
+}
+
+.stat-card .stat-value.accent {
+    color: var(--accent);
+}
+
+/* Filter bar */
+.filter-bar {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+}
+
+.filter-btn {
+    padding: 8px 18px;
+    border-radius: 50px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--muted);
+    font-family: var(--font);
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.filter-btn:hover, .filter-btn.active {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: rgba(0, 113, 227, 0.05);
+}
+
+/* Orders table */
+.orders-table-wrap {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+}
+
+.orders-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.88rem;
+}
+
+.orders-table th {
+    text-align: left;
+    padding: 14px 16px;
+    font-weight: 600;
+    color: var(--muted);
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface2);
+}
+
+.orders-table td {
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+}
+
+.orders-table tr:last-child td {
+    border-bottom: none;
+}
+
+.orders-table tr:hover td {
+    background: rgba(255, 255, 255, 0.02);
+}
+
+/* Status badges */
+.badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 50px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.badge-pending { background: rgba(255, 159, 10, 0.15); color: #ff9f0a; }
+.badge-confirmed { background: rgba(52, 199, 89, 0.15); color: #34c759; }
+.badge-processing { background: rgba(0, 113, 227, 0.15); color: #0071e3; }
+.badge-shipped { background: rgba(175, 82, 222, 0.15); color: #af52de; }
+.badge-delivered { background: rgba(52, 199, 89, 0.15); color: #34c759; }
+.badge-cancelled { background: rgba(255, 69, 58, 0.15); color: #ff453a; }
+.badge-paid { background: rgba(52, 199, 89, 0.15); color: #34c759; }
+.badge-failed { background: rgba(255, 69, 58, 0.15); color: #ff453a; }
+
+/* Status select */
+.status-select {
+    padding: 6px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--surface2);
+    color: var(--text);
+    font-family: var(--font);
+    font-size: 0.82rem;
+    cursor: pointer;
+}
+
+/* Empty state */
+.empty-state {
+    text-align: center;
+    padding: 48px;
+    color: var(--muted);
+}
+
+.empty-state .icon { font-size: 3rem; margin-bottom: 12px; display: block; }
+
+/* Responsive */
+@media (max-width: 768px) {
+    .admin-wrap { padding: 80px 16px 24px; }
+    .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    .orders-table-wrap { overflow-x: auto; }
+    .orders-table { min-width: 700px; }
+}

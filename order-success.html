@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Confirmed — MiniDesk</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        .success-wrap {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+
+        .success-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 48px;
+            max-width: 520px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .success-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        .success-card h1 {
+            font-size: 1.8rem;
+            font-weight: 800;
+            margin-bottom: 12px;
+        }
+
+        .success-card p {
+            color: var(--muted);
+            margin-bottom: 8px;
+        }
+
+        .order-num {
+            display: inline-block;
+            background: rgba(0, 113, 227, 0.1);
+            border: 1px solid rgba(0, 113, 227, 0.3);
+            color: var(--accent);
+            font-weight: 700;
+            font-size: 1.1rem;
+            padding: 10px 24px;
+            border-radius: 50px;
+            margin: 20px 0;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 6px 16px;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-top: 8px;
+        }
+
+        .status-paid {
+            background: rgba(52, 199, 89, 0.15);
+            color: #34c759;
+        }
+
+        .status-pending {
+            background: rgba(255, 159, 10, 0.15);
+            color: #ff9f0a;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-top: 32px;
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- NAV -->
+    <nav>
+        <a href="/" class="logo" style="text-decoration:none;">Mini<span>Desk</span></a>
+        <div style="display:flex;align-items:center;gap:28px;">
+            <a href="/#configurator">Configure</a>
+        </div>
+    </nav>
+
+    <div class="success-wrap">
+        <div class="success-card" id="success-content">
+            <span class="success-icon">⏳</span>
+            <h1>Checking your order...</h1>
+            <p>Please wait a moment.</p>
+        </div>
+    </div>
+
+    <script>
+        (async function () {
+            const params = new URLSearchParams(window.location.search);
+            const reference = params.get('reference');
+            const orderNumber = params.get('order');
+            const status = params.get('status');
+            const card = document.getElementById('success-content');
+
+            // If we have a payment reference, verify it
+            if (reference) {
+                try {
+                    const res = await fetch('/api/payments', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ action: 'verify', reference, gateway: 'paystack' })
+                    });
+                    const data = await res.json();
+
+                    if (data.status === 'paid') {
+                        card.innerHTML = `
+                            <span class="success-icon">🎉</span>
+                            <h1>Payment Successful!</h1>
+                            <p>Thank you for your order. We'll be in touch soon.</p>
+                            <div class="order-num">${data.order_number}</div>
+                            <div><span class="status-badge status-paid">✓ Paid</span></div>
+                            <p style="margin-top:20px;">A confirmation email has been sent to you.</p>
+                            <a href="/" class="back-link">← Back to MiniDesk</a>
+                        `;
+                        return;
+                    }
+                } catch (err) {
+                    console.error('Verification error:', err);
+                }
+            }
+
+            // Order created but payment pending
+            if (orderNumber || status === 'pending') {
+                card.innerHTML = `
+                    <span class="success-icon">📋</span>
+                    <h1>Order Received!</h1>
+                    <p>Your order has been recorded. We'll reach out with payment details.</p>
+                    ${orderNumber ? `<div class="order-num">${orderNumber}</div>` : ''}
+                    <div><span class="status-badge status-pending">⏳ Payment Pending</span></div>
+                    <p style="margin-top:20px;">We'll contact you within 24 hours.</p>
+                    <a href="/" class="back-link">← Back to MiniDesk</a>
+                `;
+                return;
+            }
+
+            // Fallback
+            card.innerHTML = `
+                <span class="success-icon">📋</span>
+                <h1>Thank you!</h1>
+                <p>Your order is being processed.</p>
+                <a href="/" class="back-link">← Back to MiniDesk</a>
+            `;
+        })();
+    </script>
+</body>
+
+</html>

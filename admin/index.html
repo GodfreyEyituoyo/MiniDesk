@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard — MiniDesk Admin</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="css/admin.css">
+</head>
+
+<body>
+    <!-- NAV -->
+    <nav>
+        <a href="/admin/" class="logo" style="text-decoration:none;">Mini<span>Desk</span> <span
+                style="font-size:0.75rem;color:var(--muted);font-weight:400;margin-left:4px;">Admin</span></a>
+        <div class="admin-user">
+            <span id="admin-email"></span>
+            <button class="btn-logout" onclick="logout()">Sign Out</button>
+        </div>
+    </nav>
+
+    <div class="admin-wrap">
+        <!-- Tabs -->
+        <div style="display:flex;gap:8px;margin-bottom:32px;">
+            <a href="/admin/"
+                style="padding:8px 20px;border-radius:50px;border:1px solid var(--accent);background:rgba(0,113,227,0.05);color:var(--accent);font-size:0.85rem;font-weight:600;text-decoration:none;">Orders</a>
+            <a href="/admin/products.html"
+                style="padding:8px 20px;border-radius:50px;border:1px solid var(--border);color:var(--muted);font-size:0.85rem;font-weight:600;text-decoration:none;">Products</a>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats-grid" id="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">Total Orders</div>
+                <div class="stat-value" id="stat-total">—</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Revenue (Paid)</div>
+                <div class="stat-value accent" id="stat-revenue">—</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Pending</div>
+                <div class="stat-value" id="stat-pending">—</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Paid</div>
+                <div class="stat-value" id="stat-paid">—</div>
+            </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="filter-bar">
+            <button class="filter-btn active" onclick="filterOrders('all', this)">All</button>
+            <button class="filter-btn" onclick="filterOrders('pending', this)">Pending</button>
+            <button class="filter-btn" onclick="filterOrders('confirmed', this)">Confirmed</button>
+            <button class="filter-btn" onclick="filterOrders('processing', this)">Processing</button>
+            <button class="filter-btn" onclick="filterOrders('shipped', this)">Shipped</button>
+            <button class="filter-btn" onclick="filterOrders('delivered', this)">Delivered</button>
+            <button class="filter-btn" onclick="filterOrders('cancelled', this)">Cancelled</button>
+        </div>
+
+        <!-- Orders Table -->
+        <div class="orders-table-wrap">
+            <table class="orders-table">
+                <thead>
+                    <tr>
+                        <th>Order</th>
+                        <th>Customer</th>
+                        <th>Bundle</th>
+                        <th>Total</th>
+                        <th>Payment</th>
+                        <th>Status</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody id="orders-body">
+                    <tr>
+                        <td colspan="7">
+                            <div class="empty-state">
+                                <span class="icon">⏳</span>
+                                <p>Loading orders...</p>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="js/admin.js"></script>
+</body>
+
+</html>

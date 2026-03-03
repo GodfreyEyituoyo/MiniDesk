@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Products — MiniDesk Admin</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="css/admin.css">
+    <style>
+        .products-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .products-header h2 {
+            font-size: 1.4rem;
+            font-weight: 800;
+        }
+
+        .btn-add {
+            background: var(--accent);
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-family: var(--font);
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: transform 0.2s;
+        }
+
+        .btn-add:hover {
+            transform: translateY(-1px);
+        }
+
+        .category-section {
+            margin-bottom: 40px;
+        }
+
+        .category-title {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--accent);
+            margin-bottom: 16px;
+        }
+
+        .product-row {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin-bottom: 10px;
+            transition: border-color 0.2s;
+        }
+
+        .product-row:hover {
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .product-row.inactive {
+            opacity: 0.4;
+        }
+
+        .product-info {
+            flex: 1;
+        }
+
+        .product-name {
+            font-weight: 700;
+            font-size: 0.95rem;
+        }
+
+        .product-slug {
+            font-size: 0.78rem;
+            color: var(--muted);
+        }
+
+        .product-price {
+            font-weight: 700;
+            color: var(--accent);
+            font-size: 1rem;
+            min-width: 100px;
+            text-align: right;
+        }
+
+        .product-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-sm {
+            padding: 6px 14px;
+            border-radius: 50px;
+            border: 1px solid var(--border);
+            background: transparent;
+            color: var(--muted);
+            font-family: var(--font);
+            font-size: 0.78rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-sm:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .btn-sm.danger:hover {
+            border-color: #ff453a;
+            color: #ff453a;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 200;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+
+        .modal-overlay.open {
+            display: flex;
+        }
+
+        .modal {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 32px;
+            max-width: 500px;
+            width: 100%;
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+
+        .modal h3 {
+            font-size: 1.2rem;
+            font-weight: 800;
+            margin-bottom: 20px;
+        }
+
+        .modal .form-group {
+            margin-bottom: 14px;
+        }
+
+        .modal .form-group label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 6px;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .modal .form-group input,
+        .modal .form-group select,
+        .modal .form-group textarea {
+            width: 100%;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 10px 14px;
+            color: var(--text);
+            font-family: var(--font);
+            font-size: 0.9rem;
+            outline: none;
+        }
+
+        .modal .form-group input:focus,
+        .modal .form-group select:focus {
+            border-color: var(--accent);
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .modal-actions button {
+            flex: 1;
+        }
+
+        .btn-cancel {
+            padding: 12px;
+            border-radius: 50px;
+            border: 1px solid var(--border);
+            background: transparent;
+            color: var(--muted);
+            font-family: var(--font);
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .btn-save {
+            padding: 12px;
+            border-radius: 50px;
+            border: none;
+            background: var(--accent);
+            color: #000;
+            font-family: var(--font);
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        /* Nav tabs */
+        .admin-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 32px;
+        }
+
+        .admin-tab {
+            padding: 8px 20px;
+            border-radius: 50px;
+            border: 1px solid var(--border);
+            background: transparent;
+            color: var(--muted);
+            font-family: var(--font);
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .admin-tab:hover,
+        .admin-tab.active {
+            border-color: var(--accent);
+            color: var(--accent);
+            background: rgba(0, 113, 227, 0.05);
+        }
+    </style>
+</head>
+
+<body>
+    <nav>
+        <a href="/admin/" class="logo" style="text-decoration:none;">Mini<span>Desk</span> <span
+                style="font-size:0.75rem;color:var(--muted);font-weight:400;margin-left:4px;">Admin</span></a>
+        <div class="admin-user">
+            <span id="admin-email"></span>
+            <button class="btn-logout" onclick="logout()">Sign Out</button>
+        </div>
+    </nav>
+
+    <div class="admin-wrap">
+        <!-- Tabs -->
+        <div class="admin-tabs">
+            <a href="/admin/" class="admin-tab">Orders</a>
+            <a href="/admin/products.html" class="admin-tab active">Products</a>
+        </div>
+
+        <div class="products-header">
+            <h2>Manage Products</h2>
+            <button class="btn-add" onclick="openAddModal()">+ Add Product</button>
+        </div>
+
+        <div id="products-container">
+            <div class="empty-state"><span class="icon">⏳</span>
+                <p>Loading products...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit/Add Modal -->
+    <div class="modal-overlay" id="modal-overlay">
+        <div class="modal">
+            <h3 id="modal-title">Edit Product</h3>
+            <form id="product-form" onsubmit="saveProduct(event)">
+                <input type="hidden" id="edit-id">
+                <div class="form-group">
+                    <label>Category</label>
+                    <select id="edit-category">
+                        <option value="bundle">Bundle</option>
+                        <option value="monitor">Monitor</option>
+                        <option value="keyboard">Keyboard</option>
+                        <option value="addon">Add-on</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Slug (unique ID)</label>
+                    <input type="text" id="edit-slug" placeholder="e.g. basic, entry, mac" required>
+                </div>
+                <div class="form-group">
+                    <label>Name</label>
+                    <input type="text" id="edit-name" placeholder="Product name" required>
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea id="edit-description" rows="2" placeholder="Short description"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Price (₦)</label>
+                    <input type="number" id="edit-price" placeholder="e.g. 95000" required>
+                </div>
+                <div class="form-group">
+                    <label>Tag (optional)</label>
+                    <input type="text" id="edit-tag" placeholder="e.g. Entry Level, Best Value">
+                </div>
+                <div class="form-group">
+                    <label>Image Path (optional)</label>
+                    <input type="text" id="edit-image" placeholder="e.g. images/monitor-entry.png">
+                </div>
+                <div class="form-group">
+                    <label>Emoji (optional)</label>
+                    <input type="text" id="edit-emoji" placeholder="e.g. ⚡ 🚀 ⌨️">
+                </div>
+                <div class="form-group">
+                    <label>Sort Order</label>
+                    <input type="number" id="edit-sort" value="0">
+                </div>
+                <div class="form-group" style="display:flex;align-items:center;gap:10px;">
+                    <input type="checkbox" id="edit-active" checked style="width:auto;">
+                    <label for="edit-active" style="margin:0;text-transform:none;font-size:0.9rem;">Active (visible on
+                        site)</label>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-cancel" onclick="closeModal()">Cancel</button>
+                    <button type="submit" class="btn-save" id="save-btn">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Auth check
+        const token = localStorage.getItem('minidesk_admin_token');
+        if (!token) window.location.href = '/admin/login.html';
+        document.getElementById('admin-email').textContent = localStorage.getItem('minidesk_admin_email') || '';
+        const authHeaders = { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` };
+
+        let allProducts = [];
+
+        async function loadProducts() {
+            try {
+                const res = await fetch('/api/products?all=true', { headers: authHeaders });
+                if (res.status === 401) { window.location.href = '/admin/login.html'; return; }
+                const data = await res.json();
+                allProducts = data.products || [];
+                renderProducts();
+            } catch (err) {
+                document.getElementById('products-container').innerHTML = '<div class="empty-state"><span class="icon">❌</span><p>Failed to load products.</p></div>';
+            }
+        }
+
+        function renderProducts() {
+            const container = document.getElementById('products-container');
+            const categories = [
+                { key: 'bundle', label: 'Bundles' },
+                { key: 'monitor', label: 'Monitors' },
+                { key: 'keyboard', label: 'Keyboards' },
+                { key: 'addon', label: 'Add-ons' }
+            ];
+
+            let html = '';
+            for (const cat of categories) {
+                const items = allProducts.filter(p => p.category === cat.key).sort((a, b) => a.sort_order - b.sort_order);
+                if (items.length === 0) continue;
+
+                html += `<div class="category-section">
+                    <div class="category-title">${cat.label}</div>
+                    ${items.map(p => `
+                        <div class="product-row ${p.is_active ? '' : 'inactive'}">
+                            <div class="product-info">
+                                <div class="product-name">${p.emoji ? p.emoji + ' ' : ''}${p.name} ${!p.is_active ? '<span style="color:#ff453a;font-size:0.75rem;">(inactive)</span>' : ''}</div>
+                                <div class="product-slug">${p.slug}${p.tag ? ' · ' + p.tag : ''}</div>
+                            </div>
+                            <div class="product-price">₦${p.price.toLocaleString()}</div>
+                            <div class="product-actions">
+                                <button class="btn-sm" onclick='editProduct(${JSON.stringify(p).replace(/'/g, "\\'")})'>Edit</button>
+                                <button class="btn-sm ${p.is_active ? 'danger' : ''}" onclick="toggleActive('${p.id}', ${!p.is_active})">
+                                    ${p.is_active ? 'Deactivate' : 'Activate'}
+                                </button>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>`;
+            }
+
+            container.innerHTML = html || '<div class="empty-state"><span class="icon">📭</span><p>No products found.</p></div>';
+        }
+
+        // Modal
+        function openAddModal() {
+            document.getElementById('modal-title').textContent = 'Add Product';
+            document.getElementById('edit-id').value = '';
+            document.getElementById('product-form').reset();
+            document.getElementById('edit-active').checked = true;
+            document.getElementById('modal-overlay').classList.add('open');
+        }
+
+        function editProduct(product) {
+            document.getElementById('modal-title').textContent = 'Edit Product';
+            document.getElementById('edit-id').value = product.id;
+            document.getElementById('edit-category').value = product.category;
+            document.getElementById('edit-slug').value = product.slug;
+            document.getElementById('edit-name').value = product.name;
+            document.getElementById('edit-description').value = product.description || '';
+            document.getElementById('edit-price').value = product.price;
+            document.getElementById('edit-tag').value = product.tag || '';
+            document.getElementById('edit-image').value = product.image || '';
+            document.getElementById('edit-emoji').value = product.emoji || '';
+            document.getElementById('edit-sort').value = product.sort_order || 0;
+            document.getElementById('edit-active').checked = product.is_active;
+            document.getElementById('modal-overlay').classList.add('open');
+        }
+
+        function closeModal() {
+            document.getElementById('modal-overlay').classList.remove('open');
+        }
+
+        async function saveProduct(e) {
+            e.preventDefault();
+            const id = document.getElementById('edit-id').value;
+            const btn = document.getElementById('save-btn');
+            btn.textContent = 'Saving...';
+            btn.disabled = true;
+
+            const payload = {
+                category: document.getElementById('edit-category').value,
+                slug: document.getElementById('edit-slug').value,
+                name: document.getElementById('edit-name').value,
+                description: document.getElementById('edit-description').value,
+                price: parseInt(document.getElementById('edit-price').value),
+                tag: document.getElementById('edit-tag').value,
+                image: document.getElementById('edit-image').value,
+                emoji: document.getElementById('edit-emoji').value,
+                sort_order: parseInt(document.getElementById('edit-sort').value) || 0,
+                is_active: document.getElementById('edit-active').checked
+            };
+
+            try {
+                const url = id ? `/api/products?id=${id}` : '/api/products';
+                const method = id ? 'PATCH' : 'POST';
+                const res = await fetch(url, { method, headers: authHeaders, body: JSON.stringify(payload) });
+                const data = await res.json();
+
+                if (!res.ok) throw new Error(data.error);
+                closeModal();
+                loadProducts();
+            } catch (err) {
+                alert('Error: ' + err.message);
+            }
+
+            btn.textContent = 'Save';
+            btn.disabled = false;
+        }
+
+        async function toggleActive(id, newState) {
+            try {
+                const res = await fetch(`/api/products?id=${id}`, {
+                    method: 'PATCH',
+                    headers: authHeaders,
+                    body: JSON.stringify({ is_active: newState })
+                });
+                if (!res.ok) throw new Error('Failed');
+                loadProducts();
+            } catch (err) {
+                alert('Failed to update product status');
+            }
+        }
+
+        window.logout = function () {
+            localStorage.removeItem('minidesk_admin_token');
+            localStorage.removeItem('minidesk_admin_email');
+            window.location.href = '/admin/login.html';
+        };
+
+        // Close modal on overlay click
+        document.getElementById('modal-overlay').addEventListener('click', function (e) {
+            if (e.target === this) closeModal();
+        });
+
+        loadProducts();
+    </script>
+</body>
+
+</html>
