@@ -323,6 +323,22 @@
                     <label>Sort Order</label>
                     <input type="number" id="edit-sort" value="0">
                 </div>
+                <div class="form-group">
+                    <label>Role</label>
+                    <select id="edit-role">
+                        <option value="static">Static (always included)</option>
+                        <option value="configurable">Configurable (customer picks)</option>
+                        <option value="addon">Add-on (optional extra)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Bundle Assignment</label>
+                    <div id="bundle-checkboxes" style="display:flex;gap:12px;flex-wrap:wrap;"></div>
+                </div>
+                <div class="form-group">
+                    <label>Discount % (shown as badge)</label>
+                    <input type="number" id="edit-discount" value="0" min="0" max="99">
+                </div>
                 <div class="form-group" style="display:flex;align-items:center;gap:10px;">
                     <input type="checkbox" id="edit-active" checked style="width:auto;">
                     <label for="edit-active" style="margin:0;text-transform:none;font-size:0.9rem;">Active (visible on
@@ -363,18 +379,19 @@
         function renderProducts() {
             const container = document.getElementById('products-container');
             const categories = [
-                { key: 'bundle', label: 'Bundles' },
-                { key: 'monitor', label: 'Monitors' },
-                { key: 'keyboard', label: 'Keyboards' },
-                { key: 'addon', label: 'Add-ons' }
+                { key: 'bundle', label: 'Bundles', filter: p => p.category === 'bundle' },
+                { key: 'configurable', label: 'Configurable (Customer Picks)', filter: p => p.role === 'configurable' },
+                { key: 'static', label: 'Static Components (Always Included)', filter: p => p.role === 'static' && p.category !== 'bundle' },
+                { key: 'addon', label: 'Add-ons (Optional)', filter: p => p.role === 'addon' }
             ];
 
             let html = '';
             for (const cat of categories) {
-                const items = allProducts.filter(p => p.category === cat.key).sort((a, b) => a.sort_order - b.sort_order);
+                const items = allProducts.filter(cat.filter).sort((a, b) => a.sort_order - b.sort_order);
                 if (items.length === 0) continue;
 
                 const escapeName = (str) => str.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                const bundleLabel = (ids) => ids && ids.length > 0 ? ids.map(id => id.charAt(0).toUpperCase() + id.slice(1)).join(', ') : '—';
 
                 html += `<div class="category-section">
                     <div class="category-title">${cat.label}</div>
@@ -382,7 +399,7 @@
                         <div class="product-row ${p.is_active ? '' : 'inactive'}">
                             <div class="product-info">
                                 <div class="product-name">${p.emoji ? p.emoji + ' ' : ''}${escapeName(p.name)} ${!p.is_active ? '<span style="color:#ff453a;font-size:0.75rem;">(inactive)</span>' : ''}</div>
-                                <div class="product-slug">${p.slug}${p.tag ? ' · ' + escapeName(p.tag) : ''}</div>
+                                <div class="product-slug">${p.slug} · ${p.category}${p.bundle_ids && p.bundle_ids.length ? ' · Bundles: ' + bundleLabel(p.bundle_ids) : ''}${p.tag ? ' · ' + escapeName(p.tag) : ''}</div>
                             </div>
                             <div class="product-price">₦${p.price.toLocaleString()}</div>
                             <div class="product-actions">
@@ -399,12 +416,25 @@
             container.innerHTML = html || '<div class="empty-state"><span class="icon">📭</span><p>No products found.</p></div>';
         }
 
-        // Modal
+        function populateBundleCheckboxes(selectedIds = []) {
+            const container = document.getElementById('bundle-checkboxes');
+            const bundles = allProducts.filter(p => p.category === 'bundle');
+            container.innerHTML = bundles.map(b => `
+                <label style="display:flex;align-items:center;gap:4px;cursor:pointer;font-size:0.85rem;color:var(--text);">
+                    <input type="checkbox" class="bundle-check" value="${b.slug}" ${selectedIds.includes(b.slug) ? 'checked' : ''} style="width:auto;">
+                    ${b.name}
+                </label>
+            `).join('');
+        }
+
         function openAddModal() {
             document.getElementById('modal-title').textContent = 'Add Product';
             document.getElementById('edit-id').value = '';
             document.getElementById('product-form').reset();
             document.getElementById('edit-active').checked = true;
+            document.getElementById('edit-role').value = 'static';
+            document.getElementById('edit-discount').value = 0;
+            populateBundleCheckboxes([]);
             document.getElementById('modal-overlay').classList.add('open');
         }
 
@@ -422,7 +452,10 @@
             document.getElementById('edit-image').value = product.image || '';
             document.getElementById('edit-emoji').value = product.emoji || '';
             document.getElementById('edit-sort').value = product.sort_order || 0;
+            document.getElementById('edit-role').value = product.role || 'static';
+            document.getElementById('edit-discount').value = product.discount_percent || 0;
             document.getElementById('edit-active').checked = product.is_active;
+            populateBundleCheckboxes(product.bundle_ids || []);
             document.getElementById('modal-overlay').classList.add('open');
         }
 
@@ -437,6 +470,8 @@
             btn.textContent = 'Saving...';
             btn.disabled = true;
 
+            const selectedBundles = Array.from(document.querySelectorAll('.bundle-check:checked')).map(cb => cb.value);
+
             const payload = {
                 category: document.getElementById('edit-category').value,
                 slug: document.getElementById('edit-slug').value,
@@ -447,6 +482,9 @@
                 image: document.getElementById('edit-image').value,
                 emoji: document.getElementById('edit-emoji').value,
                 sort_order: parseInt(document.getElementById('edit-sort').value) || 0,
+                role: document.getElementById('edit-role').value,
+                bundle_ids: selectedBundles,
+                discount_percent: parseInt(document.getElementById('edit-discount').value) || 0,
                 is_active: document.getElementById('edit-active').checked
             };
 
