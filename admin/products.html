@@ -244,10 +244,38 @@
             color: var(--accent);
             background: rgba(0, 113, 227, 0.05);
         }
+
+        .admin-loader {
+            position: fixed;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg, #0a0a0f);
+            z-index: 9999;
+        }
+
+        .admin-loader .spinner {
+            width: 32px;
+            height: 32px;
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-top-color: var(--accent, #0071e3);
+            border-radius: 50%;
+            animation: spin .6s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg)
+            }
+        }
     </style>
 </head>
 
 <body>
+    <div class="admin-loader" id="admin-loader">
+        <div class="spinner"></div>
+    </div>
     <nav>
         <a href="/admin/" class="logo" style="text-decoration:none;">Mini<span>Desk</span> <span
                 style="font-size:0.75rem;color:var(--muted);font-weight:400;margin-left:4px;">Admin</span></a>
@@ -371,7 +399,11 @@
                 // Build lookup map by ID
                 allProducts.forEach(p => { productMap[p.id] = p; });
                 renderProducts();
+                const loader = document.getElementById('admin-loader');
+                if (loader) loader.remove();
             } catch (err) {
+                const loader = document.getElementById('admin-loader');
+                if (loader) loader.remove();
                 document.getElementById('products-container').innerHTML = '<div class="empty-state"><span class="icon">❌</span><p>Failed to load products.</p></div>';
             }
         }
