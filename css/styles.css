@@ -702,6 +702,18 @@
             color: var(--accent);
         }
 
+        .discount-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #30d158, #28b84c);
+            color: #fff;
+            font-size: 0.7rem;
+            font-weight: 800;
+            padding: 3px 8px;
+            border-radius: 50px;
+            letter-spacing: 0.02em;
+            vertical-align: middle;
+        }
+
         .product-img-tray {
             background: #f0f0f0;
             border-radius: 12px;

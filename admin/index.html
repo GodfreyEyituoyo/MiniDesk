@@ -7,9 +7,38 @@
     <title>Dashboard — MiniDesk Admin</title>
     <link rel="stylesheet" href="/css/styles.css">
     <link rel="stylesheet" href="css/admin.css">
+    <style>
+        .admin-loader {
+            position: fixed;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg, #0a0a0f);
+            z-index: 9999;
+        }
+
+        .admin-loader .spinner {
+            width: 32px;
+            height: 32px;
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-top-color: var(--accent, #0071e3);
+            border-radius: 50%;
+            animation: spin .6s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg)
+            }
+        }
+    </style>
 </head>
 
 <body>
+    <div class="admin-loader" id="admin-loader">
+        <div class="spinner"></div>
+    </div>
     <!-- NAV -->
     <nav>
         <a href="/admin/" class="logo" style="text-decoration:none;">Mini<span>Desk</span> <span

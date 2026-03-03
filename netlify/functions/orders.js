@@ -36,7 +36,9 @@ exports.handler = async (event) => {
             // Server-side price calculation from DB (never trust the frontend)
             let total;
             try {
-                const slugs = [body.bundle, body.monitor, body.keyboard, 'included', ...(body.addons || [])];
+                // Bundle base already includes all static items (Mac Mini, dongle, mousepad, etc.)
+                // Total = bundle base + selected monitor + selected keyboard + any add-ons
+                const slugs = [body.bundle, body.monitor, body.keyboard, ...(body.addons || [])];
                 const { data: products, error: priceError } = await supabase
                     .from('products')
                     .select('slug, price, is_active')
@@ -48,7 +50,7 @@ exports.handler = async (event) => {
 
                 const priceMap = {};
                 for (const p of products) {
-                    if (!p.is_active && p.slug !== 'included') {
+                    if (!p.is_active) {
                         throw new Error(`Product "${p.slug}" is no longer available`);
                     }
                     priceMap[p.slug] = p.price;

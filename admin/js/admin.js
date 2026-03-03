@@ -50,8 +50,14 @@ async function loadDashboard() {
         allOrders = ordersData.orders || [];
         renderOrders(allOrders);
 
+        // Remove loader
+        const loader = document.getElementById('admin-loader');
+        if (loader) loader.remove();
+
     } catch (err) {
         console.error('Dashboard load error:', err);
+        const loader = document.getElementById('admin-loader');
+        if (loader) loader.remove();
         document.getElementById('orders-body').innerHTML = `
             <tr><td colspan="7">
                 <div class="empty-state">

@@ -91,6 +91,9 @@ exports.handler = async (event) => {
                     price: parseInt(body.price),
                     tier: body.tier || null,
                     requires_tier: body.requires_tier || [],
+                    role: body.role || 'static',
+                    bundle_ids: body.bundle_ids || [],
+                    discount_percent: parseInt(body.discount_percent) || 0,
                     is_active: body.is_active !== false,
                     sort_order: body.sort_order || 0
                 })
@@ -117,13 +120,18 @@ exports.handler = async (event) => {
             const body = JSON.parse(event.body);
             const allowedFields = [
                 'name', 'description', 'emoji', 'image', 'tag', 'tag_class',
-                'specs', 'price', 'tier', 'requires_tier', 'is_active', 'sort_order', 'slug'
+                'specs', 'price', 'tier', 'requires_tier', 'is_active', 'sort_order', 'slug',
+                'role', 'bundle_ids', 'discount_percent'
             ];
 
             const updates = {};
             for (const field of allowedFields) {
                 if (body[field] !== undefined) {
-                    updates[field] = field === 'price' ? parseInt(body[field]) : body[field];
+                    if (['price', 'discount_percent', 'sort_order'].includes(field)) {
+                        updates[field] = parseInt(body[field]) || 0;
+                    } else {
+                        updates[field] = body[field];
+                    }
                 }
             }
 
