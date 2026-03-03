@@ -99,12 +99,8 @@ exports.handler = async (event) => {
                 return jsonResponse(500, { error: 'Failed to create order' });
             }
 
-            // Send email notifications (non-blocking)
-            try {
-                await sendOrderEmails(order);
-            } catch (emailErr) {
-                console.error('Email sending failed (non-blocking):', emailErr);
-            }
+            // Send email notifications (fire-and-forget — don't block the response)
+            sendOrderEmails(order).catch(err => console.error('Email failed:', err.message));
 
             return jsonResponse(201, {
                 success: true,
@@ -186,11 +182,15 @@ async function sendOrderEmails(order) {
     }
 
     const nodemailer = require('nodemailer');
+    const smtpPort = parseInt(process.env.SMTP_PORT || '465');
     const transporter = nodemailer.createTransport({
         host: process.env.SMTP_HOST || 'smtp.gmail.com',
-        port: parseInt(process.env.SMTP_PORT || '587'),
-        secure: false,
-        auth: { user: smtpUser, pass: smtpPass }
+        port: smtpPort,
+        secure: smtpPort === 465,
+        auth: { user: smtpUser, pass: smtpPass },
+        connectionTimeout: 10000,
+        greetingTimeout: 10000,
+        socketTimeout: 10000
     });
 
     const adminEmails = (process.env.ADMIN_EMAILS || '').split(',').filter(Boolean);

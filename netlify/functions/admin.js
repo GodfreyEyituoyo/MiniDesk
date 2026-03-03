@@ -166,11 +166,15 @@ async function sendStatusUpdateEmail(order, newStatus) {
     if (!smtpUser || !smtpPass) return;
 
     const nodemailer = require('nodemailer');
+    const smtpPort = parseInt(process.env.SMTP_PORT || '465');
     const transporter = nodemailer.createTransport({
         host: process.env.SMTP_HOST || 'smtp.gmail.com',
-        port: parseInt(process.env.SMTP_PORT || '587'),
-        secure: false,
-        auth: { user: smtpUser, pass: smtpPass }
+        port: smtpPort,
+        secure: smtpPort === 465,
+        auth: { user: smtpUser, pass: smtpPass },
+        connectionTimeout: 10000,
+        greetingTimeout: 10000,
+        socketTimeout: 10000
     });
 
     const statusMessages = {
