@@ -359,7 +359,7 @@
                         <option value="addon">Add-on (optional extra)</option>
                     </select>
                 </div>
-                <div class="form-group">
+                <div class="form-group" id="bundle-assignment-group">
                     <label>Bundle Assignment</label>
                     <div id="bundle-checkboxes" style="display:flex;gap:12px;flex-wrap:wrap;"></div>
                 </div>
@@ -459,6 +459,14 @@
             `).join('');
         }
 
+        function toggleBundleFields() {
+            const cat = document.getElementById('edit-category').value;
+            const bundleGroup = document.getElementById('bundle-assignment-group');
+            if (bundleGroup) bundleGroup.style.display = cat === 'bundle' ? 'none' : '';
+        }
+
+        document.getElementById('edit-category').addEventListener('change', toggleBundleFields);
+
         function openAddModal() {
             document.getElementById('modal-title').textContent = 'Add Product';
             document.getElementById('edit-id').value = '';
@@ -467,6 +475,7 @@
             document.getElementById('edit-role').value = 'static';
             document.getElementById('edit-discount').value = 0;
             populateBundleCheckboxes([]);
+            toggleBundleFields();
             document.getElementById('modal-overlay').classList.add('open');
         }
 
@@ -488,6 +497,7 @@
             document.getElementById('edit-discount').value = product.discount_percent || 0;
             document.getElementById('edit-active').checked = product.is_active;
             populateBundleCheckboxes(product.bundle_ids || []);
+            toggleBundleFields();
             document.getElementById('modal-overlay').classList.add('open');
         }
 
