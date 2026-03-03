@@ -344,6 +344,7 @@
         const authHeaders = { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` };
 
         let allProducts = [];
+        const productMap = {};
 
         async function loadProducts() {
             try {
@@ -351,6 +352,8 @@
                 if (res.status === 401) { window.location.href = '/admin/login.html'; return; }
                 const data = await res.json();
                 allProducts = data.products || [];
+                // Build lookup map by ID
+                allProducts.forEach(p => { productMap[p.id] = p; });
                 renderProducts();
             } catch (err) {
                 document.getElementById('products-container').innerHTML = '<div class="empty-state"><span class="icon">❌</span><p>Failed to load products.</p></div>';
@@ -371,17 +374,19 @@
                 const items = allProducts.filter(p => p.category === cat.key).sort((a, b) => a.sort_order - b.sort_order);
                 if (items.length === 0) continue;
 
+                const escapeName = (str) => str.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
                 html += `<div class="category-section">
                     <div class="category-title">${cat.label}</div>
                     ${items.map(p => `
                         <div class="product-row ${p.is_active ? '' : 'inactive'}">
                             <div class="product-info">
-                                <div class="product-name">${p.emoji ? p.emoji + ' ' : ''}${p.name} ${!p.is_active ? '<span style="color:#ff453a;font-size:0.75rem;">(inactive)</span>' : ''}</div>
-                                <div class="product-slug">${p.slug}${p.tag ? ' · ' + p.tag : ''}</div>
+                                <div class="product-name">${p.emoji ? p.emoji + ' ' : ''}${escapeName(p.name)} ${!p.is_active ? '<span style="color:#ff453a;font-size:0.75rem;">(inactive)</span>' : ''}</div>
+                                <div class="product-slug">${p.slug}${p.tag ? ' · ' + escapeName(p.tag) : ''}</div>
                             </div>
                             <div class="product-price">₦${p.price.toLocaleString()}</div>
                             <div class="product-actions">
-                                <button class="btn-sm" onclick='editProduct(${JSON.stringify(p).replace(/'/g, "\\'")})'>Edit</button>
+                                <button class="btn-sm" onclick="editProduct('${p.id}')">Edit</button>
                                 <button class="btn-sm ${p.is_active ? 'danger' : ''}" onclick="toggleActive('${p.id}', ${!p.is_active})">
                                     ${p.is_active ? 'Deactivate' : 'Activate'}
                                 </button>
@@ -403,7 +408,9 @@
             document.getElementById('modal-overlay').classList.add('open');
         }
 
-        function editProduct(product) {
+        function editProduct(id) {
+            const product = productMap[id];
+            if (!product) { alert('Product not found'); return; }
             document.getElementById('modal-title').textContent = 'Edit Product';
             document.getElementById('edit-id').value = product.id;
             document.getElementById('edit-category').value = product.category;

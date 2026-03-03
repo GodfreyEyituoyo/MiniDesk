@@ -51,39 +51,76 @@ const names = {
     }
 })();
 
-// Update price labels on cards if they exist
+// Update card content (prices, names, descriptions, images, tags, emojis) from DB
 function updateDisplayedPrices(products) {
     for (const p of products) {
-        // Bundle price labels (e.g. "From ₦850,000")
+        let card = null;
+
         if (p.category === 'bundle') {
-            const card = document.getElementById('card-' + p.slug);
-            if (card) {
-                const priceEl = card.querySelector('.option-price');
-                if (priceEl) priceEl.textContent = 'From ₦' + p.price.toLocaleString();
+            card = document.getElementById('card-' + p.slug);
+        } else if (p.category === 'monitor') {
+            card = document.getElementById('card-monitor-' + p.slug);
+        } else if (p.category === 'keyboard') {
+            card = document.getElementById('card-kb-' + p.slug);
+        } else if (p.category === 'addon' && p.slug !== 'included') {
+            card = document.getElementById('card-' + p.slug);
+        }
+
+        if (!card) continue;
+
+        // Price
+        const priceEl = card.querySelector('.option-price');
+        if (priceEl) {
+            priceEl.textContent = (p.category === 'bundle' ? 'From ' : '') + '₦' + p.price.toLocaleString();
+        }
+
+        // Name
+        const nameEl = card.querySelector('.option-name');
+        if (nameEl && p.name) nameEl.textContent = p.name;
+
+        // Description
+        const descEl = card.querySelector('.option-desc');
+        if (descEl && p.description !== undefined && p.description !== null) {
+            descEl.textContent = p.description;
+        }
+
+        // Image
+        const imgTray = card.querySelector('.product-img-tray');
+        if (imgTray) {
+            const img = imgTray.querySelector('img');
+            if (p.image) {
+                if (img) {
+                    img.src = p.image;
+                    img.alt = p.name || '';
+                } else {
+                    imgTray.innerHTML = `<img src="${p.image}" alt="${p.name || ''}">`;
+                }
+                imgTray.style.display = '';
+            } else {
+                // No image in DB — hide the tray
+                imgTray.style.display = 'none';
             }
         }
-        // Monitor price labels
-        if (p.category === 'monitor') {
-            const card = document.getElementById('card-monitor-' + p.slug);
-            if (card) {
-                const priceEl = card.querySelector('.option-price');
-                if (priceEl) priceEl.textContent = '₦' + p.price.toLocaleString();
+
+        // Emoji (bundles/keyboards)
+        const emojiEl = card.querySelector('.option-emoji');
+        if (emojiEl && p.emoji !== undefined) {
+            if (p.emoji) {
+                emojiEl.textContent = p.emoji;
+                emojiEl.style.display = '';
+            } else {
+                emojiEl.style.display = 'none';
             }
         }
-        // Keyboard price labels
-        if (p.category === 'keyboard') {
-            const card = document.getElementById('card-kb-' + p.slug);
-            if (card) {
-                const priceEl = card.querySelector('.option-price');
-                if (priceEl) priceEl.textContent = '₦' + p.price.toLocaleString();
-            }
-        }
-        // Addon price labels
-        if (p.category === 'addon' && p.slug !== 'included') {
-            const card = document.getElementById('card-' + p.slug);
-            if (card) {
-                const priceEl = card.querySelector('.option-price');
-                if (priceEl) priceEl.textContent = '₦' + p.price.toLocaleString();
+
+        // Tag
+        const tagEl = card.querySelector('.option-tag');
+        if (tagEl && p.tag !== undefined) {
+            if (p.tag) {
+                tagEl.textContent = p.tag;
+                tagEl.style.display = '';
+            } else {
+                tagEl.style.display = 'none';
             }
         }
     }
@@ -124,21 +161,13 @@ function selectMonitor(val) {
     const kbLockedNote = document.getElementById('kb-locked-note');
     const macCard = document.getElementById('card-kb-mac');
 
-    if (val === 'entry') {
-        selectKeyboard('windows');
-        macCard.style.opacity = '0.35';
-        macCard.style.pointerEvents = 'none';
-        kbAutoNote.classList.remove('hidden');
-        kbUpNote.classList.add('hidden');
-        kbLockedNote.classList.remove('hidden');
-    } else {
-        macCard.style.opacity = '1';
-        macCard.style.pointerEvents = 'auto';
-        kbAutoNote.classList.add('hidden');
-        kbUpNote.classList.remove('hidden');
-        kbLockedNote.classList.add('hidden');
-        if (!state.keyboard) selectKeyboard('windows');
-    }
+    // All monitors unlock both keyboard options
+    macCard.style.opacity = '1';
+    macCard.style.pointerEvents = 'auto';
+    kbAutoNote.classList.add('hidden');
+    kbUpNote.classList.remove('hidden');
+    kbLockedNote.classList.add('hidden');
+    if (!state.keyboard) selectKeyboard('windows');
     updateSummary();
 }
 
@@ -171,7 +200,7 @@ window.clearMonitor = function () {
 
 // ── KEYBOARD SELECT ──
 function selectKeyboard(val) {
-    if (val === 'mac' && state.monitor === 'entry') return;
+    // Both keyboards available for all monitors
     state.keyboard = val;
     ['windows', 'mac'].forEach(k => {
         const c = document.getElementById('card-kb-' + k);
