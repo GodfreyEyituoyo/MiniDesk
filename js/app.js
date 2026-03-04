@@ -253,7 +253,7 @@ function selectMonitor(val) {
     if (kbLockedNote) kbLockedNote.classList.add('hidden');
     if (macCard) { macCard.style.opacity = '1'; macCard.style.pointerEvents = 'auto'; }
 
-    if (!state.keyboard) selectKeyboard('windows');
+    // Don't auto-select keyboard — let user pick manually
     updateSummary();
 }
 
@@ -312,13 +312,16 @@ function updateSummary() {
     const lines = document.getElementById('summary-lines');
     const totalEl = document.getElementById('summary-total');
     const priceEl = document.getElementById('total-price');
+    const proceedBtn = document.getElementById('proceed-btn');
 
     if (!state.bundle && !state.monitor) {
         lines.innerHTML = '<div style="color:var(--muted);font-size:0.88rem;text-align:center;padding:20px 0;">Select options to see your build here.</div>';
         totalEl.style.display = 'none';
+        if (proceedBtn) { proceedBtn.style.opacity = '0.4'; proceedBtn.style.pointerEvents = 'none'; }
         return;
     }
 
+    const configComplete = state.bundle && state.monitor && state.keyboard;
     let total = 0;
     let html = '';
 
@@ -342,16 +345,21 @@ function updateSummary() {
     });
 
     lines.innerHTML = html;
-    totalEl.style.display = 'flex';
 
-    // 20% OFF badge
-    const bundle = productData.bundles.find(b => b.slug === state.bundle);
-    const discountPercent = bundle ? bundle.discount_percent : 20;
-
-    if (discountPercent > 0) {
-        priceEl.innerHTML = `₦${total.toLocaleString()} <span class="discount-badge" style="margin-left:8px;">${discountPercent}% OFF</span>`;
+    // Only show total and enable button when all 3 are selected
+    if (configComplete) {
+        totalEl.style.display = 'flex';
+        const bundle = productData.bundles.find(b => b.slug === state.bundle);
+        const discountPercent = bundle ? bundle.discount_percent : 20;
+        if (discountPercent > 0) {
+            priceEl.innerHTML = `₦${total.toLocaleString()} <span class="discount-badge" style="margin-left:8px;">${discountPercent}% OFF</span>`;
+        } else {
+            priceEl.textContent = '₦' + total.toLocaleString();
+        }
+        if (proceedBtn) { proceedBtn.style.opacity = '1'; proceedBtn.style.pointerEvents = 'auto'; }
     } else {
-        priceEl.textContent = '₦' + total.toLocaleString();
+        totalEl.style.display = 'none';
+        if (proceedBtn) { proceedBtn.style.opacity = '0.4'; proceedBtn.style.pointerEvents = 'none'; }
     }
 }
 
