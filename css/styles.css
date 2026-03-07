@@ -867,9 +867,9 @@
             width: 32px;
             height: 32px;
             border-radius: 50%;
-            border: 2px solid rgba(255, 255, 255, 0.15);
+            border: none;
             outline: 2px solid transparent;
-            outline-offset: 2px;
+            outline-offset: 3px;
             cursor: pointer;
             transition: outline-color 0.2s, transform 0.2s;
             position: relative;
@@ -877,12 +877,11 @@
 
         .color-swatch:hover {
             transform: scale(1.1);
-            outline-color: rgba(255, 255, 255, 0.3);
         }
 
         .color-swatch.active {
             outline-color: var(--accent);
-            transform: scale(1.15);
+            transform: scale(1.05);
         }
 
         /* ── INLINE SUMMARY (Final Step) ── */
