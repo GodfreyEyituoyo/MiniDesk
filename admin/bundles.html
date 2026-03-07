@@ -263,7 +263,8 @@
                         </div>
                         <div class="admin-card-actions">
                             <button class="btn-sm" onclick="openBuilder('${b.id}')">Configure</button>
-                            <button class="btn-sm" onclick='editBundle(${JSON.stringify(b)})'>Edit</button>
+                            <button class="btn-sm" onclick="editBundle('${b.id}')">Edit</button>
+                            <button class="btn-sm danger" onclick="deleteBundle('${b.id}')">Delete</button>
                         </div>
                     </div>
                     <div class="admin-card-meta">${b.description || ''}</div>
@@ -290,7 +291,24 @@
         }
 
         function closeBundleModal() { document.getElementById('bundle-modal').classList.remove('open'); }
-        function editBundle(b) { openBundleModal(b); }
+        function editBundle(id) {
+            const b = bundles.find(x => x.id === id);
+            if (b) openBundleModal(b);
+        }
+
+        async function deleteBundle(id) {
+            if (!confirm('Delete this bundle permanently?')) return;
+            try {
+                const res = await fetch(`/api/bundles?id=${id}`, {
+                    method: 'DELETE',
+                    headers: { Authorization: 'Bearer ' + token }
+                });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error);
+                toast('Bundle deleted');
+                loadBundles();
+            } catch (e) { toast(e.message, 'error'); }
+        }
 
         document.getElementById('bm-name').addEventListener('input', e => {
             if (!document.getElementById('bm-id').value) {
