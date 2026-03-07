@@ -421,15 +421,19 @@
 
         // ── DELETE ──
         async function deleteProduct(id) {
-            if (!confirm('Deactivate this product?')) return;
+            const choice = prompt('Type "delete" to permanently remove, or "deactivate" to hide from customers:');
+            if (!choice) return;
+            const hard = choice.trim().toLowerCase() === 'delete';
+
             try {
-                const res = await fetch(`/api/products?id=${id}`, {
+                const url = hard ? `/api/products?id=${id}&hard=true` : `/api/products?id=${id}`;
+                const res = await fetch(url, {
                     method: 'DELETE',
                     headers: { Authorization: 'Bearer ' + token }
                 });
                 const data = await res.json();
                 if (!res.ok) throw new Error(data.error);
-                toast('Product deactivated');
+                toast(hard ? 'Product permanently deleted' : 'Product deactivated');
                 loadData();
             } catch (e) { toast(e.message, 'error'); }
         }

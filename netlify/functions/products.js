@@ -163,12 +163,27 @@ exports.handler = async (event) => {
             return jsonResponse(200, { success: true, product });
         }
 
-        // ── DELETE: Soft-delete (deactivate) ──
+        // ── DELETE: Delete or deactivate ──
         if (event.httpMethod === 'DELETE') {
             if (!params.id) {
                 return jsonResponse(400, { error: 'Product ID required' });
             }
 
+            // Hard delete: ?hard=true permanently removes the product
+            if (params.hard === 'true') {
+                const { error } = await supabase
+                    .from('products')
+                    .delete()
+                    .eq('id', params.id);
+
+                if (error) {
+                    console.error('Product delete error:', error);
+                    return jsonResponse(500, { error: 'Failed to delete product' });
+                }
+                return jsonResponse(200, { success: true, deleted: true });
+            }
+
+            // Soft delete: just deactivate
             const { data: product, error } = await supabase
                 .from('products')
                 .update({ is_active: false })
