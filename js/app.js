@@ -3,6 +3,7 @@ const state = {
     bundle: null,
     monitor: null,
     keyboard: null,
+    keyboardColor: null,
     addons: []
 };
 
@@ -19,7 +20,7 @@ let productData = {
 const prices = {
     bundle: { basic: 1138000, full: 1443000 },
     monitor: { entry: 428400, mid: 540400, top: 658000, creator: 658000 },
-    keyboard: { windows: 84000, mac: 154000 },
+    keyboard: { 'pop-icon': 154000, mk250: 84000 },
     addon: { stand: 22000, ssd: 68000 }
 };
 
@@ -27,8 +28,38 @@ const prices = {
 const names = {
     bundle: { basic: 'Basic Work Bundle', full: 'Full Workspace Bundle' },
     monitor: { entry: 'Dell SE2726HG (27" FHD 240Hz)', mid: 'Dell S2725DS (27" QHD 100Hz)', top: 'Dell S2725QS (27" 4K UHD)', creator: 'ASUS ProArt PA278CV (27" QHD)' },
-    keyboard: { windows: 'Windows Keyboard', mac: 'Apple Magic Keyboard' },
+    keyboard: { 'pop-icon': 'Logitech POP Icon Combo', mk250: 'Logitech MK250 Compact' },
     addon: { stand: 'Laptop Stand', ssd: 'SanDisk 1TB Extreme Portable SSD' }
+};
+
+// ── KEYBOARD COLOR DATA ──
+const keyboardColors = {
+    'pop-icon': [
+        { name: 'Graphite & White', slug: 'graphite-white', hex: '#555555', hex2: '#ffffff', img: 'images/keyboards/pop-icon-graphite-white-1.jpg', img2: 'images/keyboards/pop-icon-graphite-white-2.jpg' },
+        { name: 'Rose & Off White', slug: 'rose-offwhite', hex: '#d4848a', hex2: '#f5f0eb', img: 'images/keyboards/pop-icon-rose-offwhite-1.jpg', img2: 'images/keyboards/pop-icon-rose-offwhite-2.jpg' },
+        { name: 'Off White & Orange', slug: 'offwhite-orange', hex: '#f5f0eb', hex2: '#e67e22', img: 'images/keyboards/pop-icon-offwhite-orange-1.jpg', img2: 'images/keyboards/pop-icon-offwhite-orange-2.jpg' },
+        { name: 'Graphite & Green', slug: 'graphite-green', hex: '#555555', hex2: '#6ab04c', img: 'images/keyboards/pop-icon-graphite-green-1.jpg', img2: 'images/keyboards/pop-icon-graphite-green-2.jpg' },
+        { name: 'Lilac & Off White', slug: 'lilac-offwhite', hex: '#b48dc7', hex2: '#f5f0eb', img: 'images/keyboards/pop-icon-lilac-offwhite-1.jpg', img2: 'images/keyboards/pop-icon-lilac-offwhite-2.jpg' }
+    ],
+    mk250: [
+        { name: 'Graphite', slug: 'graphite', hex: '#555555', img: 'images/keyboards/mk250-graphite-1.jpg', img2: 'images/keyboards/mk250-graphite-2.jpg' },
+        { name: 'Off-white', slug: 'offwhite', hex: '#f5f0eb', img: 'images/keyboards/mk250-offwhite-1.jpg', img2: 'images/keyboards/mk250-offwhite-2.jpg' },
+        { name: 'Rose', slug: 'rose', hex: '#d4848a', img: 'images/keyboards/mk250-rose-1.jpg', img2: 'images/keyboards/mk250-rose-2.jpg' }
+    ]
+};
+
+// ── MONITOR IMAGE MAP ──
+const monitorImages = {
+    entry: 'images/monitor-entry.png',
+    mid: 'images/monitor-mid.png',
+    top: 'images/monitor-top.png',
+    creator: 'images/monitor-creator.png'
+};
+
+// ── BUNDLE CONTENTS (static items per bundle) ──
+const bundleContents = {
+    basic: ['Mac Mini M4', 'USB-C Hub (10-in-1)', 'Wireless Mouse'],
+    full: ['Mac Mini M4', 'USB-C Hub (10-in-1)', 'Wireless Mouse', 'Workstation Table', 'Ergonomic Chair', 'Keyboard Mat', 'Side Light']
 };
 
 // ── LOAD PRODUCTS FROM DB ──
@@ -94,25 +125,17 @@ function updateBundleRanges() {
         : ['basic', 'full'];
 
     for (const slug of bundleSlugs) {
-        const card = document.getElementById('card-' + slug);
-        if (!card) continue;
-        const priceEl = card.querySelector('.option-price');
+        const priceEl = document.getElementById('price-' + slug);
         if (!priceEl) continue;
         const range = getBundleRange(slug);
-        const bundle = productData.bundles.find(b => b.slug === slug);
-        const discountBadge = bundle && bundle.discount_percent
-            ? ` <span class="discount-badge">${bundle.discount_percent}% OFF</span>`
-            : '';
-        priceEl.innerHTML = `₦${range.low.toLocaleString()} – ₦${range.high.toLocaleString()}${discountBadge}`;
+        priceEl.textContent = `₦${range.low.toLocaleString()} – ₦${range.high.toLocaleString()}`;
     }
 }
 
-// ── UPDATE CARD CONTENT (Godfrey's dynamic syncing + Apple-style pricing) ──
+// ── UPDATE CARD CONTENT FROM DB ──
 function updateDisplayedPrices(products) {
-    // First: update bundle ranges
     updateBundleRanges();
 
-    // Then: update all card content from DB
     for (const p of products) {
         let card = null;
 
@@ -128,46 +151,25 @@ function updateDisplayedPrices(products) {
 
         if (!card) continue;
 
-        // Name (from DB)
-        const nameEl = card.querySelector('.option-name');
+        // Name
+        const nameEl = card.querySelector('.apple-option-name');
         if (nameEl && p.name) nameEl.textContent = p.name;
 
-        // Description (from DB)
-        const descEl = card.querySelector('.option-desc');
+        // Description
+        const descEl = card.querySelector('.apple-option-desc');
         if (descEl && p.description !== undefined && p.description !== null) {
             descEl.textContent = p.description;
         }
 
-        // Image (from DB)
-        const imgTray = card.querySelector('.product-img-tray');
-        if (imgTray) {
-            const img = imgTray.querySelector('img');
-            if (p.image) {
-                if (img) {
-                    img.src = p.image;
-                    img.alt = p.name || '';
-                } else {
-                    imgTray.innerHTML = `<img src="${p.image}" alt="${p.name || ''}">`;
-                }
-                imgTray.style.display = '';
-            } else {
-                imgTray.style.display = 'none';
-            }
+        // Thumb image
+        const thumbEl = card.querySelector('.apple-option-thumb img');
+        if (thumbEl && p.image) {
+            thumbEl.src = p.image;
+            thumbEl.alt = p.name || '';
         }
 
-        // Emoji (from DB)
-        const emojiEl = card.querySelector('.option-emoji');
-        if (emojiEl && p.emoji !== undefined) {
-            if (p.emoji) {
-                emojiEl.textContent = p.emoji;
-                emojiEl.style.display = '';
-            } else {
-                emojiEl.style.display = 'none';
-            }
-        }
-
-        // Tag (from DB)
-        const tagEl = card.querySelector('.option-tag');
+        // Tag
+        const tagEl = card.querySelector('.apple-option-tag');
         if (tagEl && p.tag !== undefined) {
             if (p.tag) {
                 tagEl.textContent = p.tag;
@@ -177,50 +179,67 @@ function updateDisplayedPrices(products) {
             }
         }
 
-        // Apple-style: hide individual prices on monitors and keyboards
-        if (p.category === 'monitor' || p.category === 'keyboard') {
-            const priceEl = card.querySelector('.option-price');
-            if (priceEl) priceEl.style.display = 'none';
-        }
-
-        // Add-ons: show individual prices
+        // Add-ons: show prices
         if (p.category === 'addon' && p.role === 'addon') {
-            const priceEl = card.querySelector('.option-price');
+            const priceEl = card.querySelector('.apple-option-price');
             if (priceEl) priceEl.textContent = '₦' + p.price.toLocaleString();
         }
     }
 
-    // Hide cards for inactive products (not returned by API)
-    ['entry', 'mid', 'top', 'creator'].forEach(slug => {
-        const card = document.getElementById('card-monitor-' + slug);
-        if (card && !products.find(p => p.category === 'monitor' && p.slug === slug)) {
-            card.style.display = 'none';
-        }
-    });
-    ['windows', 'mac'].forEach(slug => {
-        const card = document.getElementById('card-kb-' + slug);
-        if (card && !products.find(p => p.category === 'keyboard' && p.slug === slug)) {
-            card.style.display = 'none';
-        }
-    });
-    ['stand', 'ssd'].forEach(slug => {
-        const card = document.getElementById('card-' + slug);
-        if (card && !products.find(p => p.slug === slug && p.role === 'addon')) {
-            card.style.display = 'none';
-        }
-    });
-
-    // Re-render summary if user has selections
     if (state.bundle || state.monitor) updateSummary();
+}
+
+// ── IMAGE CROSS-FADE ──
+function showConfigImage(imgId) {
+    document.querySelectorAll('.config-img').forEach(el => el.classList.remove('active'));
+    const target = document.getElementById(imgId);
+    if (target) target.classList.add('active');
+
+    // Update dots
+    document.querySelectorAll('.img-dot').forEach(d => d.classList.remove('active'));
+    const dotMap = ['img-bundle', 'img-monitor', 'img-keyboard', 'img-addons'];
+    const idx = dotMap.indexOf(imgId);
+    const dots = document.querySelectorAll('.img-dot');
+    if (idx >= 0 && dots[idx]) dots[idx].classList.add('active');
+}
+
+// ── INTERSECTION OBSERVER (auto-switch image on scroll) ──
+function setupStepObserver() {
+    const steps = document.querySelectorAll('.config-step[data-img]');
+    const stepObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const imgId = entry.target.getAttribute('data-img');
+                if (imgId) showConfigImage(imgId);
+            }
+        });
+    }, { threshold: 0.4, rootMargin: '-20% 0px -20% 0px' });
+
+    steps.forEach(step => stepObserver.observe(step));
 }
 
 // ── BUNDLE SELECT ──
 function selectBundle(val) {
     state.bundle = val;
-    document.querySelectorAll('[id^="card-basic"],[id^="card-full"]').forEach(c => c.classList.remove('selected'));
-    document.getElementById('card-' + val).classList.add('selected');
-    const clearBtn = document.getElementById('clear-bundle-btn');
-    if (clearBtn) clearBtn.style.display = 'inline-flex';
+    document.querySelectorAll('#card-basic, #card-full').forEach(c => c.classList.remove('selected'));
+    const card = document.getElementById('card-' + val);
+    if (card) card.classList.add('selected');
+
+    // Show bundle contents chips
+    const contentsEl = document.getElementById('bundle-contents');
+    const grid = document.getElementById('bundle-contents-grid');
+    if (contentsEl && grid) {
+        const items = bundleContents[val] || [];
+        if (items.length > 0) {
+            grid.innerHTML = items.map(item =>
+                `<div class="bundle-item-chip"><span class="chip-check">✓</span> ${item}</div>`
+            ).join('');
+            contentsEl.style.display = 'block';
+        } else {
+            contentsEl.style.display = 'none';
+        }
+    }
+
     updateSummary();
 }
 
@@ -233,66 +252,94 @@ function selectMonitor(val) {
     });
     document.getElementById('card-monitor-' + val).classList.add('selected');
 
-    const clearMonBtn = document.getElementById('clear-monitor-btn');
-    if (clearMonBtn) clearMonBtn.style.display = 'inline-flex';
+    // Update left panel image
+    const monitorImg = document.querySelector('#img-monitor img');
+    if (monitorImg && monitorImages[val]) {
+        monitorImg.src = monitorImages[val];
+    }
+    showConfigImage('img-monitor');
 
-    // Enable keyboard step
-    const step3 = document.getElementById('step3');
-    step3.classList.remove('step-disabled');
-    const selectMonNote = document.getElementById('kb-select-monitor-note');
-    if (selectMonNote) selectMonNote.style.display = 'none';
-
-    // All keyboards unlocked (no tier locking)
-    const kbAutoNote = document.getElementById('kb-auto-note');
-    const kbUpNote = document.getElementById('kb-upgrade-note');
-    const kbLockedNote = document.getElementById('kb-locked-note');
-    const macCard = document.getElementById('card-kb-mac');
-
-    if (kbAutoNote) kbAutoNote.classList.add('hidden');
-    if (kbUpNote) kbUpNote.classList.remove('hidden');
-    if (kbLockedNote) kbLockedNote.classList.add('hidden');
-    if (macCard) { macCard.style.opacity = '1'; macCard.style.pointerEvents = 'auto'; }
-
-    // Don't auto-select keyboard — let user pick manually
     updateSummary();
 }
-
-window.clearMonitor = function () {
-    state.monitor = null;
-    state.keyboard = null;
-    ['entry', 'mid', 'top', 'creator'].forEach(m => {
-        const c = document.getElementById('card-monitor-' + m);
-        if (c) c.classList.remove('selected');
-    });
-    ['windows', 'mac'].forEach(k => {
-        const c = document.getElementById('card-kb-' + k);
-        if (c) c.classList.remove('selected');
-    });
-    const macCard = document.getElementById('card-kb-mac');
-    if (macCard) { macCard.style.opacity = '1'; macCard.style.pointerEvents = 'auto'; }
-    ['kb-auto-note', 'kb-upgrade-note', 'kb-locked-note'].forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.classList.add('hidden');
-    });
-    const step3 = document.getElementById('step3');
-    step3.classList.add('step-disabled');
-    const selectMonNote = document.getElementById('kb-select-monitor-note');
-    if (selectMonNote) selectMonNote.style.display = '';
-    document.getElementById('clear-monitor-btn').style.display = 'none';
-    updateSummary();
-};
 
 // ── KEYBOARD SELECT ──
 function selectKeyboard(val) {
     state.keyboard = val;
-    ['windows', 'mac'].forEach(k => {
+    state.keyboardColor = null;
+    ['pop-icon', 'mk250'].forEach(k => {
         const c = document.getElementById('card-kb-' + k);
         if (c) c.classList.remove('selected');
     });
     const el = document.getElementById('card-kb-' + val);
     if (el) el.classList.add('selected');
+
+    // Show color swatches
+    renderColorSwatches(val);
+
+    // Select first color by default
+    const colors = keyboardColors[val];
+    if (colors && colors.length > 0) {
+        selectColor(val, colors[0]);
+    }
+
+    showConfigImage('img-keyboard');
     updateSummary();
 }
+
+// ── COLOR SWATCHES ──
+function renderColorSwatches(keyboardSlug) {
+    const selector = document.getElementById('color-selector');
+    const swatchContainer = document.getElementById('color-swatches');
+    const colors = keyboardColors[keyboardSlug];
+
+    if (!colors || !selector || !swatchContainer) return;
+
+    let html = '';
+    colors.forEach((color, i) => {
+        // Create gradient swatch for two-tone colors
+        const bg = color.hex2
+            ? `background: linear-gradient(135deg, ${color.hex} 50%, ${color.hex2} 50%);`
+            : `background: ${color.hex};`;
+        html += `<button class="color-swatch${i === 0 ? ' active' : ''}" style="${bg}" 
+                    onclick="selectColor('${keyboardSlug}', keyboardColors['${keyboardSlug}'][${i}])" 
+                    title="${color.name}"></button>`;
+    });
+
+    swatchContainer.innerHTML = html;
+    selector.style.display = 'block';
+}
+
+function selectColor(keyboardSlug, colorObj) {
+    state.keyboardColor = colorObj.name;
+
+    // Update color name label
+    const nameEl = document.getElementById('color-name');
+    if (nameEl) nameEl.textContent = colorObj.name;
+
+    // Update active swatch
+    document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('active'));
+    const colors = keyboardColors[keyboardSlug];
+    const idx = colors.findIndex(c => c.slug === colorObj.slug);
+    const swatches = document.querySelectorAll('.color-swatch');
+    if (idx >= 0 && swatches[idx]) swatches[idx].classList.add('active');
+
+    // Update left panel keyboard image
+    const kbImg = document.querySelector('#img-keyboard img');
+    if (kbImg && colorObj.img) {
+        kbImg.src = colorObj.img;
+    }
+
+    // Update thumbnail in the keyboard option card
+    const thumbImg = document.querySelector('#card-kb-' + keyboardSlug + ' .apple-option-thumb img');
+    if (thumbImg && colorObj.img) {
+        thumbImg.src = colorObj.img;
+    }
+
+    updateSummary();
+}
+
+// Make selectColor globally accessible
+window.selectColor = selectColor;
 
 // ── ADDON TOGGLE ──
 function toggleAddon(val, cardEl) {
@@ -304,10 +351,21 @@ function toggleAddon(val, cardEl) {
         state.addons.push(val);
         cardEl.classList.add('selected');
     }
+
+    // Update left panel image to show selected add-on
+    if (state.addons.length > 0) {
+        const lastAddon = state.addons[state.addons.length - 1];
+        const addonImgMap = { stand: 'images/addon-stand.png', ssd: 'images/addon-ssd.png' };
+        const addImg = document.querySelector('#img-addons img');
+        if (addImg && addonImgMap[lastAddon]) {
+            addImg.src = addonImgMap[lastAddon];
+        }
+    }
+
     updateSummary();
 }
 
-// ── UPDATE SUMMARY (Apple-style: item names, no individual prices, just total) ──
+// ── UPDATE SUMMARY ──
 function updateSummary() {
     const lines = document.getElementById('summary-lines');
     const totalEl = document.getElementById('summary-total');
@@ -315,7 +373,7 @@ function updateSummary() {
     const proceedBtn = document.getElementById('proceed-btn');
 
     if (!state.bundle && !state.monitor) {
-        lines.innerHTML = '<div style="color:var(--muted);font-size:0.88rem;text-align:center;padding:20px 0;">Select options to see your build here.</div>';
+        lines.innerHTML = '<div class="summary-empty">Select your bundle to start building.</div>';
         totalEl.style.display = 'none';
         if (proceedBtn) { proceedBtn.style.opacity = '0.4'; proceedBtn.style.pointerEvents = 'none'; }
         return;
@@ -335,7 +393,9 @@ function updateSummary() {
     }
     if (state.keyboard) {
         total += prices.keyboard[state.keyboard] || 0;
-        html += summaryItem(names.keyboard[state.keyboard] || state.keyboard);
+        let kbName = names.keyboard[state.keyboard] || state.keyboard;
+        if (state.keyboardColor) kbName += ' — ' + state.keyboardColor;
+        html += summaryItem(kbName);
     }
     // Add-ons show WITH price
     state.addons.forEach(a => {
@@ -346,7 +406,7 @@ function updateSummary() {
 
     lines.innerHTML = html;
 
-    // Only show total and enable button when all 3 are selected
+    // Only show total and enable proceed when all 3 are selected
     if (configComplete) {
         totalEl.style.display = 'flex';
         const bundle = productData.bundles.find(b => b.slug === state.bundle);
@@ -363,7 +423,7 @@ function updateSummary() {
     }
 }
 
-// Summary line without price (for bundle items — Apple-style)
+// Summary line without price (Apple-style checkmark)
 function summaryItem(name) {
     return `<div class="summary-line"><span class="item-name">${name}</span><span class="item-price" style="color:var(--muted);font-size:0.8rem;">✓</span></div>`;
 }
@@ -433,6 +493,9 @@ document.addEventListener('DOMContentLoaded', () => {
             if (errEl) { errEl.remove(); input.style.borderColor = ''; }
         });
     }
+
+    // Set up IntersectionObserver for image switching
+    setupStepObserver();
 });
 
 // ── SEND ORDER ──
@@ -488,6 +551,7 @@ async function sendOrder() {
                 bundle: state.bundle,
                 monitor: state.monitor,
                 keyboard: state.keyboard,
+                keyboard_color: state.keyboardColor,
                 addons: state.addons,
                 special_requests: notes
             })
@@ -539,17 +603,13 @@ const observer = new IntersectionObserver((entries) => {
     });
 }, { threshold: 0.12 });
 
-document.querySelectorAll('.reveal, .step, .contact-section').forEach(el => {
+document.querySelectorAll('.reveal, .config-step, .contact-section').forEach(el => {
     observer.observe(el);
-});
-
-document.querySelectorAll('.step').forEach((el, i) => {
-    el.style.transitionDelay = (i * 0.1) + 's';
 });
 
 // ── HERO SLIDESHOW ──
 const slides = document.querySelectorAll('.hero-slideshow .slide');
-const dots = document.querySelectorAll('.dot');
+const dots = document.querySelectorAll('.slideshow-dots .dot');
 let currentSlide = 0;
 let isPlaying = true;
 let slideshowTimer = null;
@@ -597,7 +657,8 @@ window.clearBundle = function () {
         const c = document.getElementById('card-' + v);
         if (c) c.classList.remove('selected');
     });
-    document.getElementById('clear-bundle-btn').style.display = 'none';
+    const contentsEl = document.getElementById('bundle-contents');
+    if (contentsEl) contentsEl.style.display = 'none';
     updateSummary();
 };
 

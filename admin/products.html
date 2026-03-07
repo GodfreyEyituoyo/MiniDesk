@@ -7,275 +7,9 @@
     <title>Products — MiniDesk Admin</title>
     <link rel="stylesheet" href="/css/styles.css">
     <link rel="stylesheet" href="css/admin.css">
-    <style>
-        .products-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 24px;
-        }
-
-        .products-header h2 {
-            font-size: 1.4rem;
-            font-weight: 800;
-        }
-
-        .btn-add {
-            background: var(--accent);
-            color: #000;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 50px;
-            font-weight: 700;
-            font-family: var(--font);
-            cursor: pointer;
-            font-size: 0.85rem;
-            transition: transform 0.2s;
-        }
-
-        .btn-add:hover {
-            transform: translateY(-1px);
-        }
-
-        .category-section {
-            margin-bottom: 40px;
-        }
-
-        .category-title {
-            font-size: 0.75rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            color: var(--accent);
-            margin-bottom: 16px;
-        }
-
-        .product-row {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 16px 20px;
-            margin-bottom: 10px;
-            transition: border-color 0.2s;
-        }
-
-        .product-row:hover {
-            border-color: rgba(255, 255, 255, 0.2);
-        }
-
-        .product-row.inactive {
-            opacity: 0.4;
-        }
-
-        .product-info {
-            flex: 1;
-        }
-
-        .product-name {
-            font-weight: 700;
-            font-size: 0.95rem;
-        }
-
-        .product-slug {
-            font-size: 0.78rem;
-            color: var(--muted);
-        }
-
-        .product-price {
-            font-weight: 700;
-            color: var(--accent);
-            font-size: 1rem;
-            min-width: 100px;
-            text-align: right;
-        }
-
-        .product-actions {
-            display: flex;
-            gap: 8px;
-        }
-
-        .btn-sm {
-            padding: 6px 14px;
-            border-radius: 50px;
-            border: 1px solid var(--border);
-            background: transparent;
-            color: var(--muted);
-            font-family: var(--font);
-            font-size: 0.78rem;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .btn-sm:hover {
-            border-color: var(--accent);
-            color: var(--accent);
-        }
-
-        .btn-sm.danger:hover {
-            border-color: #ff453a;
-            color: #ff453a;
-        }
-
-        /* Modal */
-        .modal-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.7);
-            z-index: 200;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            padding: 24px;
-        }
-
-        .modal-overlay.open {
-            display: flex;
-        }
-
-        .modal {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            padding: 32px;
-            max-width: 500px;
-            width: 100%;
-            max-height: 85vh;
-            overflow-y: auto;
-        }
-
-        .modal h3 {
-            font-size: 1.2rem;
-            font-weight: 800;
-            margin-bottom: 20px;
-        }
-
-        .modal .form-group {
-            margin-bottom: 14px;
-        }
-
-        .modal .form-group label {
-            font-size: 0.8rem;
-            font-weight: 600;
-            display: block;
-            margin-bottom: 6px;
-            color: var(--muted);
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        .modal .form-group input,
-        .modal .form-group select,
-        .modal .form-group textarea {
-            width: 100%;
-            background: var(--bg);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 10px 14px;
-            color: var(--text);
-            font-family: var(--font);
-            font-size: 0.9rem;
-            outline: none;
-        }
-
-        .modal .form-group input:focus,
-        .modal .form-group select:focus {
-            border-color: var(--accent);
-        }
-
-        .modal-actions {
-            display: flex;
-            gap: 12px;
-            margin-top: 20px;
-        }
-
-        .modal-actions button {
-            flex: 1;
-        }
-
-        .btn-cancel {
-            padding: 12px;
-            border-radius: 50px;
-            border: 1px solid var(--border);
-            background: transparent;
-            color: var(--muted);
-            font-family: var(--font);
-            font-weight: 600;
-            cursor: pointer;
-        }
-
-        .btn-save {
-            padding: 12px;
-            border-radius: 50px;
-            border: none;
-            background: var(--accent);
-            color: #000;
-            font-family: var(--font);
-            font-weight: 700;
-            cursor: pointer;
-        }
-
-        /* Nav tabs */
-        .admin-tabs {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 32px;
-        }
-
-        .admin-tab {
-            padding: 8px 20px;
-            border-radius: 50px;
-            border: 1px solid var(--border);
-            background: transparent;
-            color: var(--muted);
-            font-family: var(--font);
-            font-size: 0.85rem;
-            font-weight: 600;
-            cursor: pointer;
-            text-decoration: none;
-            transition: all 0.2s;
-        }
-
-        .admin-tab:hover,
-        .admin-tab.active {
-            border-color: var(--accent);
-            color: var(--accent);
-            background: rgba(0, 113, 227, 0.05);
-        }
-
-        .admin-loader {
-            position: fixed;
-            inset: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: var(--bg, #0a0a0f);
-            z-index: 9999;
-        }
-
-        .admin-loader .spinner {
-            width: 32px;
-            height: 32px;
-            border: 3px solid rgba(255, 255, 255, 0.1);
-            border-top-color: var(--accent, #0071e3);
-            border-radius: 50%;
-            animation: spin .6s linear infinite;
-        }
-
-        @keyframes spin {
-            to {
-                transform: rotate(360deg)
-            }
-        }
-    </style>
 </head>
 
 <body>
-    <div class="admin-loader" id="admin-loader">
-        <div class="spinner"></div>
-    </div>
     <nav>
         <a href="/admin/" class="logo" style="text-decoration:none;">Mini<span>Desk</span> <span
                 style="font-size:0.75rem;color:var(--muted);font-weight:400;margin-left:4px;">Admin</span></a>
@@ -286,293 +20,421 @@
     </nav>
 
     <div class="admin-wrap">
-        <!-- Tabs -->
         <div class="admin-tabs">
             <a href="/admin/" class="admin-tab">Orders</a>
             <a href="/admin/products.html" class="admin-tab active">Products</a>
+            <a href="/admin/categories.html" class="admin-tab">Categories</a>
+            <a href="/admin/bundles.html" class="admin-tab">Bundles</a>
         </div>
 
-        <div class="products-header">
-            <h2>Manage Products</h2>
-            <button class="btn-add" onclick="openAddModal()">+ Add Product</button>
+        <!-- Filter by category -->
+        <div class="admin-toolbar">
+            <h2>Products</h2>
+            <button class="btn-add" onclick="openProductModal()">+ Add Product</button>
         </div>
+        <div class="filter-bar" id="cat-filters"></div>
 
-        <div id="products-container">
+        <div class="admin-cards" id="products-grid">
             <div class="empty-state"><span class="icon">⏳</span>
                 <p>Loading products...</p>
             </div>
         </div>
     </div>
 
-    <!-- Edit/Add Modal -->
-    <div class="modal-overlay" id="modal-overlay">
-        <div class="modal">
-            <h3 id="modal-title">Edit Product</h3>
-            <form id="product-form" onsubmit="saveProduct(event)">
-                <input type="hidden" id="edit-id">
-                <div class="form-group">
-                    <label>Category</label>
-                    <select id="edit-category">
-                        <option value="bundle">Bundle</option>
-                        <option value="monitor">Monitor</option>
-                        <option value="keyboard">Keyboard</option>
-                        <option value="addon">Add-on</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Slug (unique ID)</label>
-                    <input type="text" id="edit-slug" placeholder="e.g. basic, entry, mac" required>
-                </div>
-                <div class="form-group">
+    <!-- Product Modal -->
+    <div class="modal-overlay" id="product-modal">
+        <div class="modal" style="max-width:620px;">
+            <h3 id="pm-title">Add Product</h3>
+            <input type="hidden" id="pm-id">
+
+            <div class="modal-row">
+                <div class="modal-field">
                     <label>Name</label>
-                    <input type="text" id="edit-name" placeholder="Product name" required>
+                    <input type="text" id="pm-name" placeholder="e.g. Dell S2725DS">
                 </div>
-                <div class="form-group">
-                    <label>Description</label>
-                    <textarea id="edit-description" rows="2" placeholder="Short description"></textarea>
+                <div class="modal-field">
+                    <label>Slug</label>
+                    <input type="text" id="pm-slug" placeholder="e.g. mid">
                 </div>
-                <div class="form-group">
+            </div>
+
+            <div class="modal-field">
+                <label>Description</label>
+                <textarea id="pm-desc" placeholder="Product description"></textarea>
+            </div>
+
+            <div class="modal-row">
+                <div class="modal-field">
                     <label>Price (₦)</label>
-                    <input type="number" id="edit-price" placeholder="e.g. 95000" required>
+                    <input type="number" id="pm-price" placeholder="e.g. 540400">
                 </div>
-                <div class="form-group">
-                    <label>Tag (optional)</label>
-                    <input type="text" id="edit-tag" placeholder="e.g. Entry Level, Best Value">
+                <div class="modal-field">
+                    <label>Category</label>
+                    <select id="pm-category"></select>
                 </div>
-                <div class="form-group">
-                    <label>Image Path (optional)</label>
-                    <input type="text" id="edit-image" placeholder="e.g. images/monitor-entry.png">
+            </div>
+
+            <div class="modal-row">
+                <div class="modal-field">
+                    <label>Tag</label>
+                    <input type="text" id="pm-tag" placeholder="e.g. MID RANGE">
                 </div>
-                <div class="form-group">
-                    <label>Emoji (optional)</label>
-                    <input type="text" id="edit-emoji" placeholder="e.g. ⚡ 🚀 ⌨️">
-                </div>
-                <div class="form-group">
+                <div class="modal-field">
                     <label>Sort Order</label>
-                    <input type="number" id="edit-sort" value="0">
+                    <input type="number" id="pm-sort" value="0">
                 </div>
-                <div class="form-group">
-                    <label>Role</label>
-                    <select id="edit-role">
-                        <option value="static">Static (always included)</option>
-                        <option value="configurable">Configurable (customer picks)</option>
-                        <option value="addon">Add-on (optional extra)</option>
-                    </select>
+            </div>
+
+            <div class="modal-row">
+                <div class="modal-field">
+                    <label style="margin-bottom:10px;">Add-on?</label>
+                    <div class="toggle-wrap">
+                        <button class="toggle" id="pm-addon" onclick="this.classList.toggle('on')"></button>
+                        <span style="font-size:0.82rem;color:var(--muted);">Sell as standalone add-on</span>
+                    </div>
                 </div>
-                <div class="form-group" id="bundle-assignment-group">
-                    <label>Bundle Assignment</label>
-                    <div id="bundle-checkboxes" style="display:flex;gap:12px;flex-wrap:wrap;"></div>
+                <div class="modal-field">
+                    <label style="margin-bottom:10px;">Active?</label>
+                    <div class="toggle-wrap">
+                        <button class="toggle on" id="pm-active" onclick="this.classList.toggle('on')"></button>
+                        <span style="font-size:0.82rem;color:var(--muted);">Visible to customers</span>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label>Discount % (shown as badge)</label>
-                    <input type="number" id="edit-discount" value="0" min="0" max="99">
+            </div>
+
+            <!-- Image Upload -->
+            <div class="modal-field">
+                <label>Images</label>
+                <div class="dropzone" id="pm-dropzone">
+                    <span class="drop-icon">📷</span>
+                    Drag & drop images here, or click to browse
+                    <input type="file" id="pm-file-input" accept="image/*" multiple style="display:none;">
                 </div>
-                <div class="form-group" style="display:flex;align-items:center;gap:10px;">
-                    <input type="checkbox" id="edit-active" checked style="width:auto;">
-                    <label for="edit-active" style="margin:0;text-transform:none;font-size:0.9rem;">Active (visible on
-                        site)</label>
-                </div>
-                <div class="modal-actions">
-                    <button type="button" class="btn-cancel" onclick="closeModal()">Cancel</button>
-                    <button type="submit" class="btn-save" id="save-btn">Save</button>
-                </div>
-            </form>
+                <div class="image-previews" id="pm-images"></div>
+            </div>
+
+            <!-- Color Options -->
+            <div class="modal-field">
+                <label>Color Options</label>
+                <div class="color-options-list" id="pm-colors"></div>
+                <button class="btn-add-color" onclick="addColorRow()">+ Add Color</button>
+            </div>
+
+            <div class="modal-actions">
+                <button class="btn-cancel" onclick="closeProductModal()">Cancel</button>
+                <button class="btn-save" id="pm-save" onclick="saveProduct()">Save</button>
+            </div>
         </div>
     </div>
 
     <script>
-        // Auth check
-        const token = localStorage.getItem('minidesk_admin_token');
+        let token = localStorage.getItem('minidesk_token');
         if (!token) window.location.href = '/admin/login.html';
-        document.getElementById('admin-email').textContent = localStorage.getItem('minidesk_admin_email') || '';
-        const authHeaders = { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` };
 
-        let allProducts = [];
-        const productMap = {};
+        const emailEl = document.getElementById('admin-email');
+        try { emailEl.textContent = JSON.parse(atob(token.split('.')[1])).email; } catch (e) { }
 
-        async function loadProducts() {
+        function logout() { localStorage.removeItem('minidesk_token'); window.location.href = '/admin/login.html'; }
+        function toast(msg, type = 'success') {
+            const t = document.createElement('div');
+            t.className = 'toast ' + type;
+            t.textContent = msg;
+            document.body.appendChild(t);
+            setTimeout(() => t.remove(), 3000);
+        }
+
+        let products = [];
+        let categories = [];
+        let productImages = []; // URLs being managed in modal
+        let activeFilter = 'all';
+
+        // ── LOAD DATA ──
+        async function loadData() {
             try {
-                const res = await fetch('/api/products?all=true', { headers: authHeaders });
-                if (res.status === 401) { window.location.href = '/admin/login.html'; return; }
-                const data = await res.json();
-                allProducts = data.products || [];
-                // Build lookup map by ID
-                allProducts.forEach(p => { productMap[p.id] = p; });
+                const [pRes, cRes] = await Promise.all([
+                    fetch('/api/products?all=true', { headers: { Authorization: 'Bearer ' + token } }),
+                    fetch('/api/categories')
+                ]);
+                const pData = await pRes.json();
+                const cData = await cRes.json();
+                products = pData.products || [];
+                categories = cData.categories || [];
+                renderFilters();
                 renderProducts();
-                const loader = document.getElementById('admin-loader');
-                if (loader) loader.remove();
-            } catch (err) {
-                const loader = document.getElementById('admin-loader');
-                if (loader) loader.remove();
-                document.getElementById('products-container').innerHTML = '<div class="empty-state"><span class="icon">❌</span><p>Failed to load products.</p></div>';
-            }
+            } catch (e) { console.error(e); }
+        }
+
+        function renderFilters() {
+            const el = document.getElementById('cat-filters');
+            const counts = { all: products.length };
+            categories.forEach(c => { counts[c.id] = 0; });
+            products.forEach(p => { if (p.category_id && counts[p.category_id] !== undefined) counts[p.category_id]++; });
+
+            el.innerHTML = `<button class="filter-btn ${activeFilter === 'all' ? 'active' : ''}" onclick="filterBy('all', this)">All (${counts.all})</button>`
+                + categories.map(c =>
+                    `<button class="filter-btn ${activeFilter === c.id ? 'active' : ''}" onclick="filterBy('${c.id}', this)">${c.name} (${counts[c.id] || 0})</button>`
+                ).join('');
+        }
+
+        function filterBy(val, btn) {
+            activeFilter = val;
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            renderProducts();
         }
 
         function renderProducts() {
-            const container = document.getElementById('products-container');
-            const categories = [
-                { key: 'bundle', label: 'Bundles', filter: p => p.category === 'bundle' },
-                { key: 'configurable', label: 'Configurable (Customer Picks)', filter: p => p.role === 'configurable' },
-                { key: 'static', label: 'Static Components (Always Included)', filter: p => p.role === 'static' && p.category !== 'bundle' },
-                { key: 'addon', label: 'Add-ons (Optional)', filter: p => p.role === 'addon' }
-            ];
-
-            let html = '';
-            for (const cat of categories) {
-                const items = allProducts.filter(cat.filter).sort((a, b) => a.sort_order - b.sort_order);
-                if (items.length === 0) continue;
-
-                const escapeName = (str) => str.replace(/</g, '&lt;').replace(/>/g, '&gt;');
-                const bundleLabel = (ids) => ids && ids.length > 0 ? ids.map(id => id.charAt(0).toUpperCase() + id.slice(1)).join(', ') : '—';
-
-                html += `<div class="category-section">
-                    <div class="category-title">${cat.label}</div>
-                    ${items.map(p => `
-                        <div class="product-row ${p.is_active ? '' : 'inactive'}">
-                            <div class="product-info">
-                                <div class="product-name">${p.emoji ? p.emoji + ' ' : ''}${escapeName(p.name)} ${!p.is_active ? '<span style="color:#ff453a;font-size:0.75rem;">(inactive)</span>' : ''}</div>
-                                <div class="product-slug">${p.slug} · ${p.category}${p.bundle_ids && p.bundle_ids.length ? ' · Bundles: ' + bundleLabel(p.bundle_ids) : ''}${p.tag ? ' · ' + escapeName(p.tag) : ''}</div>
-                            </div>
-                            <div class="product-price">₦${p.price.toLocaleString()}</div>
-                            <div class="product-actions">
-                                <button class="btn-sm" onclick="editProduct('${p.id}')">Edit</button>
-                                <button class="btn-sm ${p.is_active ? 'danger' : ''}" onclick="toggleActive('${p.id}', ${!p.is_active})">
-                                    ${p.is_active ? 'Deactivate' : 'Activate'}
-                                </button>
-                            </div>
-                        </div>
-                    `).join('')}
-                </div>`;
+            const grid = document.getElementById('products-grid');
+            let filtered = products;
+            if (activeFilter !== 'all') {
+                filtered = products.filter(p => p.category_id === activeFilter);
             }
 
-            container.innerHTML = html || '<div class="empty-state"><span class="icon">📭</span><p>No products found.</p></div>';
+            if (filtered.length === 0) {
+                grid.innerHTML = '<div class="empty-state"><span class="icon">📦</span><p>No products found.</p></div>';
+                return;
+            }
+
+            grid.innerHTML = filtered.map(p => {
+                const cat = categories.find(c => c.id === p.category_id);
+                const img = (p.images && p.images.length > 0) ? p.images[0] : p.image;
+                return `
+                <div class="admin-card">
+                    ${img ? `<div class="product-card-img"><img src="${img}" alt="${p.name}"></div>` : ''}
+                    <div class="admin-card-header">
+                        <div>
+                            <div class="admin-card-title">${p.name}</div>
+                            ${p.tag ? `<div class="admin-card-subtitle" style="color:var(--accent);font-weight:600;">${p.tag}</div>` : ''}
+                        </div>
+                        <div class="admin-card-actions">
+                            <button class="btn-sm" onclick='editProduct("${p.id}")'>Edit</button>
+                            <button class="btn-sm danger" onclick="deleteProduct('${p.id}')">Delete</button>
+                        </div>
+                    </div>
+                    <div class="product-card-price">₦${p.price.toLocaleString()}</div>
+                    ${cat ? `<span class="product-card-category">${cat.name}</span>` : ''}
+                    ${p.is_addon ? '<span class="product-card-category" style="background:rgba(175,82,222,0.1);color:#bf5af2;margin-left:4px;">Add-on</span>' : ''}
+                    ${!p.is_active ? '<div class="admin-card-meta" style="color:#ff453a;">⛔ Inactive</div>' : ''}
+                </div>`;
+            }).join('');
         }
 
-        function populateBundleCheckboxes(selectedIds = []) {
-            const container = document.getElementById('bundle-checkboxes');
-            const bundles = allProducts.filter(p => p.category === 'bundle');
-            container.innerHTML = bundles.map(b => `
-                <label style="display:flex;align-items:center;gap:4px;cursor:pointer;font-size:0.85rem;color:var(--text);">
-                    <input type="checkbox" class="bundle-check" value="${b.slug}" ${selectedIds.includes(b.slug) ? 'checked' : ''} style="width:auto;">
-                    ${b.name}
-                </label>
+        // ── PRODUCT MODAL ──
+        function openProductModal(p = null) {
+            document.getElementById('pm-title').textContent = p ? 'Edit Product' : 'Add Product';
+            document.getElementById('pm-id').value = p ? p.id : '';
+            document.getElementById('pm-name').value = p ? p.name : '';
+            document.getElementById('pm-slug').value = p ? p.slug : '';
+            document.getElementById('pm-desc').value = p ? (p.description || '') : '';
+            document.getElementById('pm-price').value = p ? p.price : '';
+            document.getElementById('pm-tag').value = p ? (p.tag || '') : '';
+            document.getElementById('pm-sort').value = p ? p.sort_order : products.length;
+
+            // Category dropdown
+            const catSelect = document.getElementById('pm-category');
+            catSelect.innerHTML = '<option value="">— Select —</option>'
+                + categories.map(c => `<option value="${c.id}" ${p && p.category_id === c.id ? 'selected' : ''}>${c.name}</option>`).join('');
+
+            // Toggles
+            const addonBtn = document.getElementById('pm-addon');
+            addonBtn.className = 'toggle' + (p && p.is_addon ? ' on' : '');
+            const activeBtn = document.getElementById('pm-active');
+            activeBtn.className = 'toggle' + ((!p || p.is_active !== false) ? ' on' : '');
+
+            // Images
+            productImages = p && p.images ? [...p.images] : [];
+            renderImagePreviews();
+
+            // Colors
+            const colors = p && p.color_options ? p.color_options : [];
+            renderColorOptions(colors);
+
+            document.getElementById('product-modal').classList.add('open');
+        }
+
+        function closeProductModal() { document.getElementById('product-modal').classList.remove('open'); }
+
+        function editProduct(id) {
+            const p = products.find(x => x.id === id);
+            if (p) openProductModal(p);
+        }
+
+        // Auto-slug
+        document.getElementById('pm-name').addEventListener('input', e => {
+            if (!document.getElementById('pm-id').value) {
+                document.getElementById('pm-slug').value = e.target.value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+            }
+        });
+
+        // ── IMAGE UPLOAD ──
+        const dropzone = document.getElementById('pm-dropzone');
+        const fileInput = document.getElementById('pm-file-input');
+
+        dropzone.addEventListener('click', () => fileInput.click());
+        dropzone.addEventListener('dragover', e => { e.preventDefault(); dropzone.classList.add('dragover'); });
+        dropzone.addEventListener('dragleave', () => dropzone.classList.remove('dragover'));
+        dropzone.addEventListener('drop', e => {
+            e.preventDefault();
+            dropzone.classList.remove('dragover');
+            handleFiles(e.dataTransfer.files);
+        });
+        fileInput.addEventListener('change', e => handleFiles(e.target.files));
+
+        async function handleFiles(files) {
+            for (const file of files) {
+                if (!file.type.startsWith('image/')) continue;
+
+                const reader = new FileReader();
+                reader.onload = async (e) => {
+                    const base64 = e.target.result;
+                    dropzone.innerHTML = '<span class="drop-icon">⏳</span> Uploading...';
+
+                    try {
+                        const res = await fetch('/api/upload', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+                            body: JSON.stringify({ file: base64, filename: file.name })
+                        });
+                        const data = await res.json();
+                        if (!res.ok) throw new Error(data.error);
+
+                        productImages.push(data.url);
+                        renderImagePreviews();
+                        toast('Image uploaded');
+                    } catch (err) {
+                        toast('Upload failed: ' + err.message, 'error');
+                    }
+
+                    dropzone.innerHTML = '<span class="drop-icon">📷</span> Drag & drop images here, or click to browse';
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function renderImagePreviews() {
+            const el = document.getElementById('pm-images');
+            el.innerHTML = productImages.map((url, i) => `
+                <div class="img-preview">
+                    <img src="${url}" alt="Product image">
+                    <button class="img-remove" onclick="removeImage(${i})">✕</button>
+                </div>
             `).join('');
         }
 
-        function toggleBundleFields() {
-            const cat = document.getElementById('edit-category').value;
-            const bundleGroup = document.getElementById('bundle-assignment-group');
-            if (bundleGroup) bundleGroup.style.display = cat === 'bundle' ? 'none' : '';
+        function removeImage(i) {
+            productImages.splice(i, 1);
+            renderImagePreviews();
         }
 
-        document.getElementById('edit-category').addEventListener('change', toggleBundleFields);
-
-        function openAddModal() {
-            document.getElementById('modal-title').textContent = 'Add Product';
-            document.getElementById('edit-id').value = '';
-            document.getElementById('product-form').reset();
-            document.getElementById('edit-active').checked = true;
-            document.getElementById('edit-role').value = 'static';
-            document.getElementById('edit-discount').value = 0;
-            populateBundleCheckboxes([]);
-            toggleBundleFields();
-            document.getElementById('modal-overlay').classList.add('open');
+        // ── COLOR OPTIONS ──
+        function renderColorOptions(colors = []) {
+            const el = document.getElementById('pm-colors');
+            el.innerHTML = colors.map((c, i) => `
+                <div class="color-option-row">
+                    <input type="text" value="${c.name || ''}" placeholder="Color name" data-color-name="${i}">
+                    <input type="color" value="${c.hex || '#555555'}" data-color-hex="${i}">
+                    <input type="text" value="${c.img || ''}" placeholder="Image URL" data-color-img="${i}" style="flex:2;">
+                    <button class="btn-sm danger" onclick="this.parentElement.remove()" style="flex-shrink:0;">✕</button>
+                </div>
+            `).join('');
         }
 
-        function editProduct(id) {
-            const product = productMap[id];
-            if (!product) { alert('Product not found'); return; }
-            document.getElementById('modal-title').textContent = 'Edit Product';
-            document.getElementById('edit-id').value = product.id;
-            document.getElementById('edit-category').value = product.category;
-            document.getElementById('edit-slug').value = product.slug;
-            document.getElementById('edit-name').value = product.name;
-            document.getElementById('edit-description').value = product.description || '';
-            document.getElementById('edit-price').value = product.price;
-            document.getElementById('edit-tag').value = product.tag || '';
-            document.getElementById('edit-image').value = product.image || '';
-            document.getElementById('edit-emoji').value = product.emoji || '';
-            document.getElementById('edit-sort').value = product.sort_order || 0;
-            document.getElementById('edit-role').value = product.role || 'static';
-            document.getElementById('edit-discount').value = product.discount_percent || 0;
-            document.getElementById('edit-active').checked = product.is_active;
-            populateBundleCheckboxes(product.bundle_ids || []);
-            toggleBundleFields();
-            document.getElementById('modal-overlay').classList.add('open');
+        function addColorRow() {
+            const el = document.getElementById('pm-colors');
+            const i = el.children.length;
+            const row = document.createElement('div');
+            row.className = 'color-option-row';
+            row.innerHTML = `
+                <input type="text" value="" placeholder="Color name" data-color-name="${i}">
+                <input type="color" value="#555555" data-color-hex="${i}">
+                <input type="text" value="" placeholder="Image URL" data-color-img="${i}" style="flex:2;">
+                <button class="btn-sm danger" onclick="this.parentElement.remove()" style="flex-shrink:0;">✕</button>
+            `;
+            el.appendChild(row);
         }
 
-        function closeModal() {
-            document.getElementById('modal-overlay').classList.remove('open');
+        function collectColors() {
+            const rows = document.querySelectorAll('#pm-colors .color-option-row');
+            const colors = [];
+            rows.forEach(row => {
+                const name = row.querySelector('input[data-color-name]').value.trim();
+                const hex = row.querySelector('input[data-color-hex]').value;
+                const img = row.querySelector('input[data-color-img]').value.trim();
+                if (name) colors.push({ name, hex, img: img || null, slug: name.toLowerCase().replace(/[^a-z0-9]+/g, '-') });
+            });
+            return colors;
         }
 
-        async function saveProduct(e) {
-            e.preventDefault();
-            const id = document.getElementById('edit-id').value;
-            const btn = document.getElementById('save-btn');
-            btn.textContent = 'Saving...';
-            btn.disabled = true;
-
-            const selectedBundles = Array.from(document.querySelectorAll('.bundle-check:checked')).map(cb => cb.value);
-
-            const payload = {
-                category: document.getElementById('edit-category').value,
-                slug: document.getElementById('edit-slug').value,
-                name: document.getElementById('edit-name').value,
-                description: document.getElementById('edit-description').value,
-                price: parseInt(document.getElementById('edit-price').value),
-                tag: document.getElementById('edit-tag').value,
-                image: document.getElementById('edit-image').value,
-                emoji: document.getElementById('edit-emoji').value,
-                sort_order: parseInt(document.getElementById('edit-sort').value) || 0,
-                role: document.getElementById('edit-role').value,
-                bundle_ids: selectedBundles,
-                discount_percent: parseInt(document.getElementById('edit-discount').value) || 0,
-                is_active: document.getElementById('edit-active').checked
+        // ── SAVE PRODUCT ──
+        async function saveProduct() {
+            const id = document.getElementById('pm-id').value;
+            const body = {
+                name: document.getElementById('pm-name').value.trim(),
+                slug: document.getElementById('pm-slug').value.trim(),
+                description: document.getElementById('pm-desc').value.trim(),
+                price: parseInt(document.getElementById('pm-price').value) || 0,
+                category_id: document.getElementById('pm-category').value || null,
+                tag: document.getElementById('pm-tag').value.trim(),
+                sort_order: parseInt(document.getElementById('pm-sort').value) || 0,
+                is_addon: document.getElementById('pm-addon').classList.contains('on'),
+                is_active: document.getElementById('pm-active').classList.contains('on'),
+                images: productImages,
+                color_options: collectColors(),
+                // Keep old fields for backward compatibility
+                category: getCategorySlug(document.getElementById('pm-category').value),
+                image: productImages[0] || ''
             };
+
+            if (!body.name || !body.slug || !body.price) {
+                toast('Name, slug, and price are required', 'error');
+                return;
+            }
+
+            const btn = document.getElementById('pm-save');
+            btn.disabled = true;
+            btn.textContent = 'Saving...';
 
             try {
                 const url = id ? `/api/products?id=${id}` : '/api/products';
-                const method = id ? 'PATCH' : 'POST';
-                const res = await fetch(url, { method, headers: authHeaders, body: JSON.stringify(payload) });
+                const res = await fetch(url, {
+                    method: id ? 'PATCH' : 'POST',
+                    headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+                    body: JSON.stringify(body)
+                });
                 const data = await res.json();
-
                 if (!res.ok) throw new Error(data.error);
-                closeModal();
-                loadProducts();
-            } catch (err) {
-                alert('Error: ' + err.message);
+                toast(id ? 'Product updated' : 'Product created');
+                closeProductModal();
+                loadData();
+            } catch (e) {
+                toast(e.message, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Save';
             }
-
-            btn.textContent = 'Save';
-            btn.disabled = false;
         }
 
-        async function toggleActive(id, newState) {
+        function getCategorySlug(catId) {
+            const cat = categories.find(c => c.id === catId);
+            return cat ? cat.slug : '';
+        }
+
+        // ── DELETE ──
+        async function deleteProduct(id) {
+            if (!confirm('Deactivate this product?')) return;
             try {
                 const res = await fetch(`/api/products?id=${id}`, {
-                    method: 'PATCH',
-                    headers: authHeaders,
-                    body: JSON.stringify({ is_active: newState })
+                    method: 'DELETE',
+                    headers: { Authorization: 'Bearer ' + token }
                 });
-                if (!res.ok) throw new Error('Failed');
-                loadProducts();
-            } catch (err) {
-                alert('Failed to update product status');
-            }
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error);
+                toast('Product deactivated');
+                loadData();
+            } catch (e) { toast(e.message, 'error'); }
         }
 
-        window.logout = function () {
-            localStorage.removeItem('minidesk_admin_token');
-            localStorage.removeItem('minidesk_admin_email');
-            window.location.href = '/admin/login.html';
-        };
-
-        // Close modal on overlay click
-        document.getElementById('modal-overlay').addEventListener('click', function (e) {
-            if (e.target === this) closeModal();
-        });
-
-        loadProducts();
+        loadData();
     </script>
 </body>
 

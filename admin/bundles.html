@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bundles — MiniDesk Admin</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="css/admin.css">
+</head>
+
+<body>
+    <nav>
+        <a href="/admin/" class="logo" style="text-decoration:none;">Mini<span>Desk</span> <span
+                style="font-size:0.75rem;color:var(--muted);font-weight:400;margin-left:4px;">Admin</span></a>
+        <div class="admin-user">
+            <span id="admin-email"></span>
+            <button class="btn-logout" onclick="logout()">Sign Out</button>
+        </div>
+    </nav>
+
+    <div class="admin-wrap">
+        <div class="admin-tabs">
+            <a href="/admin/" class="admin-tab">Orders</a>
+            <a href="/admin/products.html" class="admin-tab">Products</a>
+            <a href="/admin/categories.html" class="admin-tab">Categories</a>
+            <a href="/admin/bundles.html" class="admin-tab active">Bundles</a>
+        </div>
+
+        <div class="admin-toolbar">
+            <h2>Bundles</h2>
+            <button class="btn-add" onclick="openBundleModal()">+ Add Bundle</button>
+        </div>
+
+        <!-- Bundle list -->
+        <div class="admin-cards" id="bundles-grid">
+            <div class="empty-state"><span class="icon">⏳</span>
+                <p>Loading bundles...</p>
+            </div>
+        </div>
+
+        <!-- Bundle Builder (shown when editing a bundle's categories) -->
+        <div id="builder-section" style="display:none; margin-top: 32px;">
+            <div class="admin-toolbar">
+                <h2 id="builder-title">Configure: Basic Work Bundle</h2>
+                <button class="btn-add" onclick="saveBundleCategories()">💾 Save Configuration</button>
+            </div>
+
+            <div class="bundle-builder">
+                <!-- Sidebar: Available categories to drag -->
+                <div class="bundle-sidebar">
+                    <h4>Available Categories</h4>
+                    <div id="available-cats"></div>
+                </div>
+
+                <!-- Two drop columns -->
+                <div class="bundle-columns">
+                    <div class="bundle-column">
+                        <h4 class="static-h">✓ Static (Auto-included)</h4>
+                        <div id="static-list"></div>
+                        <div class="drop-placeholder" id="static-drop" ondragover="onDragOver(event)"
+                            ondragleave="onDragLeave(event)" ondrop="onDrop(event, 'static')">
+                            Drop categories here
+                        </div>
+                    </div>
+                    <div class="bundle-column">
+                        <h4 class="config-h">⚙ Configurable (Customer picks)</h4>
+                        <div id="config-list"></div>
+                        <div class="drop-placeholder" id="config-drop" ondragover="onDragOver(event)"
+                            ondragleave="onDragLeave(event)" ondrop="onDrop(event, 'configurable')">
+                            Drop categories here
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bundle Create/Edit Modal -->
+    <div class="modal-overlay" id="bundle-modal">
+        <div class="modal">
+            <h3 id="bm-title">Add Bundle</h3>
+            <input type="hidden" id="bm-id">
+            <div class="modal-field">
+                <label>Name</label>
+                <input type="text" id="bm-name" placeholder="e.g. Full Workspace Bundle">
+            </div>
+            <div class="modal-field">
+                <label>Slug</label>
+                <input type="text" id="bm-slug" placeholder="e.g. full">
+            </div>
+            <div class="modal-field">
+                <label>Description</label>
+                <textarea id="bm-desc" placeholder="What's in this bundle"></textarea>
+            </div>
+            <div class="modal-row">
+                <div class="modal-field">
+                    <label>Discount %</label>
+                    <input type="number" id="bm-discount" value="20">
+                </div>
+                <div class="modal-field">
+                    <label>Tag</label>
+                    <input type="text" id="bm-tag" placeholder="e.g. Best Value">
+                </div>
+            </div>
+            <div class="modal-field">
+                <label>Sort Order</label>
+                <input type="number" id="bm-sort" value="0">
+            </div>
+            <div class="modal-actions">
+                <button class="btn-cancel" onclick="closeBundleModal()">Cancel</button>
+                <button class="btn-save" id="bm-save" onclick="saveBundle()">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let token = localStorage.getItem('minidesk_token');
+        if (!token) window.location.href = '/admin/login.html';
+
+        const emailEl = document.getElementById('admin-email');
+        try { emailEl.textContent = JSON.parse(atob(token.split('.')[1])).email; } catch (e) { }
+
+        function logout() { localStorage.removeItem('minidesk_token'); window.location.href = '/admin/login.html'; }
+        function toast(msg, type = 'success') {
+            const t = document.createElement('div');
+            t.className = 'toast ' + type;
+            t.textContent = msg;
+            document.body.appendChild(t);
+            setTimeout(() => t.remove(), 3000);
+        }
+
+        let bundles = [];
+        let allCategories = [];
+        let editingBundleId = null;
+        let builderStatic = [];
+        let builderConfig = [];
+
+        async function loadBundles() {
+            try {
+                const [bRes, cRes] = await Promise.all([
+                    fetch('/api/bundles?all=true', { headers: { Authorization: 'Bearer ' + token } }),
+                    fetch('/api/categories')
+                ]);
+                const bData = await bRes.json();
+                const cData = await cRes.json();
+                bundles = bData.bundles || [];
+                allCategories = cData.categories || [];
+                renderBundles();
+            } catch (e) { console.error(e); }
+        }
+
+        function renderBundles() {
+            const grid = document.getElementById('bundles-grid');
+            if (bundles.length === 0) {
+                grid.innerHTML = '<div class="empty-state"><span class="icon">📦</span><p>No bundles yet.</p></div>';
+                return;
+            }
+            grid.innerHTML = bundles.map(b => {
+                const staticCount = (b.static_categories || []).length;
+                const configCount = (b.configurable_categories || []).length;
+                const range = b.price_range || {};
+                return `
+                <div class="admin-card">
+                    <div class="admin-card-header">
+                        <div>
+                            <div class="admin-card-title">${b.name} ${b.tag ? `<span class="discount-badge" style="margin-left:6px;">${b.tag}</span>` : ''}</div>
+                            <div class="admin-card-subtitle">${b.slug} · ${b.discount_percent}% off</div>
+                        </div>
+                        <div class="admin-card-actions">
+                            <button class="btn-sm" onclick="openBuilder('${b.id}')">Configure</button>
+                            <button class="btn-sm" onclick='editBundle(${JSON.stringify(b)})'>Edit</button>
+                        </div>
+                    </div>
+                    <div class="admin-card-meta">${b.description || ''}</div>
+                    <div class="admin-card-meta" style="margin-top:8px;">
+                        <strong>${staticCount}</strong> static · <strong>${configCount}</strong> configurable
+                        ${range.low ? ` · ₦${range.low.toLocaleString()} – ₦${range.high.toLocaleString()}` : ''}
+                    </div>
+                    ${!b.is_active ? '<div class="admin-card-meta" style="color:#ff453a;">⛔ Inactive</div>' : ''}
+                </div>`;
+            }).join('');
+        }
+
+        // ── BUNDLE MODAL ──
+        function openBundleModal(b = null) {
+            document.getElementById('bm-title').textContent = b ? 'Edit Bundle' : 'Add Bundle';
+            document.getElementById('bm-id').value = b ? b.id : '';
+            document.getElementById('bm-name').value = b ? b.name : '';
+            document.getElementById('bm-slug').value = b ? b.slug : '';
+            document.getElementById('bm-desc').value = b ? (b.description || '') : '';
+            document.getElementById('bm-discount').value = b ? b.discount_percent : 20;
+            document.getElementById('bm-tag').value = b ? (b.tag || '') : '';
+            document.getElementById('bm-sort').value = b ? b.sort_order : bundles.length;
+            document.getElementById('bundle-modal').classList.add('open');
+        }
+
+        function closeBundleModal() { document.getElementById('bundle-modal').classList.remove('open'); }
+        function editBundle(b) { openBundleModal(b); }
+
+        document.getElementById('bm-name').addEventListener('input', e => {
+            if (!document.getElementById('bm-id').value) {
+                document.getElementById('bm-slug').value = e.target.value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+            }
+        });
+
+        async function saveBundle() {
+            const id = document.getElementById('bm-id').value;
+            const body = {
+                name: document.getElementById('bm-name').value.trim(),
+                slug: document.getElementById('bm-slug').value.trim(),
+                description: document.getElementById('bm-desc').value.trim(),
+                discount_percent: parseInt(document.getElementById('bm-discount').value) || 0,
+                tag: document.getElementById('bm-tag').value.trim(),
+                sort_order: parseInt(document.getElementById('bm-sort').value) || 0
+            };
+            if (!body.name || !body.slug) { toast('Name and slug required', 'error'); return; }
+
+            const btn = document.getElementById('bm-save');
+            btn.disabled = true;
+            try {
+                const url = id ? `/api/bundles?id=${id}` : '/api/bundles';
+                const res = await fetch(url, {
+                    method: id ? 'PATCH' : 'POST',
+                    headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+                    body: JSON.stringify(body)
+                });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error);
+                toast(id ? 'Bundle updated' : 'Bundle created');
+                closeBundleModal();
+                loadBundles();
+            } catch (e) { toast(e.message, 'error'); }
+            finally { btn.disabled = false; }
+        }
+
+        // ── BUNDLE BUILDER (Drag & Drop Categories) ──
+        function openBuilder(bundleId) {
+            editingBundleId = bundleId;
+            const bundle = bundles.find(b => b.id === bundleId);
+            if (!bundle) return;
+
+            document.getElementById('builder-title').textContent = 'Configure: ' + bundle.name;
+            document.getElementById('builder-section').style.display = 'block';
+            document.getElementById('builder-section').scrollIntoView({ behavior: 'smooth' });
+
+            builderStatic = (bundle.static_categories || []).map(c => ({ id: c.id, name: c.name, slug: c.slug, product_count: c.product_count || 0 }));
+            builderConfig = (bundle.configurable_categories || []).map(c => ({ id: c.id, name: c.name, slug: c.slug, product_count: c.product_count || 0 }));
+
+            renderBuilder();
+        }
+
+        function renderBuilder() {
+            const usedIds = [...builderStatic, ...builderConfig].map(c => c.id);
+            const available = allCategories.filter(c => !usedIds.includes(c.id));
+
+            document.getElementById('available-cats').innerHTML = available.length === 0
+                ? '<div style="color:var(--muted);font-size:0.82rem;padding:8px;">All categories assigned</div>'
+                : available.map(c => `
+                    <div class="bundle-cat-item" draggable="true" ondragstart="onDragStart(event, '${c.id}', '${c.name}', '${c.slug}', ${c.product_count || 0})">
+                        ${c.name} <span class="cat-count">${c.product_count || 0}</span>
+                    </div>
+                `).join('');
+
+            document.getElementById('static-list').innerHTML = builderStatic.map((c, i) => `
+                <div class="bundle-drop-item">
+                    ${c.name} <span style="color:var(--muted);font-size:0.75rem;">${c.product_count || 0} products</span>
+                    <button class="remove-item" onclick="removeFromBuilder('static', ${i})">✕</button>
+                </div>
+            `).join('');
+
+            document.getElementById('config-list').innerHTML = builderConfig.map((c, i) => `
+                <div class="bundle-drop-item">
+                    ${c.name} <span style="color:var(--muted);font-size:0.75rem;">${c.product_count || 0} products</span>
+                    <button class="remove-item" onclick="removeFromBuilder('configurable', ${i})">✕</button>
+                </div>
+            `).join('');
+        }
+
+        // Drag handlers
+        let dragData = null;
+
+        function onDragStart(e, id, name, slug, count) {
+            dragData = { id, name, slug, product_count: count };
+            e.dataTransfer.effectAllowed = 'move';
+        }
+
+        function onDragOver(e) {
+            e.preventDefault();
+            e.currentTarget.classList.add('dragover');
+        }
+
+        function onDragLeave(e) {
+            e.currentTarget.classList.remove('dragover');
+        }
+
+        function onDrop(e, role) {
+            e.preventDefault();
+            e.currentTarget.classList.remove('dragover');
+            if (!dragData) return;
+
+            const cat = { ...dragData };
+            if (role === 'static') builderStatic.push(cat);
+            else builderConfig.push(cat);
+
+            dragData = null;
+            renderBuilder();
+        }
+
+        function removeFromBuilder(role, index) {
+            if (role === 'static') builderStatic.splice(index, 1);
+            else builderConfig.splice(index, 1);
+            renderBuilder();
+        }
+
+        async function saveBundleCategories() {
+            if (!editingBundleId) return;
+
+            const categories = [
+                ...builderStatic.map((c, i) => ({ category_id: c.id, role: 'static', sort_order: i })),
+                ...builderConfig.map((c, i) => ({ category_id: c.id, role: 'configurable', sort_order: builderStatic.length + i }))
+            ];
+
+            try {
+                const res = await fetch(`/api/bundles?action=categories&id=${editingBundleId}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+                    body: JSON.stringify({ categories })
+                });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error);
+                toast('Bundle configuration saved!');
+                loadBundles();
+            } catch (e) { toast(e.message, 'error'); }
+        }
+
+        loadBundles();
+    </script>
+</body>
+
+</html>

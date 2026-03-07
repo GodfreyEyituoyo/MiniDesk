@@ -114,276 +114,226 @@
                 <p>Pick your bundle, customise your peripherals, and add what you need.</p>
             </div>
 
-            <div class="main-layout">
-                <!-- LEFT: CONFIG STEPS -->
-                <div>
-
-                    <!-- STEP 1: BUNDLE -->
-                    <div class="step" id="step1">
-                        <div class="step-header">
-                            <div class="step-num">1</div>
-                            <div class="step-title">Choose Your Bundle</div>
-                            <button id="clear-bundle-btn" onclick="clearBundle()"
-                                style="display:none;margin-left:auto;background:none;border:1px solid var(--border);color:var(--muted);font-size:0.78rem;padding:4px 12px;border-radius:50px;cursor:pointer;font-family:var(--font);transition:color 0.2s,border-color 0.2s;"
-                                onmouseover="this.style.color='var(--text)';this.style.borderColor='rgba(255,255,255,0.3)';"
-                                onmouseout="this.style.color='var(--muted)';this.style.borderColor='var(--border)';">✕
-                                Clear</button>
+            <div class="apple-layout">
+                <!-- LEFT: STICKY IMAGE PANEL -->
+                <div class="config-image-panel">
+                    <div class="config-image-inner">
+                        <!-- Bundle overview image -->
+                        <div class="config-img active" id="img-bundle">
+                            <img src="images/macmini-m4.jpg" alt="Mac Mini M4 Workstation">
+                            <div class="img-caption">Mac Mini M4 — The heart of every bundle</div>
                         </div>
-                        <div class="options-grid cols-2">
-                            <label class="option-card" id="card-basic" onclick="selectBundle('basic')">
-                                <input type="radio" name="bundle" value="basic">
-                                <div class="option-check"></div>
-                                <span class="option-emoji">⚡</span>
-                                <div class="option-name">Basic Work Bundle</div>
-                                <div class="option-desc">Mac Mini M4 + Monitor + Keyboard + Mouse + USB-C Dongle.
-                                    Everything to get to work.</div>
-                                <div class="option-price">₦1,650,400 – ₦1,950,000 <span class="discount-badge">20%
-                                        OFF</span></div>
-                            </label>
-                            <label class="option-card" id="card-full" onclick="selectBundle('full')">
-                                <input type="radio" name="bundle" value="full">
-                                <div class="option-check"></div>
-                                <span class="option-emoji">🚀</span>
-                                <div class="option-tag tag-full">Best Value</div>
-                                <div class="option-name">Full Workspace Bundle</div>
-                                <div class="option-desc">Everything in Basic + Workstation Desk + Chair + Keyboard Mat +
-                                    Fancy Side Light.</div>
-                                <div class="option-price">₦1,955,400 – ₦2,255,000 <span class="discount-badge">20%
-                                        OFF</span></div>
-                            </label>
+                        <!-- Monitor image (updated on selection) -->
+                        <div class="config-img" id="img-monitor">
+                            <img src="images/monitor-entry.png" alt="Monitor">
+                        </div>
+                        <!-- Keyboard image (updated on selection + color) -->
+                        <div class="config-img" id="img-keyboard">
+                            <img src="images/keyboards/pop-icon-graphite-white-1.jpg" alt="Keyboard & Mouse">
+                        </div>
+                        <!-- Add-on image -->
+                        <div class="config-img" id="img-addons">
+                            <img src="images/addon-stand.png" alt="Add-ons">
+                        </div>
+                        <!-- Image navigation dots -->
+                        <div class="img-nav-dots" id="img-nav-dots">
+                            <button class="img-dot active" onclick="showConfigImage('img-bundle')"></button>
+                            <button class="img-dot" onclick="showConfigImage('img-monitor')"></button>
+                            <button class="img-dot" onclick="showConfigImage('img-keyboard')"></button>
+                            <button class="img-dot" onclick="showConfigImage('img-addons')"></button>
                         </div>
                     </div>
-
-                    <div class="config-divider"></div>
-
-                    <!-- STEP 2: MONITOR -->
-                    <div class="step" id="step2">
-                        <div class="step-header">
-                            <div class="step-num">2</div>
-                            <div class="step-title">Select Your Monitor</div>
-                            <div class="step-note">Sets your keyboard tier</div>
-                            <button id="clear-monitor-btn" onclick="clearMonitor()"
-                                style="display:none;margin-left:8px;background:none;border:1px solid var(--border);color:var(--muted);font-size:0.78rem;padding:4px 12px;border-radius:50px;cursor:pointer;font-family:var(--font);transition:color 0.2s,border-color 0.2s;"
-                                onmouseover="this.style.color='var(--text)';this.style.borderColor='rgba(255,255,255,0.3)';"
-                                onmouseout="this.style.color='var(--muted)';this.style.borderColor='var(--border)';">✕
-                                Clear</button>
-                        </div>
-                        <div class="options-grid cols-2">
-                            <label class="option-card" id="card-monitor-entry" onclick="selectMonitor('entry')">
-                                <input type="radio" name="monitor" value="entry">
-                                <div class="option-check"></div>
-                                <div class="option-tag tag-entry">Entry Level</div>
-                                <div class="product-img-tray">
-                                    <img src="images/monitor-entry.png" alt="Dell SE2726HG">
-                                </div>
-                                <div class="option-name">Dell SE2726HG</div>
-                                <div class="option-desc">Perfect for all your entertainment and gaming, this 27-inch FHD
-                                    monitor features a high 240Hz refresh rate, fast IPS panel, and is certified by TÜV
-                                    Rheinland® for 3-star eye comfort.</div>
-                                <ul
-                                    style="list-style:none;font-size:0.78rem;color:var(--muted);margin:8px 0 10px;line-height:1.7;">
-                                    <li><svg width="13" height="13" viewBox="0 0 14 14" fill="none"
-                                            style="vertical-align:middle;margin-right:4px;">
-                                            <polyline points="8,2 12,2 12,6" stroke="#c0601a" stroke-width="1.6"
-                                                fill="none" stroke-linecap="round" stroke-linejoin="round" />
-                                            <line x1="12" y1="2" x2="7" y2="7" stroke="#c0601a" stroke-width="1.6"
-                                                stroke-linecap="round" />
-                                            <polyline points="6,12 2,12 2,8" stroke="#c0601a" stroke-width="1.6"
-                                                fill="none" stroke-linecap="round" stroke-linejoin="round" />
-                                            <line x1="2" y1="12" x2="7" y2="7" stroke="#c0601a" stroke-width="1.6"
-                                                stroke-linecap="round" />
-                                        </svg>27" · 1920×1080 FHD · 240Hz</li>
-                                    <li>🖼 IPS Panel · HDR · VRR</li>
-                                    <li>🔌 2× HDMI 2.1 · 1× DisplayPort 1.4</li>
-                                </ul>
-                                <div class="option-price" style="display:none;"></div>
-                            </label>
-                            <label class="option-card" id="card-monitor-mid" onclick="selectMonitor('mid')">
-                                <input type="radio" name="monitor" value="mid">
-                                <div class="option-check"></div>
-                                <div class="option-tag tag-mid">Mid Range</div>
-                                <div class="product-img-tray">
-                                    <img src="images/monitor-mid.png" alt="Dell S2725DS">
-                                </div>
-                                <div class="option-name">Dell S2725DS</div>
-                                <div class="option-desc">A stunning 27-inch QHD display with height-adjustable stand,
-                                    built-in stereo speakers, and wide colour coverage — ideal for creative work and
-                                    multitasking.</div>
-                                <ul
-                                    style="list-style:none;font-size:0.78rem;color:var(--muted);margin:8px 0 10px;line-height:1.7;">
-                                    <li><svg width="13" height="13" viewBox="0 0 14 14" fill="none"
-                                            style="vertical-align:middle;margin-right:4px;">
-                                            <polyline points="8,2 12,2 12,6" stroke="#c0601a" stroke-width="1.6"
-                                                fill="none" stroke-linecap="round" stroke-linejoin="round" />
-                                            <line x1="12" y1="2" x2="7" y2="7" stroke="#c0601a" stroke-width="1.6"
-                                                stroke-linecap="round" />
-                                            <polyline points="6,12 2,12 2,8" stroke="#c0601a" stroke-width="1.6"
-                                                fill="none" stroke-linecap="round" stroke-linejoin="round" />
-                                            <line x1="2" y1="12" x2="7" y2="7" stroke="#c0601a" stroke-width="1.6"
-                                                stroke-linecap="round" />
-                                        </svg>27" · 2560×1440 QHD · 100Hz</li>
-                                    <li>🔊 2× 5W Built-in Speakers · VRR</li>
-                                    <li>🔌 2× HDMI 2.1 · 1× DisplayPort 1.2</li>
-                                </ul>
-                                <div class="option-price" style="display:none;"></div>
-                            </label>
-                            <label class="option-card" id="card-monitor-top" onclick="selectMonitor('top')">
-                                <input type="radio" name="monitor" value="top">
-                                <div class="option-check"></div>
-                                <div class="option-tag tag-top">Top Tier</div>
-                                <div class="product-img-tray">
-                                    <img src="images/monitor-top.png" alt="Dell S2725QS">
-                                </div>
-                                <div class="option-name">Dell S2725QS</div>
-                                <div class="option-desc">Breathtaking 4K clarity on a 27-inch IPS display with
-                                    height-adjustable stand and impeccable colour accuracy — the ultimate screen for
-                                    professionals.</div>
-                                <ul
-                                    style="list-style:none;font-size:0.78rem;color:var(--muted);margin:8px 0 10px;line-height:1.7;">
-                                    <li><svg width="13" height="13" viewBox="0 0 14 14" fill="none"
-                                            style="vertical-align:middle;margin-right:4px;">
-                                            <polyline points="8,2 12,2 12,6" stroke="#c0601a" stroke-width="1.6"
-                                                fill="none" stroke-linecap="round" stroke-linejoin="round" />
-                                            <line x1="12" y1="2" x2="7" y2="7" stroke="#c0601a" stroke-width="1.6"
-                                                stroke-linecap="round" />
-                                            <polyline points="6,12 2,12 2,8" stroke="#c0601a" stroke-width="1.6"
-                                                fill="none" stroke-linecap="round" stroke-linejoin="round" />
-                                            <line x1="2" y1="12" x2="7" y2="7" stroke="#c0601a" stroke-width="1.6"
-                                                stroke-linecap="round" />
-                                        </svg>27" · 3840×2160 4K UHD · 120Hz</li>
-                                    <li>🔊 Built-in Audio · HDR · VRR</li>
-                                    <li>🔌 2× HDMI 2.1 · USB-C 65W PD · USB Hub</li>
-                                </ul>
-                                <div class="option-price" style="display:none;"></div>
-                            </label>
-                            <label class="option-card" id="card-monitor-creator" onclick="selectMonitor('creator')">
-                                <input type="radio" name="monitor" value="creator">
-                                <div class="option-check"></div>
-                                <div class="option-tag tag-creator">Creator's Choice</div>
-                                <div class="product-img-tray">
-                                    <img src="images/monitor-creator.png" alt="ASUS ProArt Display PA278CV">
-                                </div>
-                                <div class="option-name">ASUS ProArt PA278CV</div>
-                                <div class="option-desc">27-inch Calman Verified display for creative professionals.
-                                    Factory calibrated with ΔE < 2 colour accuracy, 100% sRGB / Rec. 709 coverage, and
-                                        USB-C with 65W power delivery for a single-cable workflow.</div>
-                                        <ul
-                                            style="list-style:none;font-size:0.78rem;color:var(--muted);margin:8px 0 10px;line-height:1.7;">
-                                            <li><svg width="13" height="13" viewBox="0 0 14 14" fill="none"
-                                                    style="vertical-align:middle;margin-right:4px;">
-                                                    <polyline points="8,2 12,2 12,6" stroke="#c0601a" stroke-width="1.6"
-                                                        fill="none" stroke-linecap="round" stroke-linejoin="round" />
-                                                    <line x1="12" y1="2" x2="7" y2="7" stroke="#c0601a"
-                                                        stroke-width="1.6" stroke-linecap="round" />
-                                                    <polyline points="6,12 2,12 2,8" stroke="#c0601a" stroke-width="1.6"
-                                                        fill="none" stroke-linecap="round" stroke-linejoin="round" />
-                                                    <line x1="2" y1="12" x2="7" y2="7" stroke="#c0601a"
-                                                        stroke-width="1.6" stroke-linecap="round" />
-                                                </svg>27" · 2560×1440 QHD · IPS</li>
-                                            <li>🎨 Calman Verified · ΔE < 2 · 100% sRGB</li>
-                                            <li>🔌 USB-C 65W PD · HDMI · DisplayPort</li>
-                                        </ul>
-                                        <div class="option-price" style="display:none;"></div>
-                            </label>
-                        </div>
-                        <div class="kb-note hidden" id="kb-auto-note"></div>
-                        <div class="kb-note hidden" id="kb-upgrade-note">
-                            ⌨️ <strong>Monitor selected</strong> — choose your keyboard below.
-                        </div>
-                    </div>
-
-                    <div class="config-divider"></div>
-
-                    <!-- STEP 3: KEYBOARD -->
-                    <div class="step step-disabled" id="step3">
-                        <div class="step-header">
-                            <div class="step-num">3</div>
-                            <div class="step-title">Your Keyboard</div>
-                        </div>
-                        <div class="options-grid cols-2" id="keyboard-options">
-                            <label class="option-card" id="card-kb-windows" onclick="selectKeyboard('windows')">
-                                <input type="radio" name="keyboard" value="windows">
-                                <div class="option-check"></div>
-                                <span class="option-emoji">⌨️</span>
-                                <div class="option-name">Windows Keyboard</div>
-                                <div class="option-desc">Wireless compact layout, compatible with any system. Clean and
-                                    reliable.</div>
-                                <div class="option-price" style="display:none;"></div>
-                            </label>
-                            <label class="option-card" id="card-kb-mac" onclick="selectKeyboard('mac')">
-                                <input type="radio" name="keyboard" value="mac">
-                                <div class="option-check"></div>
-                                <span class="option-emoji">⌨️</span>
-                                <div class="option-name">Apple Magic Keyboard</div>
-                                <div class="option-desc">Slim, rechargeable, Touch ID — the native Mac experience.</div>
-                                <div class="option-price" style="display:none;"></div>
-                            </label>
-                        </div>
-                        <div class="step-disabled-note" id="kb-select-monitor-note">
-                            🔒 Select a monitor above to unlock keyboard options.
-                        </div>
-                        <div class="kb-note hidden" id="kb-locked-note"></div>
-                    </div>
-
-                    <div class="config-divider"></div>
-
-                    <!-- STEP 4: ADD-ONS -->
-                    <div class="step" id="step4">
-                        <div class="step-header">
-                            <div class="step-num">4</div>
-                            <div class="step-title">Optional Add-ons</div>
-                            <div class="step-note">Add to either bundle</div>
-                        </div>
-                        <div class="addons-grid">
-                            <div class="option-card" id="card-stand" onclick="toggleAddon('stand', this)"
-                                style="cursor:pointer;">
-                                <div class="option-check"></div>
-                                <div class="product-img-tray">
-                                    <img src="images/addon-stand.png" alt="Laptop Stand">
-                                </div>
-                                <div class="option-name">Laptop Stand</div>
-                                <div class="option-desc">Foldable, adjustable-height aluminium stand. Elevates your
-                                    screen for better ergonomics. Works with MacBooks too.</div>
-                                <div class="option-price">₦22,000</div>
-                            </div>
-                            <div class="option-card" id="card-ssd" onclick="toggleAddon('ssd', this)"
-                                style="cursor:pointer;">
-                                <div class="option-check"></div>
-                                <div class="product-img-tray">
-                                    <img src="images/addon-ssd.png" alt="SanDisk Extreme SSD">
-                                </div>
-                                <div class="option-name">SanDisk 1TB Extreme Portable SSD</div>
-                                <div class="option-desc">Blazing-fast 1,050MB/s read speeds. Rugged, pocket-sized, and
-                                    USB-C ready. Never worry about storage again.</div>
-                                <div class="option-price">₦68,000</div>
-                            </div>
-                        </div>
-                    </div>
-
                 </div>
 
-                <!-- RIGHT: STICKY SUMMARY -->
-                <div>
-                    <div class="summary-box reveal">
-                        <div class="summary-title">📋 Your Configuration</div>
-                        <div id="summary-lines">
-                            <div style="color:var(--muted);font-size:0.88rem;text-align:center;padding:20px 0;">Select
-                                options to see your build here.</div>
+                <!-- RIGHT: SCROLLABLE CONFIG STEPS -->
+                <div class="config-steps-panel">
+
+                    <!-- STEP: BUNDLE -->
+                    <div class="config-step" id="step-bundle" data-img="img-bundle">
+                        <div class="apple-step-header">
+                            <h3><strong>Bundle.</strong> <span class="step-sub">Choose your foundation.</span></h3>
                         </div>
-                        <div class="summary-total" id="summary-total" style="display:none;">
-                            <span>Total</span>
-                            <span class="total-price" id="total-price">₦0</span>
+                        <div class="apple-options">
+                            <div class="apple-option-card" id="card-basic" onclick="selectBundle('basic')">
+                                <div class="apple-option-left">
+                                    <div class="apple-option-name">Basic Work Bundle</div>
+                                    <div class="apple-option-desc">Mac mini M4 + Monitor + Keyboard & Mouse + USB-C Hub
+                                    </div>
+                                </div>
+                                <div class="apple-option-right">
+                                    <div class="apple-option-price" id="price-basic">₦1,650,400 – ₦1,950,000</div>
+                                    <span class="discount-badge">20% OFF</span>
+                                </div>
+                            </div>
+                            <div class="apple-option-card" id="card-full" onclick="selectBundle('full')">
+                                <div class="apple-option-tag">Best Value</div>
+                                <div class="apple-option-left">
+                                    <div class="apple-option-name">Full Workspace Bundle</div>
+                                    <div class="apple-option-desc">Everything in Basic + Workstation Desk + Ergonomic
+                                        Chair + Keyboard Mat + Side Light</div>
+                                </div>
+                                <div class="apple-option-right">
+                                    <div class="apple-option-price" id="price-full">₦1,955,400 – ₦2,255,000</div>
+                                    <span class="discount-badge">20% OFF</span>
+                                </div>
+                            </div>
                         </div>
-                        <div style="margin-top:20px;">
-                            <a href="#order" id="proceed-btn" class="btn-primary"
-                                style="display:block;text-align:center;width:100%;font-size:0.95rem;padding:14px;opacity:0.4;pointer-events:none;">
+                        <!-- Bundle contents preview -->
+                        <div class="bundle-contents" id="bundle-contents" style="display:none;">
+                            <div class="bundle-contents-label">What's included:</div>
+                            <div class="bundle-contents-grid" id="bundle-contents-grid"></div>
+                        </div>
+                    </div>
+
+                    <!-- STEP: MONITOR -->
+                    <div class="config-step" id="step-monitor" data-img="img-monitor">
+                        <div class="apple-step-header">
+                            <h3><strong>Monitor.</strong> <span class="step-sub">Pick your display.</span></h3>
+                        </div>
+                        <div class="apple-options">
+                            <div class="apple-option-card has-image" id="card-monitor-entry"
+                                onclick="selectMonitor('entry')">
+                                <div class="apple-option-left">
+                                    <div class="apple-option-tag" style="color:#c0601a;">Entry Level</div>
+                                    <div class="apple-option-name">Dell SE2726HG</div>
+                                    <div class="apple-option-desc">27" FHD · 240Hz · IPS · HDR</div>
+                                </div>
+                                <div class="apple-option-thumb">
+                                    <img src="images/monitor-entry.png" alt="Dell SE2726HG">
+                                </div>
+                            </div>
+                            <div class="apple-option-card has-image" id="card-monitor-mid"
+                                onclick="selectMonitor('mid')">
+                                <div class="apple-option-left">
+                                    <div class="apple-option-tag" style="color:#0071e3;">Mid Range</div>
+                                    <div class="apple-option-name">Dell S2725DS</div>
+                                    <div class="apple-option-desc">27" QHD · 100Hz · Built-in Speakers</div>
+                                </div>
+                                <div class="apple-option-thumb">
+                                    <img src="images/monitor-mid.png" alt="Dell S2725DS">
+                                </div>
+                            </div>
+                            <div class="apple-option-card has-image" id="card-monitor-top"
+                                onclick="selectMonitor('top')">
+                                <div class="apple-option-left">
+                                    <div class="apple-option-tag" style="color:#30d158;">Top Tier</div>
+                                    <div class="apple-option-name">Dell S2725QS</div>
+                                    <div class="apple-option-desc">27" 4K UHD · 120Hz · USB-C 65W PD</div>
+                                </div>
+                                <div class="apple-option-thumb">
+                                    <img src="images/monitor-top.png" alt="Dell S2725QS">
+                                </div>
+                            </div>
+                            <div class="apple-option-card has-image" id="card-monitor-creator"
+                                onclick="selectMonitor('creator')">
+                                <div class="apple-option-left">
+                                    <div class="apple-option-tag" style="color:#bf5af2;">Creator's Choice</div>
+                                    <div class="apple-option-name">ASUS ProArt PA278CV</div>
+                                    <div class="apple-option-desc">27" QHD · Calman Verified · ΔE < 2 · USB-C 65W</div>
+                                    </div>
+                                    <div class="apple-option-thumb">
+                                        <img src="images/monitor-creator.png" alt="ASUS ProArt PA278CV">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- STEP: KEYBOARD & MOUSE -->
+                        <div class="config-step" id="step-keyboard" data-img="img-keyboard">
+                            <div class="apple-step-header">
+                                <h3><strong>Keyboard & Mouse.</strong> <span class="step-sub">Choose your combo.</span>
+                                </h3>
+                            </div>
+                            <div class="apple-options">
+                                <div class="apple-option-card has-image" id="card-kb-pop-icon"
+                                    onclick="selectKeyboard('pop-icon')">
+                                    <div class="apple-option-left">
+                                        <div class="apple-option-tag" style="color:#ff9f0a;">Premium</div>
+                                        <div class="apple-option-name">Logitech POP Icon Combo</div>
+                                        <div class="apple-option-desc">Stylish, compact keyboard & mouse with
+                                            customizable Action Keys</div>
+                                    </div>
+                                    <div class="apple-option-thumb">
+                                        <img src="images/keyboards/pop-icon-graphite-white-1.jpg"
+                                            alt="Logitech POP Icon">
+                                    </div>
+                                </div>
+                                <div class="apple-option-card has-image" id="card-kb-mk250"
+                                    onclick="selectKeyboard('mk250')">
+                                    <div class="apple-option-left">
+                                        <div class="apple-option-name">Logitech MK250 Compact</div>
+                                        <div class="apple-option-desc">Compact Bluetooth wireless keyboard & mouse combo
+                                        </div>
+                                    </div>
+                                    <div class="apple-option-thumb">
+                                        <img src="images/keyboards/mk250-graphite-1.jpg" alt="Logitech MK250">
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Color Selector (appears after keyboard selection) -->
+                            <div class="color-selector" id="color-selector" style="display:none;">
+                                <div class="color-label">Color — <span id="color-name">Graphite & White</span></div>
+                                <div class="color-swatches" id="color-swatches"></div>
+                            </div>
+                        </div>
+
+                        <!-- STEP: ADD-ONS -->
+                        <div class="config-step" id="step-addons" data-img="img-addons">
+                            <div class="apple-step-header">
+                                <h3><strong>Add-ons.</strong> <span class="step-sub">Enhance your setup.</span></h3>
+                            </div>
+                            <div class="apple-options">
+                                <div class="apple-option-card has-image" id="card-stand"
+                                    onclick="toggleAddon('stand', this)">
+                                    <div class="apple-option-left">
+                                        <div class="apple-option-name">Laptop Stand</div>
+                                        <div class="apple-option-desc">Foldable aluminium, adjustable height, ergonomic
+                                        </div>
+                                    </div>
+                                    <div class="apple-option-right">
+                                        <div class="apple-option-price">₦22,000</div>
+                                    </div>
+                                    <div class="apple-option-thumb">
+                                        <img src="images/addon-stand.png" alt="Laptop Stand">
+                                    </div>
+                                </div>
+                                <div class="apple-option-card has-image" id="card-ssd"
+                                    onclick="toggleAddon('ssd', this)">
+                                    <div class="apple-option-left">
+                                        <div class="apple-option-name">SanDisk 1TB Extreme Portable SSD</div>
+                                        <div class="apple-option-desc">1,050MB/s reads, rugged, USB-C ready</div>
+                                    </div>
+                                    <div class="apple-option-right">
+                                        <div class="apple-option-price">₦68,000</div>
+                                    </div>
+                                    <div class="apple-option-thumb">
+                                        <img src="images/addon-ssd.png" alt="SanDisk SSD">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- SUMMARY (Final Step) -->
+                        <div class="config-step config-summary" id="step-summary">
+                            <div class="apple-step-header">
+                                <h3><strong>Your Configuration.</strong></h3>
+                            </div>
+                            <div class="summary-items" id="summary-lines">
+                                <div class="summary-empty">Select your bundle to start building.</div>
+                            </div>
+                            <div class="summary-total-row" id="summary-total" style="display:none;">
+                                <span>Total</span>
+                                <span class="total-price" id="total-price">₦0</span>
+                            </div>
+                            <a href="#order" id="proceed-btn" class="btn-primary proceed-btn"
+                                style="opacity:0.4;pointer-events:none;">
                                 Proceed to Order →
                             </a>
                         </div>
+
                     </div>
                 </div>
             </div>
-        </div>
     </section>
 
     <!-- ORDER FORM -->

@@ -76,27 +76,35 @@ exports.handler = async (event) => {
                 }
             }
 
+            const insertData = {
+                category: body.category,
+                slug: body.slug,
+                name: body.name,
+                description: body.description || '',
+                emoji: body.emoji || '',
+                image: body.image || '',
+                tag: body.tag || '',
+                tag_class: body.tag_class || '',
+                specs: body.specs || [],
+                price: parseInt(body.price),
+                tier: body.tier || null,
+                requires_tier: body.requires_tier || [],
+                role: body.role || 'static',
+                bundle_ids: body.bundle_ids || [],
+                discount_percent: parseInt(body.discount_percent) || 0,
+                is_active: body.is_active !== false,
+                sort_order: body.sort_order || 0
+            };
+
+            // Phase 2 fields
+            if (body.category_id) insertData.category_id = body.category_id;
+            if (body.images) insertData.images = body.images;
+            if (body.color_options) insertData.color_options = body.color_options;
+            if (body.is_addon !== undefined) insertData.is_addon = body.is_addon;
+
             const { data: product, error } = await supabase
                 .from('products')
-                .insert({
-                    category: body.category,
-                    slug: body.slug,
-                    name: body.name,
-                    description: body.description || '',
-                    emoji: body.emoji || '',
-                    image: body.image || '',
-                    tag: body.tag || '',
-                    tag_class: body.tag_class || '',
-                    specs: body.specs || [],
-                    price: parseInt(body.price),
-                    tier: body.tier || null,
-                    requires_tier: body.requires_tier || [],
-                    role: body.role || 'static',
-                    bundle_ids: body.bundle_ids || [],
-                    discount_percent: parseInt(body.discount_percent) || 0,
-                    is_active: body.is_active !== false,
-                    sort_order: body.sort_order || 0
-                })
+                .insert(insertData)
                 .select()
                 .single();
 
@@ -121,7 +129,8 @@ exports.handler = async (event) => {
             const allowedFields = [
                 'name', 'description', 'emoji', 'image', 'tag', 'tag_class',
                 'specs', 'price', 'tier', 'requires_tier', 'is_active', 'sort_order', 'slug',
-                'role', 'bundle_ids', 'discount_percent'
+                'role', 'bundle_ids', 'discount_percent',
+                'category_id', 'images', 'color_options', 'is_addon'
             ];
 
             const updates = {};

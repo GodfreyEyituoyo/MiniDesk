@@ -31,8 +31,20 @@
   to = "/.netlify/functions/products"
   status = 200
 
-# SPA-style fallback for admin routes
 [[redirects]]
-  from = "/admin/*"
-  to = "/admin/index.html"
+  from = "/api/categories"
+  to = "/.netlify/functions/categories"
   status = 200
+
+[[redirects]]
+  from = "/api/bundles"
+  to = "/.netlify/functions/bundles"
+  status = 200
+
+[[redirects]]
+  from = "/api/upload"
+  to = "/.netlify/functions/upload"
+  status = 200
+
+
+

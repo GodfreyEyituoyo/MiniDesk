@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Categories — MiniDesk Admin</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="css/admin.css">
+</head>
+
+<body>
+    <nav>
+        <a href="/admin/" class="logo" style="text-decoration:none;">Mini<span>Desk</span> <span
+                style="font-size:0.75rem;color:var(--muted);font-weight:400;margin-left:4px;">Admin</span></a>
+        <div class="admin-user">
+            <span id="admin-email"></span>
+            <button class="btn-logout" onclick="logout()">Sign Out</button>
+        </div>
+    </nav>
+
+    <div class="admin-wrap">
+        <div class="admin-tabs">
+            <a href="/admin/" class="admin-tab">Orders</a>
+            <a href="/admin/products.html" class="admin-tab">Products</a>
+            <a href="/admin/categories.html" class="admin-tab active">Categories</a>
+            <a href="/admin/bundles.html" class="admin-tab">Bundles</a>
+        </div>
+
+        <div class="admin-toolbar">
+            <h2>Categories</h2>
+            <button class="btn-add" onclick="openModal()">+ Add Category</button>
+        </div>
+
+        <div class="admin-cards" id="categories-grid">
+            <div class="empty-state"><span class="icon">⏳</span>
+                <p>Loading categories...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal-overlay" id="modal">
+        <div class="modal">
+            <h3 id="modal-title">Add Category</h3>
+            <input type="hidden" id="edit-id">
+            <div class="modal-field">
+                <label>Name</label>
+                <input type="text" id="f-name" placeholder="e.g. Monitors">
+            </div>
+            <div class="modal-field">
+                <label>Slug</label>
+                <input type="text" id="f-slug" placeholder="e.g. monitors">
+            </div>
+            <div class="modal-field">
+                <label>Description</label>
+                <textarea id="f-desc" placeholder="Optional description"></textarea>
+            </div>
+            <div class="modal-field">
+                <label>Sort Order</label>
+                <input type="number" id="f-sort" value="0">
+            </div>
+            <div class="modal-actions">
+                <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+                <button class="btn-save" id="btn-save" onclick="saveCategory()">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let token = localStorage.getItem('minidesk_token');
+        if (!token) window.location.href = '/admin/login.html';
+
+        const emailEl = document.getElementById('admin-email');
+        try { emailEl.textContent = JSON.parse(atob(token.split('.')[1])).email; } catch (e) { }
+
+        function logout() { localStorage.removeItem('minidesk_token'); window.location.href = '/admin/login.html'; }
+        function toast(msg, type = 'success') {
+            const t = document.createElement('div');
+            t.className = 'toast ' + type;
+            t.textContent = msg;
+            document.body.appendChild(t);
+            setTimeout(() => t.remove(), 3000);
+        }
+
+        let categories = [];
+
+        async function loadCategories() {
+            try {
+                const res = await fetch('/api/categories');
+                const data = await res.json();
+                categories = data.categories || [];
+                renderCategories();
+            } catch (e) { console.error(e); }
+        }
+
+        function renderCategories() {
+            const grid = document.getElementById('categories-grid');
+            if (categories.length === 0) {
+                grid.innerHTML = '<div class="empty-state"><span class="icon">📂</span><p>No categories yet.</p></div>';
+                return;
+            }
+            grid.innerHTML = categories.map(c => `
+                <div class="admin-card">
+                    <div class="admin-card-header">
+                        <div>
+                            <div class="admin-card-title">${c.name}</div>
+                            <div class="admin-card-subtitle">${c.slug}</div>
+                        </div>
+                        <div class="admin-card-actions">
+                            <button class="btn-sm" onclick='editCategory(${JSON.stringify(c)})'>Edit</button>
+                            <button class="btn-sm danger" onclick="deleteCategory('${c.id}')">Delete</button>
+                        </div>
+                    </div>
+                    ${c.description ? `<div class="admin-card-meta">${c.description}</div>` : ''}
+                    <div class="admin-card-meta">${c.product_count} product${c.product_count !== 1 ? 's' : ''} · Sort: ${c.sort_order}</div>
+                </div>
+            `).join('');
+        }
+
+        function openModal(cat = null) {
+            document.getElementById('modal-title').textContent = cat ? 'Edit Category' : 'Add Category';
+            document.getElementById('edit-id').value = cat ? cat.id : '';
+            document.getElementById('f-name').value = cat ? cat.name : '';
+            document.getElementById('f-slug').value = cat ? cat.slug : '';
+            document.getElementById('f-desc').value = cat ? (cat.description || '') : '';
+            document.getElementById('f-sort').value = cat ? cat.sort_order : categories.length;
+            document.getElementById('modal').classList.add('open');
+        }
+
+        function closeModal() { document.getElementById('modal').classList.remove('open'); }
+
+        function editCategory(cat) { openModal(cat); }
+
+        // Auto-generate slug from name
+        document.getElementById('f-name').addEventListener('input', e => {
+            const slugEl = document.getElementById('f-slug');
+            if (!document.getElementById('edit-id').value) {
+                slugEl.value = e.target.value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+            }
+        });
+
+        async function saveCategory() {
+            const id = document.getElementById('edit-id').value;
+            const body = {
+                name: document.getElementById('f-name').value.trim(),
+                slug: document.getElementById('f-slug').value.trim(),
+                description: document.getElementById('f-desc').value.trim(),
+                sort_order: parseInt(document.getElementById('f-sort').value) || 0
+            };
+
+            if (!body.name || !body.slug) { toast('Name and slug required', 'error'); return; }
+
+            const btn = document.getElementById('btn-save');
+            btn.disabled = true;
+            btn.textContent = 'Saving...';
+
+            try {
+                const url = id ? `/api/categories?id=${id}` : '/api/categories';
+                const method = id ? 'PATCH' : 'POST';
+                const res = await fetch(url, {
+                    method,
+                    headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+                    body: JSON.stringify(body)
+                });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error);
+                toast(id ? 'Category updated' : 'Category created');
+                closeModal();
+                loadCategories();
+            } catch (e) {
+                toast(e.message, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Save';
+            }
+        }
+
+        async function deleteCategory(id) {
+            if (!confirm('Delete this category? Products must be moved first.')) return;
+            try {
+                const res = await fetch(`/api/categories?id=${id}`, {
+                    method: 'DELETE',
+                    headers: { Authorization: 'Bearer ' + token }
+                });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error);
+                toast('Category deleted');
+                loadCategories();
+            } catch (e) { toast(e.message, 'error'); }
+        }
+
+        loadCategories();
+    </script>
+</body>
+
+</html>
