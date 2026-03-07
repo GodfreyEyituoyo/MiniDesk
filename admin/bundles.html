@@ -115,13 +115,13 @@
     </div>
 
     <script>
-        let token = localStorage.getItem('minidesk_token');
+        let token = localStorage.getItem('minidesk_admin_token');
         if (!token) window.location.href = '/admin/login.html';
 
         const emailEl = document.getElementById('admin-email');
         try { emailEl.textContent = JSON.parse(atob(token.split('.')[1])).email; } catch (e) { }
 
-        function logout() { localStorage.removeItem('minidesk_token'); window.location.href = '/admin/login.html'; }
+        function logout() { localStorage.removeItem('minidesk_admin_token'); localStorage.removeItem('minidesk_admin_email'); window.location.href = '/admin/login.html'; }
         function toast(msg, type = 'success') {
             const t = document.createElement('div');
             t.className = 'toast ' + type;
