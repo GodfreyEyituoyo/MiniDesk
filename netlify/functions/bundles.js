@@ -49,7 +49,7 @@ exports.handler = async (event) => {
             const bundleIds = bundlesList.map(b => b.id);
             const { data: bundleCats } = await supabase
                 .from('bundle_categories')
-                .select('*, categories(*)')
+                .select('*, categories(*), products(*)')
                 .in('bundle_id', bundleIds)
                 .order('sort_order', { ascending: true });
 
@@ -62,29 +62,31 @@ exports.handler = async (event) => {
 
             // Assemble full bundle objects
             const bundles = bundlesList.map(bundle => {
-                const cats = (bundleCats || []).filter(bc => bc.bundle_id === bundle.id);
+                const entries = (bundleCats || []).filter(bc => bc.bundle_id === bundle.id);
 
-                const staticCategories = [];
-                const configurableCategories = [];
+                const staticItems = [];      // Individual products or single-product categories
+                const configurableCategories = [];  // Full categories (customer picks)
                 let basePrice = 0;
 
-                cats.forEach(bc => {
-                    const catProducts = (allProducts || []).filter(p => p.category_id === bc.category_id);
-                    const catObj = {
-                        ...bc.categories,
-                        role: bc.role,
-                        sort_order: bc.sort_order,
-                        products: catProducts
-                    };
-
-                    if (bc.role === 'static') {
-                        staticCategories.push(catObj);
-                        // Sum cheapest product in each static category for base price
-                        if (catProducts.length > 0) {
-                            basePrice += Math.min(...catProducts.map(p => p.price));
-                        }
-                    } else {
-                        configurableCategories.push(catObj);
+                entries.forEach(bc => {
+                    if (bc.product_id && bc.products) {
+                        // Individual product inclusion (always static)
+                        staticItems.push({
+                            type: 'product',
+                            product: bc.products,
+                            sort_order: bc.sort_order
+                        });
+                        basePrice += bc.products.price || 0;
+                    } else if (bc.category_id && bc.categories) {
+                        // Full category reference (configurable)
+                        const catProducts = (allProducts || []).filter(p => p.category_id === bc.category_id);
+                        configurableCategories.push({
+                            ...bc.categories,
+                            role: 'configurable',
+                            sort_order: bc.sort_order,
+                            products: catProducts,
+                            product_count: catProducts.length
+                        });
                     }
                 });
 
@@ -99,7 +101,7 @@ exports.handler = async (event) => {
 
                 return {
                     ...bundle,
-                    static_categories: staticCategories,
+                    static_items: staticItems,
                     configurable_categories: configurableCategories,
                     base_price: basePrice,
                     price_range: {
@@ -128,10 +130,10 @@ exports.handler = async (event) => {
             // Set categories for a bundle
             if (params.action === 'categories' && params.id) {
                 const body = JSON.parse(event.body);
-                const { categories } = body; // [{ category_id, role, sort_order }]
+                const { items } = body; // [{ category_id?, product_id?, role, sort_order }]
 
-                if (!Array.isArray(categories)) {
-                    return jsonResponse(400, { error: 'categories must be an array' });
+                if (!Array.isArray(items)) {
+                    return jsonResponse(400, { error: 'items must be an array' });
                 }
 
                 // Delete existing bundle_categories
@@ -141,12 +143,13 @@ exports.handler = async (event) => {
                     .eq('bundle_id', params.id);
 
                 // Insert new ones
-                if (categories.length > 0) {
-                    const rows = categories.map((c, i) => ({
+                if (items.length > 0) {
+                    const rows = items.map((item, i) => ({
                         bundle_id: params.id,
-                        category_id: c.category_id,
-                        role: c.role || 'static',
-                        sort_order: c.sort_order !== undefined ? c.sort_order : i
+                        category_id: item.category_id || null,
+                        product_id: item.product_id || null,
+                        role: item.role || 'static',
+                        sort_order: item.sort_order !== undefined ? item.sort_order : i
                     }));
 
                     const { error } = await supabase

@@ -7,6 +7,100 @@
     <title>Bundles — MiniDesk Admin</title>
     <link rel="stylesheet" href="/css/styles.css">
     <link rel="stylesheet" href="css/admin.css">
+    <style>
+        /* Expandable category in sidebar */
+        .cat-group {
+            margin-bottom: 4px;
+        }
+
+        .cat-group-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 12px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: background 0.15s;
+        }
+
+        .cat-group-header:hover {
+            background: rgba(255, 255, 255, 0.07);
+        }
+
+        .cat-group-header .arrow {
+            transition: transform 0.2s;
+            font-size: 0.7rem;
+            color: var(--muted);
+        }
+
+        .cat-group.open .arrow {
+            transform: rotate(90deg);
+        }
+
+        .cat-group-products {
+            display: none;
+            padding: 4px 0 4px 16px;
+        }
+
+        .cat-group.open .cat-group-products {
+            display: block;
+        }
+
+        .cat-drag-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 12px;
+            margin: 3px 0;
+            background: rgba(0, 113, 227, 0.06);
+            border: 1px dashed rgba(0, 113, 227, 0.3);
+            border-radius: 8px;
+            cursor: grab;
+            font-size: 0.82rem;
+            transition: background 0.15s;
+        }
+
+        .cat-drag-item:hover {
+            background: rgba(0, 113, 227, 0.12);
+        }
+
+        .cat-drag-item .drag-label {
+            color: var(--muted);
+            font-size: 0.72rem;
+            margin-left: 8px;
+        }
+
+        .cat-drag-item.is-category {
+            border-color: rgba(48, 209, 88, 0.3);
+            background: rgba(48, 209, 88, 0.06);
+        }
+
+        .cat-drag-item.is-category:hover {
+            background: rgba(48, 209, 88, 0.12);
+        }
+
+        /* Drop items with type indicator */
+        .bundle-drop-item .item-type {
+            font-size: 0.68rem;
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-left: 6px;
+        }
+
+        .item-type.product-type {
+            background: rgba(0, 113, 227, 0.15);
+            color: #0a84ff;
+        }
+
+        .item-type.category-type {
+            background: rgba(48, 209, 88, 0.15);
+            color: #30d158;
+        }
+    </style>
 </head>
 
 <body>
@@ -39,36 +133,32 @@
             </div>
         </div>
 
-        <!-- Bundle Builder (shown when editing a bundle's categories) -->
+        <!-- Bundle Builder -->
         <div id="builder-section" style="display:none; margin-top: 32px;">
             <div class="admin-toolbar">
-                <h2 id="builder-title">Configure: Basic Work Bundle</h2>
-                <button class="btn-add" onclick="saveBundleCategories()">💾 Save Configuration</button>
+                <h2 id="builder-title">Configure: Bundle</h2>
+                <button class="btn-add" onclick="saveConfiguration()">💾 Save Configuration</button>
             </div>
 
             <div class="bundle-builder">
-                <!-- Sidebar: Available categories to drag -->
+                <!-- Sidebar: Categories (expandable) with products inside -->
                 <div class="bundle-sidebar">
-                    <h4>Available Categories</h4>
-                    <div id="available-cats"></div>
+                    <h4>Available Items</h4>
+                    <div style="font-size:0.75rem;color:var(--muted);margin-bottom:10px;">
+                        Drag a <span style="color:#0a84ff;">product</span> → Static (auto-included)<br>
+                        Drag a <span style="color:#30d158;">category</span> → Configurable (customer picks)
+                    </div>
+                    <div id="available-items"></div>
                 </div>
 
-                <!-- Two drop columns -->
-                <div class="bundle-columns">
-                    <div class="bundle-column">
-                        <h4 class="static-h">✓ Static (Auto-included)</h4>
-                        <div id="static-list"></div>
-                        <div class="drop-placeholder" id="static-drop" ondragover="onDragOver(event)"
-                            ondragleave="onDragLeave(event)" ondrop="onDrop(event, 'static')">
-                            Drop categories here
-                        </div>
-                    </div>
-                    <div class="bundle-column">
-                        <h4 class="config-h">⚙ Configurable (Customer picks)</h4>
-                        <div id="config-list"></div>
-                        <div class="drop-placeholder" id="config-drop" ondragover="onDragOver(event)"
-                            ondragleave="onDragLeave(event)" ondrop="onDrop(event, 'configurable')">
-                            Drop categories here
+                <!-- Single drop column: Bundle Contents -->
+                <div class="bundle-columns" style="flex:1;">
+                    <div class="bundle-column" style="flex:1;">
+                        <h4>📦 Bundle Contents</h4>
+                        <div id="bundle-items-list"></div>
+                        <div class="drop-placeholder" id="bundle-drop" ondragover="onDragOver(event)"
+                            ondragleave="onDragLeave(event)" ondrop="onDrop(event)">
+                            Drop products or categories here
                         </div>
                     </div>
                 </div>
@@ -132,20 +222,24 @@
 
         let bundles = [];
         let allCategories = [];
+        let allProducts = [];
         let editingBundleId = null;
-        let builderStatic = [];
-        let builderConfig = [];
+        let bundleItems = []; // Mixed array: { type: 'product'|'category', id, name, ... }
 
+        // ── LOAD DATA ──
         async function loadBundles() {
             try {
-                const [bRes, cRes] = await Promise.all([
+                const [bRes, cRes, pRes] = await Promise.all([
                     fetch('/api/bundles?all=true', { headers: { Authorization: 'Bearer ' + token } }),
-                    fetch('/api/categories')
+                    fetch('/api/categories'),
+                    fetch('/api/products?all=true', { headers: { Authorization: 'Bearer ' + token } })
                 ]);
                 const bData = await bRes.json();
                 const cData = await cRes.json();
+                const pData = await pRes.json();
                 bundles = bData.bundles || [];
                 allCategories = cData.categories || [];
+                allProducts = pData.products || [];
                 renderBundles();
             } catch (e) { console.error(e); }
         }
@@ -157,7 +251,7 @@
                 return;
             }
             grid.innerHTML = bundles.map(b => {
-                const staticCount = (b.static_categories || []).length;
+                const staticCount = (b.static_items || []).length;
                 const configCount = (b.configurable_categories || []).length;
                 const range = b.price_range || {};
                 return `
@@ -174,7 +268,7 @@
                     </div>
                     <div class="admin-card-meta">${b.description || ''}</div>
                     <div class="admin-card-meta" style="margin-top:8px;">
-                        <strong>${staticCount}</strong> static · <strong>${configCount}</strong> configurable
+                        <strong>${staticCount}</strong> static item${staticCount !== 1 ? 's' : ''} · <strong>${configCount}</strong> configurable
                         ${range.low ? ` · ₦${range.low.toLocaleString()} – ₦${range.high.toLocaleString()}` : ''}
                     </div>
                     ${!b.is_active ? '<div class="admin-card-meta" style="color:#ff453a;">⛔ Inactive</div>' : ''}
@@ -234,7 +328,7 @@
             finally { btn.disabled = false; }
         }
 
-        // ── BUNDLE BUILDER (Drag & Drop Categories) ──
+        // ── BUNDLE BUILDER ──
         function openBuilder(bundleId) {
             editingBundleId = bundleId;
             const bundle = bundles.find(b => b.id === bundleId);
@@ -244,44 +338,128 @@
             document.getElementById('builder-section').style.display = 'block';
             document.getElementById('builder-section').scrollIntoView({ behavior: 'smooth' });
 
-            builderStatic = (bundle.static_categories || []).map(c => ({ id: c.id, name: c.name, slug: c.slug, product_count: c.product_count || 0 }));
-            builderConfig = (bundle.configurable_categories || []).map(c => ({ id: c.id, name: c.name, slug: c.slug, product_count: c.product_count || 0 }));
+            // Load existing configuration
+            bundleItems = [];
+
+            // Static items (individual products)
+            (bundle.static_items || []).forEach(si => {
+                bundleItems.push({
+                    type: 'product',
+                    product_id: si.product.id,
+                    name: si.product.name,
+                    price: si.product.price,
+                    category_name: getCategoryName(si.product.category_id),
+                    sort_order: si.sort_order
+                });
+            });
+
+            // Configurable categories
+            (bundle.configurable_categories || []).forEach(cc => {
+                bundleItems.push({
+                    type: 'category',
+                    category_id: cc.id,
+                    name: cc.name,
+                    product_count: cc.product_count || cc.products?.length || 0,
+                    sort_order: cc.sort_order
+                });
+            });
+
+            // Sort by sort_order
+            bundleItems.sort((a, b) => a.sort_order - b.sort_order);
 
             renderBuilder();
         }
 
-        function renderBuilder() {
-            const usedIds = [...builderStatic, ...builderConfig].map(c => c.id);
-            const available = allCategories.filter(c => !usedIds.includes(c.id));
-
-            document.getElementById('available-cats').innerHTML = available.length === 0
-                ? '<div style="color:var(--muted);font-size:0.82rem;padding:8px;">All categories assigned</div>'
-                : available.map(c => `
-                    <div class="bundle-cat-item" draggable="true" ondragstart="onDragStart(event, '${c.id}', '${c.name}', '${c.slug}', ${c.product_count || 0})">
-                        ${c.name} <span class="cat-count">${c.product_count || 0}</span>
-                    </div>
-                `).join('');
-
-            document.getElementById('static-list').innerHTML = builderStatic.map((c, i) => `
-                <div class="bundle-drop-item">
-                    ${c.name} <span style="color:var(--muted);font-size:0.75rem;">${c.product_count || 0} products</span>
-                    <button class="remove-item" onclick="removeFromBuilder('static', ${i})">✕</button>
-                </div>
-            `).join('');
-
-            document.getElementById('config-list').innerHTML = builderConfig.map((c, i) => `
-                <div class="bundle-drop-item">
-                    ${c.name} <span style="color:var(--muted);font-size:0.75rem;">${c.product_count || 0} products</span>
-                    <button class="remove-item" onclick="removeFromBuilder('configurable', ${i})">✕</button>
-                </div>
-            `).join('');
+        function getCategoryName(catId) {
+            const cat = allCategories.find(c => c.id === catId);
+            return cat ? cat.name : '';
         }
 
-        // Drag handlers
+        function renderBuilder() {
+            // Sidebar: show categories, each expandable with their products
+            const usedProductIds = bundleItems.filter(i => i.type === 'product').map(i => i.product_id);
+            const usedCategoryIds = bundleItems.filter(i => i.type === 'category').map(i => i.category_id);
+
+            const sidebar = document.getElementById('available-items');
+            let html = '';
+
+            allCategories.forEach(cat => {
+                const catProducts = allProducts.filter(p => p.category_id === cat.id && p.is_active !== false);
+                const isUsedAsCategory = usedCategoryIds.includes(cat.id);
+
+                // If the whole category is already in the bundle, skip it entirely
+                if (isUsedAsCategory) return;
+
+                // Filter out products already individually added
+                const availableProducts = catProducts.filter(p => !usedProductIds.includes(p.id));
+
+                if (availableProducts.length === 0 && catProducts.length === 0) return;
+
+                html += `<div class="cat-group" id="cat-${cat.id}">`;
+                html += `<div class="cat-group-header" onclick="toggleCatGroup('${cat.id}')">
+                    <span>${cat.name} (${catProducts.length})</span>
+                    <span class="arrow">▶</span>
+                </div>`;
+                html += `<div class="cat-group-products">`;
+
+                // Drag the whole category (only if 2+ products available)
+                if (catProducts.length >= 2) {
+                    html += `<div class="cat-drag-item is-category" draggable="true"
+                        ondragstart="startDrag(event, 'category', '${cat.id}', '${cat.name.replace(/'/g, "\\'")}', ${catProducts.length})">
+                        📂 All ${cat.name} <span class="drag-label">Configurable</span>
+                    </div>`;
+                }
+
+                // Drag individual products
+                availableProducts.forEach(p => {
+                    html += `<div class="cat-drag-item" draggable="true"
+                        ondragstart="startDrag(event, 'product', '${p.id}', '${p.name.replace(/'/g, "\\'")}', 0, ${p.price}, '${cat.name.replace(/'/g, "\\'")}')">
+                        ${p.name} <span class="drag-label">₦${p.price.toLocaleString()}</span>
+                    </div>`;
+                });
+
+                html += `</div></div>`;
+            });
+
+            if (!html) {
+                html = '<div style="color:var(--muted);font-size:0.82rem;padding:8px;">All items assigned</div>';
+            }
+            sidebar.innerHTML = html;
+
+            // Bundle contents list
+            const listEl = document.getElementById('bundle-items-list');
+            if (bundleItems.length === 0) {
+                listEl.innerHTML = '';
+                return;
+            }
+
+            listEl.innerHTML = bundleItems.map((item, i) => {
+                if (item.type === 'product') {
+                    return `<div class="bundle-drop-item">
+                        ${item.name}
+                        <span class="item-type product-type">Static</span>
+                        <span style="color:var(--muted);font-size:0.75rem;margin-left:4px;">₦${item.price.toLocaleString()}</span>
+                        <button class="remove-item" onclick="removeItem(${i})">✕</button>
+                    </div>`;
+                } else {
+                    return `<div class="bundle-drop-item">
+                        ${item.name}
+                        <span class="item-type category-type">Configurable · ${item.product_count} options</span>
+                        <button class="remove-item" onclick="removeItem(${i})">✕</button>
+                    </div>`;
+                }
+            }).join('');
+        }
+
+        function toggleCatGroup(catId) {
+            document.getElementById('cat-' + catId)?.classList.toggle('open');
+        }
+
+        // ── DRAG & DROP ──
         let dragData = null;
 
-        function onDragStart(e, id, name, slug, count) {
-            dragData = { id, name, slug, product_count: count };
+        function startDrag(e, type, id, name, productCount, price, categoryName) {
+            dragData = { type, id, name, productCount: productCount || 0, price: price || 0, categoryName: categoryName || '' };
             e.dataTransfer.effectAllowed = 'move';
         }
 
@@ -294,52 +472,77 @@
             e.currentTarget.classList.remove('dragover');
         }
 
-        function onDrop(e, role) {
+        function onDrop(e) {
             e.preventDefault();
             e.currentTarget.classList.remove('dragover');
             if (!dragData) return;
 
-            const cat = { ...dragData };
+            if (dragData.type === 'product') {
+                // Check not already added
+                if (bundleItems.some(i => i.type === 'product' && i.product_id === dragData.id)) {
+                    toast('Product already in bundle', 'error');
+                    dragData = null;
+                    return;
+                }
+                bundleItems.push({
+                    type: 'product',
+                    product_id: dragData.id,
+                    name: dragData.name,
+                    price: dragData.price,
+                    category_name: dragData.categoryName,
+                    sort_order: bundleItems.length
+                });
+            } else if (dragData.type === 'category') {
+                // Check not already added
+                if (bundleItems.some(i => i.type === 'category' && i.category_id === dragData.id)) {
+                    toast('Category already in bundle', 'error');
+                    dragData = null;
+                    return;
+                }
+                // Remove any individual products from this category (the whole category supersedes)
+                const catProducts = allProducts.filter(p => p.category_id === dragData.id);
+                const catProductIds = catProducts.map(p => p.id);
+                const removed = bundleItems.filter(i => i.type === 'product' && catProductIds.includes(i.product_id));
+                if (removed.length > 0) {
+                    bundleItems = bundleItems.filter(i => !(i.type === 'product' && catProductIds.includes(i.product_id)));
+                    toast(`Removed ${removed.length} individual product(s) — full category now covers them`);
+                }
 
-            // Validation: categories with 2+ products can't be Static
-            if (role === 'static' && cat.product_count > 1) {
-                toast(`"${cat.name}" has ${cat.product_count} products — moved to Configurable`, 'error');
-                builderConfig.push(cat);
-            }
-            // Validation: categories with only 1 product can't be Configurable
-            else if (role === 'configurable' && cat.product_count <= 1) {
-                toast(`"${cat.name}" has only ${cat.product_count} product — moved to Static`, 'error');
-                builderStatic.push(cat);
-            }
-            else if (role === 'static') {
-                builderStatic.push(cat);
-            } else {
-                builderConfig.push(cat);
+                bundleItems.push({
+                    type: 'category',
+                    category_id: dragData.id,
+                    name: dragData.name,
+                    product_count: dragData.productCount,
+                    sort_order: bundleItems.length
+                });
             }
 
             dragData = null;
             renderBuilder();
         }
 
-        function removeFromBuilder(role, index) {
-            if (role === 'static') builderStatic.splice(index, 1);
-            else builderConfig.splice(index, 1);
+        function removeItem(index) {
+            bundleItems.splice(index, 1);
             renderBuilder();
         }
 
-        async function saveBundleCategories() {
+        // ── SAVE ──
+        async function saveConfiguration() {
             if (!editingBundleId) return;
 
-            const categories = [
-                ...builderStatic.map((c, i) => ({ category_id: c.id, role: 'static', sort_order: i })),
-                ...builderConfig.map((c, i) => ({ category_id: c.id, role: 'configurable', sort_order: builderStatic.length + i }))
-            ];
+            const items = bundleItems.map((item, i) => {
+                if (item.type === 'product') {
+                    return { product_id: item.product_id, role: 'static', sort_order: i };
+                } else {
+                    return { category_id: item.category_id, role: 'configurable', sort_order: i };
+                }
+            });
 
             try {
                 const res = await fetch(`/api/bundles?action=categories&id=${editingBundleId}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
-                    body: JSON.stringify({ categories })
+                    body: JSON.stringify({ items })
                 });
                 const data = await res.json();
                 if (!res.ok) throw new Error(data.error);
