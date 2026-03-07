@@ -300,8 +300,22 @@
             if (!dragData) return;
 
             const cat = { ...dragData };
-            if (role === 'static') builderStatic.push(cat);
-            else builderConfig.push(cat);
+
+            // Validation: categories with 2+ products can't be Static
+            if (role === 'static' && cat.product_count > 1) {
+                toast(`"${cat.name}" has ${cat.product_count} products — moved to Configurable`, 'error');
+                builderConfig.push(cat);
+            }
+            // Validation: categories with only 1 product can't be Configurable
+            else if (role === 'configurable' && cat.product_count <= 1) {
+                toast(`"${cat.name}" has only ${cat.product_count} product — moved to Static`, 'error');
+                builderStatic.push(cat);
+            }
+            else if (role === 'static') {
+                builderStatic.push(cat);
+            } else {
+                builderConfig.push(cat);
+            }
 
             dragData = null;
             renderBuilder();
