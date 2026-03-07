@@ -197,7 +197,8 @@
 
             grid.innerHTML = filtered.map(p => {
                 const cat = categories.find(c => c.id === p.category_id);
-                const img = (p.images && p.images.length > 0) ? p.images[0] : p.image;
+                const rawImg = (p.images && p.images.length > 0) ? p.images[0] : p.image;
+                const img = rawImg && !rawImg.startsWith('/') && !rawImg.startsWith('http') ? '/' + rawImg : rawImg;
                 return `
                 <div class="admin-card">
                     ${img ? `<div class="product-card-img"><img src="${img}" alt="${p.name}"></div>` : ''}
