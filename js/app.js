@@ -218,6 +218,20 @@ function setupStepObserver() {
     steps.forEach(step => stepObserver.observe(step));
 }
 
+// ── AUTO-SCROLL TO NEXT STEP ──
+function scrollToNextStep(currentStepId) {
+    const steps = ['step-bundle', 'step-monitor', 'step-keyboard', 'step-addons', 'step-summary'];
+    const idx = steps.indexOf(currentStepId);
+    if (idx >= 0 && idx < steps.length - 1) {
+        const nextEl = document.getElementById(steps[idx + 1]);
+        if (nextEl) {
+            setTimeout(() => {
+                nextEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 350);
+        }
+    }
+}
+
 // ── BUNDLE SELECT ──
 function selectBundle(val) {
     state.bundle = val;
@@ -241,6 +255,7 @@ function selectBundle(val) {
     }
 
     updateSummary();
+    scrollToNextStep('step-bundle');
 }
 
 // ── MONITOR SELECT ──
@@ -260,6 +275,7 @@ function selectMonitor(val) {
     showConfigImage('img-monitor');
 
     updateSummary();
+    scrollToNextStep('step-monitor');
 }
 
 // ── KEYBOARD SELECT ──
@@ -284,6 +300,7 @@ function selectKeyboard(val) {
 
     showConfigImage('img-keyboard');
     updateSummary();
+    scrollToNextStep('step-keyboard');
 }
 
 // ── COLOR SWATCHES ──
