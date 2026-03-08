@@ -226,7 +226,7 @@ function scrollToNextStep(currentStepId) {
         const nextEl = document.getElementById(steps[idx + 1]);
         if (nextEl) {
             setTimeout(() => {
-                nextEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                nextEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
             }, 350);
         }
     }
