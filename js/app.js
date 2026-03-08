@@ -35,16 +35,16 @@ const names = {
 // ── KEYBOARD COLOR DATA ──
 const keyboardColors = {
     'pop-icon': [
-        { name: 'Graphite & White', slug: 'graphite-white', hex: '#555555', hex2: '#ffffff', img: 'images/keyboards/pop-icon-graphite-white-1.jpg', img2: 'images/keyboards/pop-icon-graphite-white-2.jpg' },
-        { name: 'Rose & Off White', slug: 'rose-offwhite', hex: '#d4848a', hex2: '#f5f0eb', img: 'images/keyboards/pop-icon-rose-offwhite-1.jpg', img2: 'images/keyboards/pop-icon-rose-offwhite-2.jpg' },
-        { name: 'Off White & Orange', slug: 'offwhite-orange', hex: '#f5f0eb', hex2: '#e67e22', img: 'images/keyboards/pop-icon-offwhite-orange-1.jpg', img2: 'images/keyboards/pop-icon-offwhite-orange-2.jpg' },
-        { name: 'Graphite & Green', slug: 'graphite-green', hex: '#555555', hex2: '#6ab04c', img: 'images/keyboards/pop-icon-graphite-green-1.jpg', img2: 'images/keyboards/pop-icon-graphite-green-2.jpg' },
-        { name: 'Lilac & Off White', slug: 'lilac-offwhite', hex: '#b48dc7', hex2: '#f5f0eb', img: 'images/keyboards/pop-icon-lilac-offwhite-1.jpg', img2: 'images/keyboards/pop-icon-lilac-offwhite-2.jpg' }
+        { name: 'Graphite & White', slug: 'graphite-white', hex: '#555555', hex2: '#ffffff', img: 'images/keyboards/pop-icon-graphite-white-1.png' },
+        { name: 'Rose & Off White', slug: 'rose-offwhite', hex: '#d4848a', hex2: '#f5f0eb', img: 'images/keyboards/pop-icon-rose-offwhite-1.png' },
+        { name: 'Off White & Orange', slug: 'offwhite-orange', hex: '#f5f0eb', hex2: '#e67e22', img: 'images/keyboards/pop-icon-offwhite-orange-1.png' },
+        { name: 'Graphite & Green', slug: 'graphite-green', hex: '#555555', hex2: '#6ab04c', img: 'images/keyboards/pop-icon-graphite-green-1.png' },
+        { name: 'Lilac & Off White', slug: 'lilac-offwhite', hex: '#b48dc7', hex2: '#f5f0eb', img: 'images/keyboards/pop-icon-lilac-offwhite-1.png' }
     ],
     mk250: [
-        { name: 'Graphite', slug: 'graphite', hex: '#555555', img: 'images/keyboards/mk250-graphite-1.jpg', img2: 'images/keyboards/mk250-graphite-2.jpg' },
-        { name: 'Off-white', slug: 'offwhite', hex: '#f5f0eb', img: 'images/keyboards/mk250-offwhite-1.jpg', img2: 'images/keyboards/mk250-offwhite-2.jpg' },
-        { name: 'Rose', slug: 'rose', hex: '#d4848a', img: 'images/keyboards/mk250-rose-1.jpg', img2: 'images/keyboards/mk250-rose-2.jpg' }
+        { name: 'Graphite', slug: 'graphite', hex: '#555555', img: 'images/keyboards/mk250-graphite-1.png' },
+        { name: 'Off-white', slug: 'offwhite', hex: '#f5f0eb', img: 'images/keyboards/mk250-offwhite-1.png' },
+        { name: 'Rose', slug: 'rose', hex: '#d4848a', img: 'images/keyboards/mk250-rose-1.png' }
     ]
 };
 

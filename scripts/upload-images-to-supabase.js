@@ -32,8 +32,8 @@ const imageMap = [
     // Mac Mini
     { file: 'images/macmini-m4.jpg', slug: 'mac-mini-m4', name: 'macmini-m4.jpg' },
     // Keyboards
-    { file: 'images/keyboards/pop-icon-graphite-white-1.jpg', slug: 'pop-icon', name: 'pop-icon-graphite-white-1.jpg' },
-    { file: 'images/keyboards/mk250-graphite-1.jpg', slug: 'mk250', name: 'mk250-graphite-1.jpg' },
+    { file: 'images/keyboards/pop-icon-graphite-white-1.png', slug: 'pop-icon', name: 'pop-icon-graphite-white-1.png' },
+    { file: 'images/keyboards/mk250-graphite-1.png', slug: 'mk250', name: 'mk250-graphite-1.png' },
     // Addons
     { file: 'images/addon-ssd.png', slug: null, nameMatch: '%sandisk%', name: 'addon-ssd.png' },
     { file: 'images/addon-stand.png', slug: null, nameMatch: '%laptop stand%', name: 'addon-stand.png' },

@@ -129,7 +129,7 @@
                         </div>
                         <!-- Keyboard image (updated on selection + color) -->
                         <div class="config-img" id="img-keyboard">
-                            <img src="images/keyboards/pop-icon-graphite-white-1.jpg" alt="Keyboard & Mouse">
+                            <img src="images/keyboards/pop-icon-graphite-white-1.png" alt="Keyboard & Mouse">
                         </div>
                         <!-- Add-on image -->
                         <div class="config-img" id="img-addons">
@@ -190,149 +190,127 @@
                             <h3><strong>Monitor.</strong> <span class="step-sub">Pick your display.</span></h3>
                         </div>
                         <div class="apple-options">
-                            <div class="apple-option-card has-image" id="card-monitor-entry"
-                                onclick="selectMonitor('entry')">
+                            <div class="apple-option-card" id="card-monitor-entry" onclick="selectMonitor('entry')">
                                 <div class="apple-option-left">
                                     <div class="apple-option-tag" style="color:#c0601a;">Entry Level</div>
                                     <div class="apple-option-name">Dell SE2726HG</div>
                                     <div class="apple-option-desc">27" FHD · 240Hz · IPS · HDR</div>
                                 </div>
-                                <div class="apple-option-thumb">
-                                    <img src="images/monitor-entry.png" alt="Dell SE2726HG">
-                                </div>
                             </div>
-                            <div class="apple-option-card has-image" id="card-monitor-mid"
-                                onclick="selectMonitor('mid')">
+                            <div class="apple-option-card" id="card-monitor-mid" onclick="selectMonitor('mid')">
                                 <div class="apple-option-left">
                                     <div class="apple-option-tag" style="color:#0071e3;">Mid Range</div>
                                     <div class="apple-option-name">Dell S2725DS</div>
                                     <div class="apple-option-desc">27" QHD · 100Hz · Built-in Speakers</div>
                                 </div>
-                                <div class="apple-option-thumb">
-                                    <img src="images/monitor-mid.png" alt="Dell S2725DS">
-                                </div>
                             </div>
-                            <div class="apple-option-card has-image" id="card-monitor-top"
-                                onclick="selectMonitor('top')">
+                            <div class="apple-option-card" id="card-monitor-top" onclick="selectMonitor('top')">
                                 <div class="apple-option-left">
                                     <div class="apple-option-tag" style="color:#30d158;">Top Tier</div>
                                     <div class="apple-option-name">Dell S2725QS</div>
                                     <div class="apple-option-desc">27" 4K UHD · 120Hz · USB-C 65W PD</div>
                                 </div>
-                                <div class="apple-option-thumb">
-                                    <img src="images/monitor-top.png" alt="Dell S2725QS">
-                                </div>
                             </div>
-                            <div class="apple-option-card has-image" id="card-monitor-creator"
-                                onclick="selectMonitor('creator')">
+                            <div class="apple-option-card" id="card-monitor-creator" onclick="selectMonitor('creator')">
                                 <div class="apple-option-left">
                                     <div class="apple-option-tag" style="color:#bf5af2;">Creator's Choice</div>
                                     <div class="apple-option-name">ASUS ProArt PA278CV</div>
                                     <div class="apple-option-desc">27" QHD · Calman Verified · ΔE < 2 · USB-C 65W</div>
                                     </div>
-                                    <div class="apple-option-thumb">
-                                        <img src="images/monitor-creator.png" alt="ASUS ProArt PA278CV">
-                                    </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <!-- STEP: KEYBOARD & MOUSE -->
-                        <div class="config-step" id="step-keyboard" data-img="img-keyboard">
-                            <div class="apple-step-header">
-                                <h3><strong>Keyboard & Mouse.</strong> <span class="step-sub">Choose your combo.</span>
-                                </h3>
-                            </div>
-                            <div class="apple-options">
-                                <div class="apple-option-card has-image" id="card-kb-mk250"
-                                    onclick="selectKeyboard('mk250')">
-                                    <div class="apple-option-left">
-                                        <div class="apple-option-name">Logitech MK250 Compact</div>
-                                        <div class="apple-option-desc">Compact Bluetooth wireless keyboard & mouse combo
+                            <!-- STEP: KEYBOARD & MOUSE -->
+                            <div class="config-step" id="step-keyboard" data-img="img-keyboard">
+                                <div class="apple-step-header">
+                                    <h3><strong>Keyboard & Mouse.</strong> <span class="step-sub">Choose your
+                                            combo.</span>
+                                    </h3>
+                                </div>
+                                <div class="apple-options">
+                                    <div class="apple-option-card" id="card-kb-mk250" onclick="selectKeyboard('mk250')">
+                                        <div class="apple-option-left">
+                                            <div class="apple-option-name">Logitech MK250 Compact</div>
+                                            <div class="apple-option-desc">Compact Bluetooth wireless keyboard & mouse
+                                                combo
+                                            </div>
                                         </div>
                                     </div>
-                                    <div class="apple-option-thumb">
-                                        <img src="images/keyboards/mk250-graphite-1.jpg" alt="Logitech MK250">
-                                    </div>
-                                </div>
-                                <div class="apple-option-card has-image" id="card-kb-pop-icon"
-                                    onclick="selectKeyboard('pop-icon')">
-                                    <div class="apple-option-left">
-                                        <div class="apple-option-tag" style="color:#ff9f0a;">Premium</div>
-                                        <div class="apple-option-name">Logitech POP Icon Combo</div>
-                                        <div class="apple-option-desc">Stylish, compact keyboard & mouse with
-                                            customizable Action Keys</div>
-                                    </div>
-                                    <div class="apple-option-thumb">
-                                        <img src="images/keyboards/pop-icon-graphite-white-1.jpg"
-                                            alt="Logitech POP Icon">
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- Color Selector (appears after keyboard selection) -->
-                            <div class="color-selector" id="color-selector" style="display:none;">
-                                <div class="color-label">Color — <span id="color-name">Graphite & White</span></div>
-                                <div class="color-swatches" id="color-swatches"></div>
-                            </div>
-                        </div>
-
-                        <!-- STEP: ADD-ONS -->
-                        <div class="config-step" id="step-addons" data-img="img-addons">
-                            <div class="apple-step-header">
-                                <h3><strong>Add-ons.</strong> <span class="step-sub">Enhance your setup.</span></h3>
-                            </div>
-                            <div class="apple-options">
-                                <div class="apple-option-card has-image" id="card-stand"
-                                    onclick="toggleAddon('stand', this)">
-                                    <div class="apple-option-left">
-                                        <div class="apple-option-name">Laptop Stand</div>
-                                        <div class="apple-option-desc">Foldable aluminium, adjustable height, ergonomic
+                                    <div class="apple-option-card" id="card-kb-pop-icon"
+                                        onclick="selectKeyboard('pop-icon')">
+                                        <div class="apple-option-left">
+                                            <div class="apple-option-tag" style="color:#ff9f0a;">Premium</div>
+                                            <div class="apple-option-name">Logitech POP Icon Combo</div>
+                                            <div class="apple-option-desc">Stylish, compact keyboard & mouse with
+                                                customizable Action Keys</div>
                                         </div>
                                     </div>
-                                    <div class="apple-option-right">
-                                        <div class="apple-option-price">₦22,000</div>
-                                    </div>
-                                    <div class="apple-option-thumb">
-                                        <img src="images/addon-stand.png" alt="Laptop Stand">
-                                    </div>
                                 </div>
-                                <div class="apple-option-card has-image" id="card-ssd"
-                                    onclick="toggleAddon('ssd', this)">
-                                    <div class="apple-option-left">
-                                        <div class="apple-option-name">SanDisk 1TB Extreme Portable SSD</div>
-                                        <div class="apple-option-desc">1,050MB/s reads, rugged, USB-C ready</div>
-                                    </div>
-                                    <div class="apple-option-right">
-                                        <div class="apple-option-price">₦68,000</div>
-                                    </div>
-                                    <div class="apple-option-thumb">
-                                        <img src="images/addon-ssd.png" alt="SanDisk SSD">
-                                    </div>
+                                <!-- Color Selector (appears after keyboard selection) -->
+                                <div class="color-selector" id="color-selector" style="display:none;">
+                                    <div class="color-label">Color — <span id="color-name">Graphite & White</span></div>
+                                    <div class="color-swatches" id="color-swatches"></div>
                                 </div>
                             </div>
-                        </div>
 
-                        <!-- SUMMARY (Final Step) -->
-                        <div class="config-step config-summary" id="step-summary">
-                            <div class="apple-step-header">
-                                <h3><strong>Your Configuration.</strong></h3>
+                            <!-- STEP: ADD-ONS -->
+                            <div class="config-step" id="step-addons" data-img="img-addons">
+                                <div class="apple-step-header">
+                                    <h3><strong>Add-ons.</strong> <span class="step-sub">Enhance your setup.</span></h3>
+                                </div>
+                                <div class="apple-options">
+                                    <div class="apple-option-card has-image" id="card-stand"
+                                        onclick="toggleAddon('stand', this)">
+                                        <div class="apple-option-left">
+                                            <div class="apple-option-name">Laptop Stand</div>
+                                            <div class="apple-option-desc">Foldable aluminium, adjustable height,
+                                                ergonomic
+                                            </div>
+                                        </div>
+                                        <div class="apple-option-right">
+                                            <div class="apple-option-price">₦22,000</div>
+                                        </div>
+                                        <div class="apple-option-thumb">
+                                            <img src="images/addon-stand.png" alt="Laptop Stand">
+                                        </div>
+                                    </div>
+                                    <div class="apple-option-card has-image" id="card-ssd"
+                                        onclick="toggleAddon('ssd', this)">
+                                        <div class="apple-option-left">
+                                            <div class="apple-option-name">SanDisk 1TB Extreme Portable SSD</div>
+                                            <div class="apple-option-desc">1,050MB/s reads, rugged, USB-C ready</div>
+                                        </div>
+                                        <div class="apple-option-right">
+                                            <div class="apple-option-price">₦68,000</div>
+                                        </div>
+                                        <div class="apple-option-thumb">
+                                            <img src="images/addon-ssd.png" alt="SanDisk SSD">
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="summary-items" id="summary-lines">
-                                <div class="summary-empty">Select your bundle to start building.</div>
-                            </div>
-                            <div class="summary-total-row" id="summary-total" style="display:none;">
-                                <span>Total</span>
-                                <span class="total-price" id="total-price">₦0</span>
-                            </div>
-                            <a href="#order" id="proceed-btn" class="btn-primary proceed-btn"
-                                style="opacity:0.4;pointer-events:none;">
-                                Proceed to Order →
-                            </a>
-                        </div>
 
+                            <!-- SUMMARY (Final Step) -->
+                            <div class="config-step config-summary" id="step-summary">
+                                <div class="apple-step-header">
+                                    <h3><strong>Your Configuration.</strong></h3>
+                                </div>
+                                <div class="summary-items" id="summary-lines">
+                                    <div class="summary-empty">Select your bundle to start building.</div>
+                                </div>
+                                <div class="summary-total-row" id="summary-total" style="display:none;">
+                                    <span>Total</span>
+                                    <span class="total-price" id="total-price">₦0</span>
+                                </div>
+                                <a href="#order" id="proceed-btn" class="btn-primary proceed-btn"
+                                    style="opacity:0.4;pointer-events:none;">
+                                    Proceed to Order →
+                                </a>
+                            </div>
+
+                        </div>
                     </div>
                 </div>
-            </div>
     </section>
 
     <!-- ORDER FORM -->
