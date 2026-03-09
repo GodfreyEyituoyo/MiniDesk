@@ -265,7 +265,7 @@ function selectBundle(val) {
     }
 
     updateSummary();
-    scrollToNextStep('step-bundle');
+    // scrollToNextStep('step-bundle');  // disabled for now
 }
 
 // ── MONITOR SELECT ──
@@ -285,7 +285,7 @@ function selectMonitor(val) {
     showConfigImage('img-monitor');
 
     updateSummary();
-    scrollToNextStep('step-monitor');
+    // scrollToNextStep('step-monitor');  // disabled for now
 }
 
 // ── KEYBOARD SELECT ──
@@ -310,7 +310,7 @@ function selectKeyboard(val) {
 
     showConfigImage('img-keyboard');
     updateSummary();
-    scrollToNextStep('step-keyboard');
+    // scrollToNextStep('step-keyboard');  // disabled for now
 }
 
 // ── COLOR SWATCHES ──

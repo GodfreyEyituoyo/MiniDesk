@@ -664,8 +664,8 @@
 
         /* ── CONFIG STEPS ── */
         .config-step {
-            padding-bottom: 48px;
-            margin-bottom: 48px;
+            padding-bottom: 64px;
+            margin-bottom: 64px;
             border-bottom: 1px solid var(--border);
         }
 
