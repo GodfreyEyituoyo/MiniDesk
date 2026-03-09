@@ -64,17 +64,16 @@ const monitorImages = {
 const bundleDetailItems = [
     { name: 'Mac Mini M4', desc: '10-core CPU, 10-core GPU, 16GB unified memory, 256GB SSD', img: 'images/static/mac-mini-m4.webp', bundles: ['basic', 'full'] },
     { name: 'USB-C Hub (10-in-1)', desc: 'HDMI, USB-A ×3, USB-C, SD/microSD, Ethernet, 100W passthrough', img: 'images/static/usb-c-hub.webp', bundles: ['basic', 'full'] },
-    { name: 'Wireless Mouse', desc: 'Ergonomic design, silent click, long battery life', img: 'images/static/wireless-mouse.webp', bundles: ['basic', 'full'] },
     { name: 'Workstation Table', desc: 'Spacious minimalist desk with cable management', img: 'images/static/workstation-table.webp', bundles: ['full'] },
     { name: 'Ergonomic Chair', desc: 'Furgle mesh-back chair with lumbar support and headrest', img: 'images/static/ergonomic-chair.webp', bundles: ['full'] },
     { name: 'Keyboard Mat', desc: 'Premium felt desk mat, full-width coverage', img: 'images/static/keyboard-mat.webp', bundles: ['full'] },
     { name: 'Side Light', desc: 'Modern LED desk lamp with adjustable brightness', img: 'images/static/side-light.webp', bundles: ['full'] }
 ];
 
-// Quick list for summary (derived from detail items)
+// Quick list for summary (static items only — monitor & keyboard shown as specific selections)
 const bundleContents = {
-    basic: bundleDetailItems.filter(i => i.bundles.includes('basic')).map(i => i.name).concat(['Monitor', 'Keyboard & Mouse']),
-    full: bundleDetailItems.filter(i => i.bundles.includes('full')).map(i => i.name).concat(['Monitor', 'Keyboard & Mouse'])
+    basic: bundleDetailItems.filter(i => i.bundles.includes('basic')).map(i => i.name),
+    full: bundleDetailItems.filter(i => i.bundles.includes('full')).map(i => i.name)
 };
 
 // ── LOAD PRODUCTS FROM DB ──
