@@ -759,16 +759,19 @@ let slideshowTimer = null;
 const pauseSVG = `<svg id="pp-icon" viewBox="0 0 12 12" width="12" height="12" fill="#fff"><rect x="1" y="0" width="3.5" height="12" rx="1"/><rect x="7.5" y="0" width="3.5" height="12" rx="1"/></svg>`;
 const playSVG = `<svg id="pp-icon" viewBox="0 0 12 12" width="12" height="12" fill="#fff"><polygon points="1,0 11,6 1,12"/></svg>`;
 
-window.goToSlide = function (index) {
+window.heroGoToSlide = function (index) {
+    if (!slides[currentSlide] || !dots[currentSlide]) return;
     slides[currentSlide].classList.remove('active');
     dots[currentSlide].classList.remove('active');
     currentSlide = index;
+    if (!slides[currentSlide] || !dots[currentSlide]) return;
     slides[currentSlide].classList.add('active');
     dots[currentSlide].classList.add('active');
 };
 
 function advanceSlide() {
-    goToSlide((currentSlide + 1) % slides.length);
+    if (slides.length === 0) return;
+    heroGoToSlide((currentSlide + 1) % slides.length);
 }
 
 function startAutoPlay() {
