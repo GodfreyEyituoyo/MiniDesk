@@ -422,10 +422,6 @@ function selectColor(keyboardSlug, colorObj) {
     updateSectionImage('step-keyboard', colorObj.img, colorObj.name + ' keyboard');
 
     // Update thumbnail in the keyboard option card
-    const thumbImg = document.querySelector('#card-kb-' + keyboardSlug + ' .apple-option-thumb img');
-    if (thumbImg && colorObj.img) {
-        thumbImg.src = colorObj.img;
-    }
 
     updateSummary();
 }
@@ -477,17 +473,23 @@ function updateSummary() {
 
     if (state.bundle) {
         total += prices.bundle[state.bundle] || 0;
+        // Bundle name as header
         html += summaryItem(names.bundle[state.bundle] || state.bundle);
+        // Static items included in the bundle
+        const statics = bundleContents[state.bundle] || [];
+        statics.forEach(item => {
+            html += summarySubItem(item);
+        });
     }
     if (state.monitor) {
         total += prices.monitor[state.monitor] || 0;
-        html += summaryItem(names.monitor[state.monitor] || state.monitor);
+        html += summarySubItem(names.monitor[state.monitor] || state.monitor);
     }
     if (state.keyboard) {
         total += prices.keyboard[state.keyboard] || 0;
         let kbName = names.keyboard[state.keyboard] || state.keyboard;
         if (state.keyboardColor) kbName += ' — ' + state.keyboardColor;
-        html += summaryItem(kbName);
+        html += summarySubItem(kbName);
     }
     // Add-ons show WITH price
     state.addons.forEach(a => {
@@ -515,9 +517,14 @@ function updateSummary() {
     }
 }
 
-// Summary line without price (Apple-style checkmark)
+// Summary line — bundle header (Apple-style checkmark)
 function summaryItem(name) {
-    return `<div class="summary-line"><span class="item-name">${name}</span><span class="item-price" style="color:var(--muted);font-size:0.8rem;">✓</span></div>`;
+    return `<div class="summary-line" style="font-weight:600;"><span class="item-name">${name}</span><span class="item-price" style="color:var(--muted);font-size:0.8rem;">✓</span></div>`;
+}
+
+// Summary sub-item — individual items within the bundle (indented, lighter)
+function summarySubItem(name) {
+    return `<div class="summary-line" style="padding-left:16px;"><span class="item-name" style="color:var(--muted);">${name}</span><span class="item-price" style="color:var(--muted);font-size:0.8rem;">✓</span></div>`;
 }
 
 // Summary line with price (for add-ons)
