@@ -115,33 +115,11 @@
             </div>
 
             <div class="apple-layout">
-                <!-- LEFT: STICKY IMAGE PANEL -->
+                <!-- LEFT: STICKY IMAGE PANEL (desktop only) -->
                 <div class="config-image-panel">
                     <div class="config-image-inner">
-                        <!-- Bundle overview image -->
-                        <div class="config-img active" id="img-bundle">
-                            <img src="images/macmini-m4.jpg" alt="Mac Mini M4 Workstation">
-                            <div class="img-caption">Mac Mini M4 — The heart of every bundle</div>
-                        </div>
-                        <!-- Monitor image (updated on selection) -->
-                        <div class="config-img" id="img-monitor">
-                            <img src="images/monitor-entry.png" alt="Monitor">
-                        </div>
-                        <!-- Keyboard image (updated on selection + color) -->
-                        <div class="config-img" id="img-keyboard">
-                            <img src="images/keyboards/pop-icon-graphite-white-1.png" alt="Keyboard & Mouse">
-                        </div>
-                        <!-- Add-on image -->
-                        <div class="config-img" id="img-addons">
-                            <img src="images/addon-stand.png" alt="Add-ons">
-                        </div>
-                        <!-- Image navigation dots -->
-                        <div class="img-nav-dots" id="img-nav-dots">
-                            <button class="img-dot active" onclick="showConfigImage('img-bundle')"></button>
-                            <button class="img-dot" onclick="showConfigImage('img-monitor')"></button>
-                            <button class="img-dot" onclick="showConfigImage('img-keyboard')"></button>
-                            <button class="img-dot" onclick="showConfigImage('img-addons')"></button>
-                        </div>
+                        <!-- Each section's carousel is cloned here by JS -->
+                        <div class="desktop-carousel-slot" id="desktop-carousel-slot"></div>
                     </div>
                 </div>
 
@@ -149,9 +127,18 @@
                 <div class="config-steps-panel">
 
                     <!-- STEP: BUNDLE -->
-                    <div class="config-step" id="step-bundle" data-img="img-bundle">
+                    <div class="config-step" id="step-bundle">
                         <div class="apple-step-header">
                             <h3><strong>Bundle.</strong> <span class="step-sub">Choose your foundation.</span></h3>
+                        </div>
+                        <!-- Per-section carousel -->
+                        <div class="step-carousel" data-section="bundle">
+                            <div class="carousel-track">
+                                <div class="carousel-slide active">
+                                    <img src="images/macmini-m4.webp" alt="Mac Mini M4 Workstation" loading="lazy">
+                                </div>
+                            </div>
+                            <div class="carousel-caption">Mac Mini M4 — The heart of every bundle</div>
                         </div>
                         <div class="apple-options">
                             <div class="apple-option-card" id="card-basic" onclick="selectBundle('basic')">
@@ -185,9 +172,17 @@
                     </div>
 
                     <!-- STEP: MONITOR -->
-                    <div class="config-step" id="step-monitor" data-img="img-monitor">
+                    <div class="config-step" id="step-monitor">
                         <div class="apple-step-header">
                             <h3><strong>Monitor.</strong> <span class="step-sub">Pick your display.</span></h3>
+                        </div>
+                        <!-- Per-section carousel -->
+                        <div class="step-carousel" data-section="monitor">
+                            <div class="carousel-track">
+                                <div class="carousel-slide active">
+                                    <img src="images/monitor-entry.webp" alt="Monitor" loading="lazy">
+                                </div>
+                            </div>
                         </div>
                         <div class="apple-options">
                             <div class="apple-option-card has-image" id="card-monitor-entry"
@@ -200,7 +195,7 @@
                                         certified by TÜV Rheinland® for 3-star eye comfort.</div>
                                 </div>
                                 <div class="apple-option-thumb">
-                                    <img src="images/monitor-entry.png" alt="Dell SE2726HG">
+                                    <img src="images/monitor-entry.webp" alt="Dell SE2726HG">
                                 </div>
                             </div>
                             <div class="apple-option-card has-image" id="card-monitor-mid"
@@ -213,7 +208,7 @@
                                         work and multitasking.</div>
                                 </div>
                                 <div class="apple-option-thumb">
-                                    <img src="images/monitor-mid.png" alt="Dell S2725DS">
+                                    <img src="images/monitor-mid.webp" alt="Dell S2725DS">
                                 </div>
                             </div>
                             <div class="apple-option-card has-image" id="card-monitor-top"
@@ -226,7 +221,7 @@
                                         professionals.</div>
                                 </div>
                                 <div class="apple-option-thumb">
-                                    <img src="images/monitor-top.png" alt="Dell S2725QS">
+                                    <img src="images/monitor-top.webp" alt="Dell S2725QS">
                                 </div>
                             </div>
                             <div class="apple-option-card has-image" id="card-monitor-creator"
@@ -240,17 +235,26 @@
                                             workflow.</div>
                                     </div>
                                     <div class="apple-option-thumb">
-                                        <img src="images/monitor-creator.png" alt="ASUS ProArt PA278CV">
+                                        <img src="images/monitor-creator.webp" alt="ASUS ProArt PA278CV">
                                     </div>
                                 </div>
                             </div>
                         </div>
 
                         <!-- STEP: KEYBOARD & MOUSE -->
-                        <div class="config-step" id="step-keyboard" data-img="img-keyboard">
+                        <div class="config-step" id="step-keyboard">
                             <div class="apple-step-header">
                                 <h3><strong>Keyboard & Mouse.</strong> <span class="step-sub">Choose your combo.</span>
                                 </h3>
+                            </div>
+                            <!-- Per-section carousel -->
+                            <div class="step-carousel" data-section="keyboard">
+                                <div class="carousel-track" id="keyboard-carousel-track">
+                                    <div class="carousel-slide active">
+                                        <img src="images/keyboards/pop-icon-graphite-white-1.webp"
+                                            alt="Keyboard & Mouse" loading="lazy">
+                                    </div>
+                                </div>
                             </div>
                             <div class="apple-options">
                                 <div class="apple-option-card has-image" id="card-kb-mk250"
@@ -262,7 +266,7 @@
                                             for everyday productivity.</div>
                                     </div>
                                     <div class="apple-option-thumb">
-                                        <img src="images/keyboards/mk250-graphite-1.png" alt="Logitech MK250">
+                                        <img src="images/keyboards/mk250-graphite-1.webp" alt="Logitech MK250">
                                     </div>
                                 </div>
                                 <div class="apple-option-card has-image" id="card-kb-pop-icon"
@@ -275,12 +279,12 @@
                                             shortcuts for your favourite apps.</div>
                                     </div>
                                     <div class="apple-option-thumb">
-                                        <img src="images/keyboards/pop-icon-graphite-white-1.png"
+                                        <img src="images/keyboards/pop-icon-graphite-white-1.webp"
                                             alt="Logitech POP Icon">
                                     </div>
                                 </div>
                             </div>
-                            <!-- Color Selector (appears after keyboard selection) -->
+                            <!-- Color Selector -->
                             <div class="color-selector" id="color-selector" style="display:none;">
                                 <div class="color-label">Color — <span id="color-name">Graphite & White</span></div>
                                 <div class="color-swatches" id="color-swatches"></div>
@@ -288,9 +292,17 @@
                         </div>
 
                         <!-- STEP: ADD-ONS -->
-                        <div class="config-step" id="step-addons" data-img="img-addons">
+                        <div class="config-step" id="step-addons">
                             <div class="apple-step-header">
                                 <h3><strong>Add-ons.</strong> <span class="step-sub">Enhance your setup.</span></h3>
+                            </div>
+                            <!-- Per-section carousel -->
+                            <div class="step-carousel" data-section="addons">
+                                <div class="carousel-track">
+                                    <div class="carousel-slide active">
+                                        <img src="images/addon-stand.webp" alt="Add-ons" loading="lazy">
+                                    </div>
+                                </div>
                             </div>
                             <div class="apple-options">
                                 <div class="apple-option-card has-image" id="card-stand"
@@ -304,7 +316,7 @@
                                         <div class="apple-option-price">₦22,000</div>
                                     </div>
                                     <div class="apple-option-thumb">
-                                        <img src="images/addon-stand.png" alt="Laptop Stand">
+                                        <img src="images/addon-stand.webp" alt="Laptop Stand">
                                     </div>
                                 </div>
                                 <div class="apple-option-card has-image" id="card-ssd"
@@ -318,7 +330,7 @@
                                         <div class="apple-option-price">₦68,000</div>
                                     </div>
                                     <div class="apple-option-thumb">
-                                        <img src="images/addon-ssd.png" alt="SanDisk SSD">
+                                        <img src="images/addon-ssd.webp" alt="SanDisk SSD">
                                     </div>
                                 </div>
                             </div>

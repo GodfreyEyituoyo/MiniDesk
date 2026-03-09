@@ -35,25 +35,25 @@ const names = {
 // ── KEYBOARD COLOR DATA ──
 const keyboardColors = {
     'pop-icon': [
-        { name: 'Graphite & White', slug: 'graphite-white', hex: '#555555', hex2: '#ffffff', img: 'images/keyboards/pop-icon-graphite-white-1.png' },
-        { name: 'Rose & Off White', slug: 'rose-offwhite', hex: '#d4848a', hex2: '#f5f0eb', img: 'images/keyboards/pop-icon-rose-offwhite-1.png' },
-        { name: 'Off White & Orange', slug: 'offwhite-orange', hex: '#f5f0eb', hex2: '#e67e22', img: 'images/keyboards/pop-icon-offwhite-orange-1.png' },
-        { name: 'Graphite & Green', slug: 'graphite-green', hex: '#555555', hex2: '#6ab04c', img: 'images/keyboards/pop-icon-graphite-green-1.png' },
-        { name: 'Lilac & Off White', slug: 'lilac-offwhite', hex: '#b48dc7', hex2: '#f5f0eb', img: 'images/keyboards/pop-icon-lilac-offwhite-1.png' }
+        { name: 'Graphite & White', slug: 'graphite-white', hex: '#555555', hex2: '#ffffff', img: 'images/keyboards/pop-icon-graphite-white-1.webp' },
+        { name: 'Rose & Off White', slug: 'rose-offwhite', hex: '#d4848a', hex2: '#f5f0eb', img: 'images/keyboards/pop-icon-rose-offwhite-1.webp' },
+        { name: 'Off White & Orange', slug: 'offwhite-orange', hex: '#f5f0eb', hex2: '#e67e22', img: 'images/keyboards/pop-icon-offwhite-orange-1.webp' },
+        { name: 'Graphite & Green', slug: 'graphite-green', hex: '#555555', hex2: '#6ab04c', img: 'images/keyboards/pop-icon-graphite-green-1.webp' },
+        { name: 'Lilac & Off White', slug: 'lilac-offwhite', hex: '#b48dc7', hex2: '#f5f0eb', img: 'images/keyboards/pop-icon-lilac-offwhite-1.webp' }
     ],
     mk250: [
-        { name: 'Graphite', slug: 'graphite', hex: '#555555', img: 'images/keyboards/mk250-graphite-1.png' },
-        { name: 'Off-white', slug: 'offwhite', hex: '#f5f0eb', img: 'images/keyboards/mk250-offwhite-1.png' },
-        { name: 'Rose', slug: 'rose', hex: '#d4848a', img: 'images/keyboards/mk250-rose-1.png' }
+        { name: 'Graphite', slug: 'graphite', hex: '#555555', img: 'images/keyboards/mk250-graphite-1.webp' },
+        { name: 'Off-white', slug: 'offwhite', hex: '#f5f0eb', img: 'images/keyboards/mk250-offwhite-1.webp' },
+        { name: 'Rose', slug: 'rose', hex: '#d4848a', img: 'images/keyboards/mk250-rose-1.webp' }
     ]
 };
 
 // ── MONITOR IMAGE MAP ──
 const monitorImages = {
-    entry: 'images/monitor-entry.png',
-    mid: 'images/monitor-mid.png',
-    top: 'images/monitor-top.png',
-    creator: 'images/monitor-creator.png'
+    entry: 'images/monitor-entry.webp',
+    mid: 'images/monitor-mid.webp',
+    top: 'images/monitor-top.webp',
+    creator: 'images/monitor-creator.webp'
 };
 
 // ── BUNDLE CONTENTS (static items per bundle) ──
@@ -189,57 +189,130 @@ function updateDisplayedPrices(products) {
     if (state.bundle || state.monitor) updateSummary();
 }
 
-// ── IMAGE CROSS-FADE ──
-function showConfigImage(imgId) {
-    document.querySelectorAll('.config-img').forEach(el => el.classList.remove('active'));
-    const target = document.getElementById(imgId);
-    if (target) target.classList.add('active');
+// ── PER-SECTION CAROUSEL SYSTEM ──
+let activeSection = null;
 
-    // Update dots
-    document.querySelectorAll('.img-dot').forEach(d => d.classList.remove('active'));
-    const dotMap = ['img-bundle', 'img-monitor', 'img-keyboard', 'img-addons'];
-    const idx = dotMap.indexOf(imgId);
-    const dots = document.querySelectorAll('.img-dot');
-    if (idx >= 0 && dots[idx]) dots[idx].classList.add('active');
+// Clone active section’s carousel into the desktop sticky panel
+function showSectionInPanel(sectionEl) {
+    const slot = document.getElementById('desktop-carousel-slot');
+    if (!slot) return;
+    const carousel = sectionEl.querySelector('.step-carousel');
+    if (!carousel) return;
+    // Don't re-clone if same section
+    if (activeSection === sectionEl) return;
+    activeSection = sectionEl;
+    // Clone and place
+    slot.innerHTML = '';
+    const clone = carousel.cloneNode(true);
+    clone.style.display = 'block';
+    slot.appendChild(clone);
+    // Re-init dots/arrows on the clone
+    initCarouselControls(clone);
 }
 
-// ── INTERSECTION OBSERVER (auto-switch image on scroll) ──
-let scrollLock = false; // Prevent observer from fighting programmatic scroll
+// Initialize carousel dots and arrows
+function initCarouselControls(carouselEl) {
+    const slides = carouselEl.querySelectorAll('.carousel-slide');
+    if (slides.length <= 1) {
+        carouselEl.classList.add('carousel-single');
+        return;
+    }
+    carouselEl.classList.remove('carousel-single');
+    // Create dots
+    let dotsContainer = carouselEl.querySelector('.carousel-dots');
+    if (!dotsContainer) {
+        dotsContainer = document.createElement('div');
+        dotsContainer.className = 'carousel-dots';
+        carouselEl.appendChild(dotsContainer);
+    }
+    dotsContainer.innerHTML = '';
+    slides.forEach((_, i) => {
+        const dot = document.createElement('button');
+        dot.className = 'carousel-dot' + (i === 0 ? ' active' : '');
+        dot.addEventListener('click', () => goToSlide(carouselEl, i));
+        dotsContainer.appendChild(dot);
+    });
+    // Create arrows if not present
+    if (!carouselEl.querySelector('.carousel-prev')) {
+        const prev = document.createElement('button');
+        prev.className = 'carousel-prev';
+        prev.innerHTML = '\u2039';
+        prev.addEventListener('click', () => {
+            const current = getCurrentSlideIndex(carouselEl);
+            goToSlide(carouselEl, (current - 1 + slides.length) % slides.length);
+        });
+        carouselEl.appendChild(prev);
+    }
+    if (!carouselEl.querySelector('.carousel-next')) {
+        const next = document.createElement('button');
+        next.className = 'carousel-next';
+        next.innerHTML = '\u203A';
+        next.addEventListener('click', () => {
+            const current = getCurrentSlideIndex(carouselEl);
+            goToSlide(carouselEl, (current + 1) % slides.length);
+        });
+        carouselEl.appendChild(next);
+    }
+}
+
+function getCurrentSlideIndex(carouselEl) {
+    const slides = carouselEl.querySelectorAll('.carousel-slide');
+    for (let i = 0; i < slides.length; i++) {
+        if (slides[i].classList.contains('active')) return i;
+    }
+    return 0;
+}
+
+function goToSlide(carouselEl, idx) {
+    const slides = carouselEl.querySelectorAll('.carousel-slide');
+    const dots = carouselEl.querySelectorAll('.carousel-dot');
+    slides.forEach(s => s.classList.remove('active'));
+    dots.forEach(d => d.classList.remove('active'));
+    if (slides[idx]) slides[idx].classList.add('active');
+    if (dots[idx]) dots[idx].classList.add('active');
+}
+
+// Update a section's carousel image (e.g. when selecting monitor or keyboard color)
+function updateSectionImage(sectionId, imgSrc, altText) {
+    const section = document.getElementById(sectionId);
+    if (!section) return;
+    const carousel = section.querySelector('.step-carousel');
+    if (!carousel) return;
+    const firstSlide = carousel.querySelector('.carousel-slide img');
+    if (firstSlide) {
+        firstSlide.src = imgSrc;
+        if (altText) firstSlide.alt = altText;
+    }
+    // Also update desktop panel if this is the active section
+    if (activeSection === section) {
+        activeSection = null; // Force re-clone
+        showSectionInPanel(section);
+    }
+}
+
+// ── INTERSECTION OBSERVER (switch desktop panel on scroll) ──
 function setupStepObserver() {
-    const steps = document.querySelectorAll('.config-step[data-img]');
+    const steps = document.querySelectorAll('.config-step');
     const stepObserver = new IntersectionObserver((entries) => {
-        if (scrollLock) return; // Don't switch during programmatic scroll
         entries.forEach(entry => {
             if (entry.isIntersecting) {
-                const imgId = entry.target.getAttribute('data-img');
-                if (imgId) showConfigImage(imgId);
+                showSectionInPanel(entry.target);
             }
         });
-    }, { threshold: 0.5, rootMargin: '-30% 0px -30% 0px' });
+    }, { threshold: 0.3, rootMargin: '-20% 0px -20% 0px' });
 
-    steps.forEach(step => stepObserver.observe(step));
-}
-
-// ── AUTO-SCROLL TO NEXT STEP ──
-function scrollToNextStep(currentStepId) {
-    const steps = ['step-bundle', 'step-monitor', 'step-keyboard', 'step-addons', 'step-summary'];
-    const imgMap = { 'step-bundle': 'img-bundle', 'step-monitor': 'img-monitor', 'step-keyboard': 'img-keyboard', 'step-addons': 'img-addons' };
-    const idx = steps.indexOf(currentStepId);
-    if (idx >= 0 && idx < steps.length - 1) {
-        const nextStepId = steps[idx + 1];
-        const nextEl = document.getElementById(nextStepId);
-        if (nextEl) {
-            // Lock observer during programmatic scroll
-            scrollLock = true;
-            // Immediately show the correct image for the next step
-            if (imgMap[nextStepId]) showConfigImage(imgMap[nextStepId]);
-            setTimeout(() => {
-                nextEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                // Unlock after scroll animation completes
-                setTimeout(() => { scrollLock = false; }, 800);
-            }, 350);
+    steps.forEach(step => {
+        if (step.querySelector('.step-carousel')) {
+            stepObserver.observe(step);
         }
-    }
+    });
+
+    // Init all inline carousels (for mobile)
+    document.querySelectorAll('.step-carousel').forEach(c => initCarouselControls(c));
+
+    // Show first section in desktop panel
+    const firstStep = document.querySelector('.config-step');
+    if (firstStep) showSectionInPanel(firstStep);
 }
 
 // ── BUNDLE SELECT ──
@@ -277,15 +350,12 @@ function selectMonitor(val) {
     });
     document.getElementById('card-monitor-' + val).classList.add('selected');
 
-    // Update left panel image
-    const monitorImg = document.querySelector('#img-monitor img');
-    if (monitorImg && monitorImages[val]) {
-        monitorImg.src = monitorImages[val];
+    // Update this section's carousel image
+    if (monitorImages[val]) {
+        updateSectionImage('step-monitor', monitorImages[val], 'Monitor');
     }
-    showConfigImage('img-monitor');
 
     updateSummary();
-    // scrollToNextStep('step-monitor');  // disabled for now
 }
 
 // ── KEYBOARD SELECT ──
@@ -308,9 +378,7 @@ function selectKeyboard(val) {
         selectColor(val, colors[0]);
     }
 
-    showConfigImage('img-keyboard');
     updateSummary();
-    // scrollToNextStep('step-keyboard');  // disabled for now
 }
 
 // ── COLOR SWATCHES ──
@@ -350,11 +418,8 @@ function selectColor(keyboardSlug, colorObj) {
     const swatches = document.querySelectorAll('.color-swatch');
     if (idx >= 0 && swatches[idx]) swatches[idx].classList.add('active');
 
-    // Update left panel keyboard image
-    const kbImg = document.querySelector('#img-keyboard img');
-    if (kbImg && colorObj.img) {
-        kbImg.src = colorObj.img;
-    }
+    // Update keyboard section's carousel image
+    updateSectionImage('step-keyboard', colorObj.img, colorObj.name + ' keyboard');
 
     // Update thumbnail in the keyboard option card
     const thumbImg = document.querySelector('#card-kb-' + keyboardSlug + ' .apple-option-thumb img');
