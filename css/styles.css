@@ -650,17 +650,10 @@
             align-items: center;
             justify-content: center;
             transition: background 0.2s, opacity 0.2s;
-            opacity: 0;
-        }
-
-        .carousel-track:hover~.carousel-prev,
-        .carousel-track:hover~.carousel-next,
-        .carousel-prev:hover,
-        .carousel-next:hover,
-        .step-carousel:hover .carousel-prev,
-        .step-carousel:hover .carousel-next {
             opacity: 1;
         }
+
+
 
         .carousel-prev {
             left: 12px;

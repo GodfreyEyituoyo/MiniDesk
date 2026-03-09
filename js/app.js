@@ -236,27 +236,30 @@ function initCarouselControls(carouselEl) {
         dot.addEventListener('click', () => goToSlide(carouselEl, i));
         dotsContainer.appendChild(dot);
     });
-    // Create arrows if not present
-    if (!carouselEl.querySelector('.carousel-prev')) {
-        const prev = document.createElement('button');
-        prev.className = 'carousel-prev';
-        prev.innerHTML = '\u2039';
-        prev.addEventListener('click', () => {
-            const current = getCurrentSlideIndex(carouselEl);
-            goToSlide(carouselEl, (current - 1 + slides.length) % slides.length);
-        });
-        carouselEl.appendChild(prev);
-    }
-    if (!carouselEl.querySelector('.carousel-next')) {
-        const next = document.createElement('button');
-        next.className = 'carousel-next';
-        next.innerHTML = '\u203A';
-        next.addEventListener('click', () => {
-            const current = getCurrentSlideIndex(carouselEl);
-            goToSlide(carouselEl, (current + 1) % slides.length);
-        });
-        carouselEl.appendChild(next);
-    }
+    // Remove existing arrows (crucial for cloned node in sticky panel)
+    const oldPrev = carouselEl.querySelector('.carousel-prev');
+    if (oldPrev) oldPrev.remove();
+    const oldNext = carouselEl.querySelector('.carousel-next');
+    if (oldNext) oldNext.remove();
+
+    // Create arrows
+    const prev = document.createElement('button');
+    prev.className = 'carousel-prev';
+    prev.innerHTML = '\u2039';
+    prev.addEventListener('click', () => {
+        const current = getCurrentSlideIndex(carouselEl);
+        goToSlide(carouselEl, (current - 1 + slides.length) % slides.length);
+    });
+    carouselEl.appendChild(prev);
+
+    const next = document.createElement('button');
+    next.className = 'carousel-next';
+    next.innerHTML = '\u203A';
+    next.addEventListener('click', () => {
+        const current = getCurrentSlideIndex(carouselEl);
+        goToSlide(carouselEl, (current + 1) % slides.length);
+    });
+    carouselEl.appendChild(next);
 }
 
 function getCurrentSlideIndex(carouselEl) {
