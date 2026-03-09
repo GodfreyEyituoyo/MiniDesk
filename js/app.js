@@ -60,10 +60,21 @@ const monitorImages = {
     ]
 };
 
-// ── BUNDLE CONTENTS (ALL items per bundle — static + configurable) ──
+// ── BUNDLE DETAIL ITEMS (static items with images + descriptions) ──
+const bundleDetailItems = [
+    { name: 'Mac Mini M4', desc: '10-core CPU, 10-core GPU, 16GB unified memory, 256GB SSD', img: 'images/static/mac-mini-m4.webp', bundles: ['basic', 'full'] },
+    { name: 'USB-C Hub (10-in-1)', desc: 'HDMI, USB-A ×3, USB-C, SD/microSD, Ethernet, 100W passthrough', img: 'images/static/usb-c-hub.webp', bundles: ['basic', 'full'] },
+    { name: 'Wireless Mouse', desc: 'Ergonomic design, silent click, long battery life', img: 'images/static/wireless-mouse.webp', bundles: ['basic', 'full'] },
+    { name: 'Workstation Table', desc: 'Spacious minimalist desk with cable management', img: 'images/static/workstation-table.webp', bundles: ['full'] },
+    { name: 'Ergonomic Chair', desc: 'Furgle mesh-back chair with lumbar support and headrest', img: 'images/static/ergonomic-chair.webp', bundles: ['full'] },
+    { name: 'Keyboard Mat', desc: 'Premium felt desk mat, full-width coverage', img: 'images/static/keyboard-mat.webp', bundles: ['full'] },
+    { name: 'Side Light', desc: 'Modern LED desk lamp with adjustable brightness', img: 'images/static/side-light.webp', bundles: ['full'] }
+];
+
+// Quick list for summary (derived from detail items)
 const bundleContents = {
-    basic: ['Mac Mini M4', 'Monitor', 'Keyboard & Mouse', 'USB-C Hub (10-in-1)', 'Wireless Mouse'],
-    full: ['Mac Mini M4', 'Monitor', 'Keyboard & Mouse', 'USB-C Hub (10-in-1)', 'Wireless Mouse', 'Workstation Table', 'Ergonomic Chair', 'Keyboard Mat', 'Side Light']
+    basic: bundleDetailItems.filter(i => i.bundles.includes('basic')).map(i => i.name).concat(['Monitor', 'Keyboard & Mouse']),
+    full: bundleDetailItems.filter(i => i.bundles.includes('full')).map(i => i.name).concat(['Monitor', 'Keyboard & Mouse'])
 };
 
 // ── LOAD PRODUCTS FROM DB ──
@@ -357,15 +368,30 @@ function selectBundle(val) {
     const card = document.getElementById('card-' + val);
     if (card) card.classList.add('selected');
 
-    // Show bundle contents chips
+    // Render bundle detail cards (static items with images + descriptions)
     const contentsEl = document.getElementById('bundle-contents');
     const grid = document.getElementById('bundle-contents-grid');
     if (contentsEl && grid) {
-        const items = bundleContents[val] || [];
+        const items = bundleDetailItems.filter(i => i.bundles.includes(val));
         if (items.length > 0) {
-            grid.innerHTML = items.map(item =>
-                `<div class="bundle-item-chip"><span class="chip-check">✓</span> ${item}</div>`
-            ).join('');
+            grid.innerHTML = items.map(item => `
+                <div class="bundle-detail-card">
+                    <div class="bundle-detail-img">
+                        <img src="${item.img}" alt="${item.name}" loading="lazy">
+                    </div>
+                    <div class="bundle-detail-info">
+                        <div class="bundle-detail-name">${item.name}</div>
+                        <div class="bundle-detail-desc">${item.desc}</div>
+                    </div>
+                </div>
+            `).join('') + `
+                <div class="bundle-detail-card bundle-detail-configurable">
+                    <div class="bundle-detail-info">
+                        <div class="bundle-detail-name">+ Monitor & Keyboard</div>
+                        <div class="bundle-detail-desc">Choose your display and keyboard combo below</div>
+                    </div>
+                </div>
+            `;
             contentsEl.style.display = 'block';
         } else {
             contentsEl.style.display = 'none';
