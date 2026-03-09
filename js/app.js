@@ -53,7 +53,11 @@ const monitorImages = {
     entry: 'images/monitor-entry.webp',
     mid: 'images/monitor-mid.webp',
     top: 'images/monitor-top.webp',
-    creator: 'images/monitor-creator.webp'
+    creator: [
+        'images/monitor-creator-1.webp',
+        'images/monitor-creator-2.webp',
+        'images/monitor-creator-3.webp'
+    ]
 };
 
 // ── BUNDLE CONTENTS (static items per bundle) ──
@@ -272,17 +276,47 @@ function goToSlide(carouselEl, idx) {
     if (dots[idx]) dots[idx].classList.add('active');
 }
 
-// Update a section's carousel image (e.g. when selecting monitor or keyboard color)
-function updateSectionImage(sectionId, imgSrc, altText) {
+// Update a section's carousel image(s)
+function updateSectionImage(sectionId, imgSrcs, altText) {
     const section = document.getElementById(sectionId);
     if (!section) return;
     const carousel = section.querySelector('.step-carousel');
     if (!carousel) return;
-    const firstSlide = carousel.querySelector('.carousel-slide img');
-    if (firstSlide) {
-        firstSlide.src = imgSrc;
-        if (altText) firstSlide.alt = altText;
+
+    const track = carousel.querySelector('.carousel-track');
+    const dotsContainer = carousel.querySelector('.carousel-dots');
+    if (!track) return;
+
+    // Convert to array if it's a single string
+    const images = Array.isArray(imgSrcs) ? imgSrcs : [imgSrcs];
+
+    // Rebuild track slides
+    track.innerHTML = '';
+    images.forEach((img, idx) => {
+        const slide = document.createElement('div');
+        slide.className = 'carousel-slide' + (idx === 0 ? ' active' : '');
+        const imgEl = document.createElement('img');
+        imgEl.src = img;
+        if (altText) imgEl.alt = altText + ' ' + (idx + 1);
+        imgEl.loading = 'lazy';
+        slide.appendChild(imgEl);
+        track.appendChild(slide);
+    });
+
+    // Remove old arrows and dots
+    const prev = carousel.querySelector('.carousel-prev');
+    const next = carousel.querySelector('.carousel-next');
+    if (prev) prev.remove();
+    if (next) next.remove();
+    if (dotsContainer) {
+        dotsContainer.innerHTML = '';
+        // If we had a single image previously, and now have multiple, initCarouselControls needs a fresh dots container
+        dotsContainer.remove();
     }
+
+    // Re-init the carousel controls (it will regenerate dots and arrows if length > 1)
+    initCarouselControls(carousel);
+
     // Always force the desktop panel to switch to this active section when interacted with
     activeSection = null; // Force re-clone
     showSectionInPanel(section);
