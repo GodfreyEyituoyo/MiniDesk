@@ -204,16 +204,18 @@ function showConfigImage(imgId) {
 }
 
 // ── INTERSECTION OBSERVER (auto-switch image on scroll) ──
+let scrollLock = false; // Prevent observer from fighting programmatic scroll
 function setupStepObserver() {
     const steps = document.querySelectorAll('.config-step[data-img]');
     const stepObserver = new IntersectionObserver((entries) => {
+        if (scrollLock) return; // Don't switch during programmatic scroll
         entries.forEach(entry => {
             if (entry.isIntersecting) {
                 const imgId = entry.target.getAttribute('data-img');
                 if (imgId) showConfigImage(imgId);
             }
         });
-    }, { threshold: 0.4, rootMargin: '-20% 0px -20% 0px' });
+    }, { threshold: 0.5, rootMargin: '-30% 0px -30% 0px' });
 
     steps.forEach(step => stepObserver.observe(step));
 }
@@ -221,12 +223,20 @@ function setupStepObserver() {
 // ── AUTO-SCROLL TO NEXT STEP ──
 function scrollToNextStep(currentStepId) {
     const steps = ['step-bundle', 'step-monitor', 'step-keyboard', 'step-addons', 'step-summary'];
+    const imgMap = { 'step-bundle': 'img-bundle', 'step-monitor': 'img-monitor', 'step-keyboard': 'img-keyboard', 'step-addons': 'img-addons' };
     const idx = steps.indexOf(currentStepId);
     if (idx >= 0 && idx < steps.length - 1) {
-        const nextEl = document.getElementById(steps[idx + 1]);
+        const nextStepId = steps[idx + 1];
+        const nextEl = document.getElementById(nextStepId);
         if (nextEl) {
+            // Lock observer during programmatic scroll
+            scrollLock = true;
+            // Immediately show the correct image for the next step
+            if (imgMap[nextStepId]) showConfigImage(imgMap[nextStepId]);
             setTimeout(() => {
                 nextEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                // Unlock after scroll animation completes
+                setTimeout(() => { scrollLock = false; }, 800);
             }, 350);
         }
     }
