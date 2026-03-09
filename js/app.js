@@ -66,7 +66,7 @@ const bundleDetailItems = [
     { name: 'USB-C Hub (10-in-1)', desc: 'HDMI, USB-A ×3, USB-C, SD/microSD, Ethernet, 100W passthrough', img: 'images/static/usb-c-hub.webp', bundles: ['basic', 'full'] },
     { name: 'Workstation Table', desc: 'Spacious minimalist desk with cable management', img: 'images/static/workstation-table.webp', bundles: ['full'] },
     { name: 'Ergonomic Chair', desc: 'Furgle mesh-back chair with lumbar support and headrest', img: 'images/static/ergonomic-chair.webp', bundles: ['full'] },
-    { name: 'Keyboard Mat', desc: 'Premium felt desk mat, full-width coverage', img: 'images/static/keyboard-mat.webp', bundles: ['full'] },
+    { name: 'Keyboard Mat', desc: 'Compact desk mat covering your keyboard and mouse area', img: 'images/static/keyboard-mat.webp', bundles: ['basic', 'full'] },
     { name: 'Side Light', desc: 'Modern LED desk lamp with adjustable brightness', img: 'images/static/side-light.webp', bundles: ['full'] }
 ];
 
