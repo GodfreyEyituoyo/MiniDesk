@@ -283,11 +283,9 @@ function updateSectionImage(sectionId, imgSrc, altText) {
         firstSlide.src = imgSrc;
         if (altText) firstSlide.alt = altText;
     }
-    // Also update desktop panel if this is the active section
-    if (activeSection === section) {
-        activeSection = null; // Force re-clone
-        showSectionInPanel(section);
-    }
+    // Always force the desktop panel to switch to this active section when interacted with
+    activeSection = null; // Force re-clone
+    showSectionInPanel(section);
 }
 
 // ── INTERSECTION OBSERVER (switch desktop panel on scroll) ──
@@ -338,7 +336,10 @@ function selectBundle(val) {
     }
 
     updateSummary();
-    // scrollToNextStep('step-bundle');  // disabled for now
+
+    // Force active section in panel when clicked
+    activeSection = null;
+    showSectionInPanel(document.getElementById('step-bundle'));
 }
 
 // ── MONITOR SELECT ──
@@ -443,12 +444,17 @@ function toggleAddon(val, cardEl) {
     // Update left panel image to show selected add-on
     if (state.addons.length > 0) {
         const lastAddon = state.addons[state.addons.length - 1];
-        const addonImgMap = { stand: 'images/addon-stand.png', ssd: 'images/addon-ssd.png' };
-        const addImg = document.querySelector('#img-addons img');
-        if (addImg && addonImgMap[lastAddon]) {
-            addImg.src = addonImgMap[lastAddon];
+        const addonImgMap = { stand: 'images/addon-stand.webp', ssd: 'images/addon-ssd.webp' };
+        if (addonImgMap[lastAddon]) {
+            updateSectionImage('step-addons', addonImgMap[lastAddon], 'Add-on');
         }
+    } else {
+        updateSectionImage('step-addons', 'images/addon-stand.webp', 'Add-ons');
     }
+
+    // Force active section in panel when clicked
+    activeSection = null;
+    showSectionInPanel(document.getElementById('step-addons'));
 
     updateSummary();
 }
