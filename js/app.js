@@ -60,10 +60,10 @@ const monitorImages = {
     ]
 };
 
-// ── BUNDLE CONTENTS (static items per bundle) ──
+// ── BUNDLE CONTENTS (ALL items per bundle — static + configurable) ──
 const bundleContents = {
-    basic: ['Mac Mini M4', 'USB-C Hub (10-in-1)', 'Wireless Mouse'],
-    full: ['Mac Mini M4', 'USB-C Hub (10-in-1)', 'Wireless Mouse', 'Workstation Table', 'Ergonomic Chair', 'Keyboard Mat', 'Side Light']
+    basic: ['Mac Mini M4', 'Monitor', 'Keyboard & Mouse', 'USB-C Hub (10-in-1)', 'Wireless Mouse'],
+    full: ['Mac Mini M4', 'Monitor', 'Keyboard & Mouse', 'USB-C Hub (10-in-1)', 'Wireless Mouse', 'Workstation Table', 'Ergonomic Chair', 'Keyboard Mat', 'Side Light']
 };
 
 // ── LOAD PRODUCTS FROM DB ──
@@ -374,9 +374,38 @@ function selectBundle(val) {
 
     updateSummary();
 
-    // Force active section in panel when clicked
-    activeSection = null;
-    showSectionInPanel(document.getElementById('step-bundle'));
+    // Switch bundle carousel to show the selected bundle's image
+    const bundleImageMap = {
+        basic: 'images/bundle-basic.webp',
+        full: 'images/bundle-full.webp'
+    };
+    if (bundleImageMap[val]) {
+        updateSectionImage('step-bundle', bundleImageMap[val], names.bundle[val] || val);
+    }
+
+    // Unlock subsequent sections
+    unlockSections();
+}
+
+// ── SECTION GATING ──
+function unlockSections() {
+    const sections = ['step-monitor', 'step-keyboard', 'step-addons'];
+    sections.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+            el.classList.remove('section-locked');
+        }
+    });
+}
+
+function lockSections() {
+    const sections = ['step-monitor', 'step-keyboard', 'step-addons'];
+    sections.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+            el.classList.add('section-locked');
+        }
+    });
 }
 
 // ── MONITOR SELECT ──
@@ -804,6 +833,7 @@ window.clearBundle = function () {
     });
     const contentsEl = document.getElementById('bundle-contents');
     if (contentsEl) contentsEl.style.display = 'none';
+    lockSections();
     updateSummary();
 };
 

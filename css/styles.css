@@ -761,6 +761,36 @@
             border-bottom: none;
         }
 
+        /* Locked sections — until bundle is selected */
+        .config-step.section-locked {
+            opacity: 0.35;
+            pointer-events: none;
+            user-select: none;
+            position: relative;
+        }
+
+        .config-step.section-locked::after {
+            content: '🔒 Select a bundle first';
+            position: absolute;
+            top: 60px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            color: var(--muted);
+            z-index: 10;
+            white-space: nowrap;
+        }
+
+        [data-theme="light"] .config-step.section-locked::after {
+            background: rgba(0, 0, 0, 0.06);
+            border-color: rgba(0, 0, 0, 0.1);
+        }
+
         /* Apple-style step headers */
         .apple-step-header h3 {
             font-family: var(--font);
