@@ -66,7 +66,7 @@ const bundleDetailItems = [
     { name: 'USB-C Hub (10-in-1)', desc: 'HDMI, USB-A ×3, USB-C, SD/microSD, Ethernet, 100W passthrough', img: 'images/static/usb-c-hub.webp', bundles: ['basic', 'full'] },
     { name: 'Workstation Table', desc: 'Spacious minimalist desk with cable management', img: 'images/static/workstation-table.webp', bundles: ['full'] },
     { name: 'Ergonomic Chair', desc: 'Furgle mesh-back chair with lumbar support and headrest', img: 'images/static/ergonomic-chair.webp', bundles: ['full'] },
-    { name: 'Keyboard Mat', desc: 'Compact desk mat covering your keyboard and mouse area', img: 'images/static/keyboard-mat.webp', bundles: ['basic', 'full'] },
+    { name: 'Keyboard Mat', desc: 'Compact desk mat covering your keyboard and mouse area', img: 'images/static/keyboard-mat.webp', bundles: ['full'] },
     { name: 'Side Light', desc: 'Modern LED desk lamp with adjustable brightness', img: 'images/static/side-light.webp', bundles: ['full'] }
 ];
 
@@ -175,12 +175,7 @@ function updateDisplayedPrices(products) {
             descEl.textContent = p.description;
         }
 
-        // Thumb image
-        const thumbEl = card.querySelector('.apple-option-thumb img');
-        if (thumbEl && p.image) {
-            thumbEl.src = p.image;
-            thumbEl.alt = p.name || '';
-        }
+        // (thumbnails removed from cards)
 
         // Tag
         const tagEl = card.querySelector('.apple-option-tag');
@@ -203,28 +198,85 @@ function updateDisplayedPrices(products) {
     if (state.bundle || state.monitor) updateSummary();
 }
 
-// ── PER-SECTION CAROUSEL SYSTEM ──
+// ── PER-SECTION IMAGE SYSTEM (first-principles redesign) ──
 let activeSection = null;
+let activePanelSrc = null; // Track what's currently showing in the desktop panel
 
-// Clone active section’s carousel into the desktop sticky panel
+// ── PRELOAD ALL PRODUCT IMAGES ──
+function preloadAllImages() {
+    const urls = new Set();
+    // Monitor images
+    Object.values(monitorImages).forEach(v => {
+        if (Array.isArray(v)) v.forEach(u => urls.add(u));
+        else urls.add(v);
+    });
+    // Keyboard color images
+    Object.values(keyboardColors).forEach(colors => {
+        colors.forEach(c => urls.add(c.img));
+    });
+    // Bundle images
+    urls.add('images/bundle-basic.webp');
+    urls.add('images/bundle-full.webp');
+    // Addon images
+    urls.add('images/addon-stand.webp');
+    urls.add('images/addon-ssd.webp');
+    // Preload each
+    urls.forEach(url => { const img = new Image(); img.src = url; });
+}
+
+// ── SYNC DESKTOP PANEL IMAGE ──
+// Instead of cloning the entire carousel, we maintain a persistent image in the panel
+// and just swap its src with a crossfade.
 function showSectionInPanel(sectionEl) {
     const slot = document.getElementById('desktop-carousel-slot');
     if (!slot) return;
     const carousel = sectionEl.querySelector('.step-carousel');
     if (!carousel) return;
-    // Don't re-clone if same section
-    if (activeSection === sectionEl) return;
+
+    // Get the active slide's image src from this section
+    const activeSlide = carousel.querySelector('.carousel-slide.active img');
+    if (!activeSlide) return;
+    const src = activeSlide.src;
+
+    // Skip if panel already shows this exact image
+    if (activePanelSrc === src && activeSection === sectionEl) return;
     activeSection = sectionEl;
-    // Clone and place
-    slot.innerHTML = '';
-    const clone = carousel.cloneNode(true);
-    clone.style.display = 'block';
-    slot.appendChild(clone);
-    // Re-init dots/arrows on the clone
-    initCarouselControls(clone);
+    activePanelSrc = src;
+
+    // Check if multi-image section (e.g. Creator's Choice monitor)
+    const slides = carousel.querySelectorAll('.carousel-slide');
+    if (slides.length > 1) {
+        // For multi-image: clone the full carousel (with controls)
+        slot.innerHTML = '';
+        const clone = carousel.cloneNode(true);
+        clone.style.display = 'block';
+        slot.appendChild(clone);
+        initCarouselControls(clone);
+        return;
+    }
+
+    // For single-image: use persistent img with crossfade
+    let panelImg = slot.querySelector('.panel-img');
+    if (!panelImg) {
+        slot.innerHTML = '';
+        panelImg = document.createElement('img');
+        panelImg.className = 'panel-img';
+        panelImg.style.cssText = 'max-width:85%;max-height:85%;object-fit:contain;border-radius:16px;transition:opacity 0.3s ease;';
+        slot.appendChild(panelImg);
+    }
+
+    // Crossfade: fade out → swap → fade in
+    panelImg.style.opacity = '0';
+    setTimeout(() => {
+        panelImg.src = src;
+        panelImg.alt = activeSlide.alt || '';
+        panelImg.onload = () => { panelImg.style.opacity = '1'; };
+        // Fallback if image is already cached (onload won't fire)
+        if (panelImg.complete) panelImg.style.opacity = '1';
+    }, 150);
 }
 
-// Initialize carousel dots and arrows
+// Initialize carousel dots and arrows (only used for multi-image sections)
 function initCarouselControls(carouselEl) {
     const slides = carouselEl.querySelectorAll('.carousel-slide');
     if (slides.length <= 1) {
@@ -246,7 +298,7 @@ function initCarouselControls(carouselEl) {
         dot.addEventListener('click', () => goToSlide(carouselEl, i));
         dotsContainer.appendChild(dot);
     });
-    // Remove existing arrows (crucial for cloned node in sticky panel)
+    // Remove existing arrows
     const oldPrev = carouselEl.querySelector('.carousel-prev');
     if (oldPrev) oldPrev.remove();
     const oldNext = carouselEl.querySelector('.carousel-next');
@@ -289,49 +341,95 @@ function goToSlide(carouselEl, idx) {
     if (dots[idx]) dots[idx].classList.add('active');
 }
 
-// Update a section's carousel image(s)
+// ── UPDATE SECTION IMAGE (smart src-swap with crossfade) ──
 function updateSectionImage(sectionId, imgSrcs, altText) {
     const section = document.getElementById(sectionId);
     if (!section) return;
     const carousel = section.querySelector('.step-carousel');
     if (!carousel) return;
-
     const track = carousel.querySelector('.carousel-track');
-    const dotsContainer = carousel.querySelector('.carousel-dots');
     if (!track) return;
 
-    // Convert to array if it's a single string
     const images = Array.isArray(imgSrcs) ? imgSrcs : [imgSrcs];
 
-    // Rebuild track slides
-    track.innerHTML = '';
-    images.forEach((img, idx) => {
-        const slide = document.createElement('div');
-        slide.className = 'carousel-slide' + (idx === 0 ? ' active' : '');
-        const imgEl = document.createElement('img');
-        imgEl.src = img;
-        if (altText) imgEl.alt = altText + ' ' + (idx + 1);
-        imgEl.loading = 'lazy';
-        slide.appendChild(imgEl);
-        track.appendChild(slide);
-    });
+    // SINGLE IMAGE: swap src on existing <img> element (no DOM rebuild)
+    if (images.length === 1) {
+        let slide = track.querySelector('.carousel-slide');
+        let imgEl = slide ? slide.querySelector('img') : null;
 
-    // Remove old arrows and dots
-    const prev = carousel.querySelector('.carousel-prev');
-    const next = carousel.querySelector('.carousel-next');
-    if (prev) prev.remove();
-    if (next) next.remove();
-    if (dotsContainer) {
-        dotsContainer.innerHTML = '';
-        // If we had a single image previously, and now have multiple, initCarouselControls needs a fresh dots container
-        dotsContainer.remove();
+        // If we previously had multiple slides, clean up to single
+        if (track.querySelectorAll('.carousel-slide').length > 1) {
+            // Remove extra slides
+            track.innerHTML = '';
+            slide = document.createElement('div');
+            slide.className = 'carousel-slide active';
+            imgEl = document.createElement('img');
+            imgEl.style.cssText = 'transition:opacity 0.3s ease;border-radius:16px;';
+            slide.appendChild(imgEl);
+            track.appendChild(slide);
+            // Remove any leftover dots/arrows
+            const dots = carousel.querySelector('.carousel-dots');
+            const prev = carousel.querySelector('.carousel-prev');
+            const next = carousel.querySelector('.carousel-next');
+            if (dots) dots.remove();
+            if (prev) prev.remove();
+            if (next) next.remove();
+            carousel.classList.add('carousel-single');
+        }
+
+        if (!imgEl) {
+            // Create if doesn't exist
+            slide = document.createElement('div');
+            slide.className = 'carousel-slide active';
+            imgEl = document.createElement('img');
+            imgEl.style.cssText = 'transition:opacity 0.3s ease;border-radius:16px;';
+            slide.appendChild(imgEl);
+            track.appendChild(slide);
+        }
+
+        // Skip if same image already showing
+        if (imgEl.src && imgEl.src.endsWith(images[0])) {
+            // Still sync the panel
+            activePanelSrc = null; // force panel refresh
+            showSectionInPanel(section);
+            return;
+        }
+
+        // Crossfade: fade out → swap src → fade in
+        imgEl.style.opacity = '0';
+        setTimeout(() => {
+            imgEl.src = images[0];
+            if (altText) imgEl.alt = altText;
+            imgEl.onload = () => { imgEl.style.opacity = '1'; };
+            if (imgEl.complete) imgEl.style.opacity = '1';
+        }, 150);
+
+    } else {
+        // MULTI IMAGE: rebuild slides (only for Creator's Choice etc.)
+        track.innerHTML = '';
+        images.forEach((img, idx) => {
+            const slide = document.createElement('div');
+            slide.className = 'carousel-slide' + (idx === 0 ? ' active' : '');
+            const imgEl = document.createElement('img');
+            imgEl.src = img;
+            imgEl.style.cssText = 'border-radius:16px;';
+            if (altText) imgEl.alt = altText + ' ' + (idx + 1);
+            slide.appendChild(imgEl);
+            track.appendChild(slide);
+        });
+        // Remove old controls and re-init
+        const prev = carousel.querySelector('.carousel-prev');
+        const next = carousel.querySelector('.carousel-next');
+        const dots = carousel.querySelector('.carousel-dots');
+        if (prev) prev.remove();
+        if (next) next.remove();
+        if (dots) dots.remove();
+        initCarouselControls(carousel);
     }
 
-    // Re-init the carousel controls (it will regenerate dots and arrows if length > 1)
-    initCarouselControls(carousel);
-
-    // Always force the desktop panel to switch to this active section when interacted with
-    activeSection = null; // Force re-clone
+    // Sync desktop panel
+    activePanelSrc = null; // force refresh
+    activeSection = null;
     showSectionInPanel(section);
 }
 
@@ -352,8 +450,11 @@ function setupStepObserver() {
         }
     });
 
-    // Init all inline carousels (for mobile)
+    // Init multi-image carousels (for mobile)
     document.querySelectorAll('.step-carousel').forEach(c => initCarouselControls(c));
+
+    // Preload all product images
+    preloadAllImages();
 
     // Show first section in desktop panel
     const firstStep = document.querySelector('.config-step');
@@ -533,19 +634,15 @@ function toggleAddon(val, cardEl) {
     }
 
     // Update left panel image to show selected add-on
+    const addonImgMap = { stand: 'images/addon-stand.webp', ssd: 'images/addon-ssd.webp' };
     if (state.addons.length > 0) {
         const lastAddon = state.addons[state.addons.length - 1];
-        const addonImgMap = { stand: 'images/addon-stand.webp', ssd: 'images/addon-ssd.webp' };
         if (addonImgMap[lastAddon]) {
             updateSectionImage('step-addons', addonImgMap[lastAddon], 'Add-on');
         }
     } else {
         updateSectionImage('step-addons', 'images/addon-stand.webp', 'Add-ons');
     }
-
-    // Force active section in panel when clicked
-    activeSection = null;
-    showSectionInPanel(document.getElementById('step-addons'));
 
     updateSummary();
 }
