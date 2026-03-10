@@ -224,38 +224,16 @@ function preloadAllImages() {
     urls.forEach(url => { const img = new Image(); img.src = url; });
 }
 
-// ── SYNC DESKTOP PANEL IMAGE ──
-// Instead of cloning the entire carousel, we maintain a persistent image in the panel
-// and just swap its src with a crossfade.
-function showSectionInPanel(sectionEl) {
+// ── SYNC PANEL IMAGE (pass src directly — never read stale DOM) ──
+function syncPanelImage(src, alt) {
     const slot = document.getElementById('desktop-carousel-slot');
     if (!slot) return;
-    const carousel = sectionEl.querySelector('.step-carousel');
-    if (!carousel) return;
-
-    // Get the active slide's image src from this section
-    const activeSlide = carousel.querySelector('.carousel-slide.active img');
-    if (!activeSlide) return;
-    const src = activeSlide.src;
 
     // Skip if panel already shows this exact image
-    if (activePanelSrc === src && activeSection === sectionEl) return;
-    activeSection = sectionEl;
+    if (activePanelSrc === src) return;
     activePanelSrc = src;
 
-    // Check if multi-image section (e.g. Creator's Choice monitor)
-    const slides = carousel.querySelectorAll('.carousel-slide');
-    if (slides.length > 1) {
-        // For multi-image: clone the full carousel (with controls)
-        slot.innerHTML = '';
-        const clone = carousel.cloneNode(true);
-        clone.style.display = 'block';
-        slot.appendChild(clone);
-        initCarouselControls(clone);
-        return;
-    }
-
-    // For single-image: use persistent img with crossfade
+    // Get or create persistent panel img
     let panelImg = slot.querySelector('.panel-img');
     if (!panelImg) {
         slot.innerHTML = '';
@@ -269,11 +247,48 @@ function showSectionInPanel(sectionEl) {
     panelImg.style.opacity = '0';
     setTimeout(() => {
         panelImg.src = src;
-        panelImg.alt = activeSlide.alt || '';
+        panelImg.alt = alt || '';
         panelImg.onload = () => { panelImg.style.opacity = '1'; };
-        // Fallback if image is already cached (onload won't fire)
         if (panelImg.complete) panelImg.style.opacity = '1';
     }, 150);
+}
+
+// ── SYNC PANEL CAROUSEL (for multi-image like Creator's Choice) ──
+function syncPanelCarousel(carousel) {
+    const slot = document.getElementById('desktop-carousel-slot');
+    if (!slot) return;
+    slot.innerHTML = '';
+    const clone = carousel.cloneNode(true);
+    clone.style.display = 'block';
+    slot.appendChild(clone);
+    initCarouselControls(clone);
+    // Track first image as panel src
+    const firstImg = clone.querySelector('.carousel-slide.active img');
+    activePanelSrc = firstImg ? firstImg.src : null;
+}
+
+// ── SHOW SECTION IN PANEL (observer only — for scroll-based section switching) ──
+function showSectionInPanel(sectionEl) {
+    const slot = document.getElementById('desktop-carousel-slot');
+    if (!slot) return;
+    const carousel = sectionEl.querySelector('.step-carousel');
+    if (!carousel) return;
+
+    // Don't switch if already on this section
+    if (activeSection === sectionEl) return;
+    activeSection = sectionEl;
+
+    // Check if multi-image section
+    const slides = carousel.querySelectorAll('.carousel-slide');
+    if (slides.length > 1) {
+        syncPanelCarousel(carousel);
+        return;
+    }
+
+    // Single image: read from inline carousel (which is always up-to-date)
+    const activeSlide = carousel.querySelector('.carousel-slide.active img');
+    if (!activeSlide) return;
+    syncPanelImage(activeSlide.src, activeSlide.alt);
 }
 
 // Initialize carousel dots and arrows (only used for multi-image sections)
@@ -341,7 +356,9 @@ function goToSlide(carouselEl, idx) {
     if (dots[idx]) dots[idx].classList.add('active');
 }
 
-// ── UPDATE SECTION IMAGE (smart src-swap with crossfade) ──
+// ── UPDATE SECTION IMAGE ──
+// Updates inline carousel IMMEDIATELY, then syncs panel with known-correct src.
+// No setTimeout on the inline carousel — avoids the race condition.
 function updateSectionImage(sectionId, imgSrcs, altText) {
     const section = document.getElementById(sectionId);
     if (!section) return;
@@ -352,57 +369,53 @@ function updateSectionImage(sectionId, imgSrcs, altText) {
 
     const images = Array.isArray(imgSrcs) ? imgSrcs : [imgSrcs];
 
-    // SINGLE IMAGE: swap src on existing <img> element (no DOM rebuild)
+    // SINGLE IMAGE: swap src immediately
     if (images.length === 1) {
         let slide = track.querySelector('.carousel-slide');
         let imgEl = slide ? slide.querySelector('img') : null;
 
         // If we previously had multiple slides, clean up to single
         if (track.querySelectorAll('.carousel-slide').length > 1) {
-            // Remove extra slides
             track.innerHTML = '';
             slide = document.createElement('div');
             slide.className = 'carousel-slide active';
             imgEl = document.createElement('img');
-            imgEl.style.cssText = 'transition:opacity 0.3s ease;border-radius:16px;';
+            imgEl.style.cssText = 'border-radius:16px;';
             slide.appendChild(imgEl);
             track.appendChild(slide);
             // Remove any leftover dots/arrows
             const dots = carousel.querySelector('.carousel-dots');
-            const prev = carousel.querySelector('.carousel-prev');
-            const next = carousel.querySelector('.carousel-next');
+            const cprev = carousel.querySelector('.carousel-prev');
+            const cnext = carousel.querySelector('.carousel-next');
             if (dots) dots.remove();
-            if (prev) prev.remove();
-            if (next) next.remove();
+            if (cprev) cprev.remove();
+            if (cnext) cnext.remove();
             carousel.classList.add('carousel-single');
         }
 
         if (!imgEl) {
-            // Create if doesn't exist
             slide = document.createElement('div');
             slide.className = 'carousel-slide active';
             imgEl = document.createElement('img');
-            imgEl.style.cssText = 'transition:opacity 0.3s ease;border-radius:16px;';
+            imgEl.style.cssText = 'border-radius:16px;';
             slide.appendChild(imgEl);
             track.appendChild(slide);
         }
 
         // Skip if same image already showing
         if (imgEl.src && imgEl.src.endsWith(images[0])) {
-            // Still sync the panel
-            activePanelSrc = null; // force panel refresh
-            showSectionInPanel(section);
+            // Ensure panel is in sync
+            syncPanelImage(imgEl.src, altText || imgEl.alt);
             return;
         }
 
-        // Crossfade: fade out → swap src → fade in
-        imgEl.style.opacity = '0';
-        setTimeout(() => {
-            imgEl.src = images[0];
-            if (altText) imgEl.alt = altText;
-            imgEl.onload = () => { imgEl.style.opacity = '1'; };
-            if (imgEl.complete) imgEl.style.opacity = '1';
-        }, 150);
+        // Update inline carousel IMMEDIATELY (no delay — this is hidden on desktop)
+        imgEl.src = images[0];
+        if (altText) imgEl.alt = altText;
+
+        // Update panel with crossfade (pass the correct src directly)
+        activeSection = section;
+        syncPanelImage(images[0], altText);
 
     } else {
         // MULTI IMAGE: rebuild slides (only for Creator's Choice etc.)
@@ -425,12 +438,11 @@ function updateSectionImage(sectionId, imgSrcs, altText) {
         if (next) next.remove();
         if (dots) dots.remove();
         initCarouselControls(carousel);
-    }
 
-    // Sync desktop panel
-    activePanelSrc = null; // force refresh
-    activeSection = null;
-    showSectionInPanel(section);
+        // Sync panel with full carousel clone
+        activeSection = section;
+        syncPanelCarousel(carousel);
+    }
 }
 
 // ── INTERSECTION OBSERVER (switch desktop panel on scroll) ──
