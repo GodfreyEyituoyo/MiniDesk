@@ -629,7 +629,7 @@
             max-height: 85%;
             object-fit: contain;
             border-radius: 16px;
-            transition: opacity 0.3s ease;
+            transition: opacity 0.15s ease;
         }
 
         /* Carousel nav arrows */

@@ -239,7 +239,7 @@ function syncPanelImage(src, alt) {
         slot.innerHTML = '';
         panelImg = document.createElement('img');
         panelImg.className = 'panel-img';
-        panelImg.style.cssText = 'max-width:85%;max-height:85%;object-fit:contain;border-radius:16px;transition:opacity 0.3s ease;';
+        panelImg.style.cssText = 'max-width:85%;max-height:85%;object-fit:contain;border-radius:16px;transition:opacity 0.15s ease;';
         slot.appendChild(panelImg);
     }
 
@@ -250,7 +250,7 @@ function syncPanelImage(src, alt) {
         panelImg.alt = alt || '';
         panelImg.onload = () => { panelImg.style.opacity = '1'; };
         if (panelImg.complete) panelImg.style.opacity = '1';
-    }, 150);
+    }, 50);
 }
 
 // ── SYNC PANEL CAROUSEL (for multi-image like Creator's Choice) ──
