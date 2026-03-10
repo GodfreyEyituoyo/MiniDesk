@@ -50,9 +50,21 @@ const keyboardColors = {
 
 // ── MONITOR IMAGE MAP ──
 const monitorImages = {
-    entry: 'images/monitor-entry.webp',
-    mid: 'images/monitor-mid.webp',
-    top: 'images/monitor-top.webp',
+    entry: [
+        'images/monitor-entry-1.webp',
+        'images/monitor-entry-2.webp',
+        'images/monitor-entry-3.webp'
+    ],
+    mid: [
+        'images/monitor-mid-1.webp',
+        'images/monitor-mid-2.webp',
+        'images/monitor-mid-3.webp'
+    ],
+    top: [
+        'images/monitor-top-1.webp',
+        'images/monitor-top-2.webp',
+        'images/monitor-top-3.webp'
+    ],
     creator: [
         'images/monitor-creator-1.webp',
         'images/monitor-creator-2.webp',
