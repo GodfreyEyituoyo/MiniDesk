@@ -87,7 +87,7 @@ const PRODUCT_DATA = {
         bundle: { basic: 1138000, full: 1443000 },
         monitor: { entry: 428400, mid: 540400, top: 658000, creator: 658000 },
         keyboard: { 'pop-icon': 154000, mk250: 84000 },
-        addon: { stand: 22000, ssd: 68000 }
+        addon: { stand: 22000, ssd: 265000 }
     },
     names: {
         bundle: { basic: 'Basic Work Bundle', full: 'Full Workspace Bundle' },
