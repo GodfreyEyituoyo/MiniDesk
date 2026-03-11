@@ -685,6 +685,7 @@ function updateSummary() {
         lines.innerHTML = '<div class="summary-empty">Select your bundle to start building.</div>';
         totalEl.style.display = 'none';
         if (proceedBtn) { proceedBtn.style.opacity = '0.4'; proceedBtn.style.pointerEvents = 'none'; }
+        updateOrderBtn(false);
         return;
     }
 
@@ -732,10 +733,21 @@ function updateSummary() {
             priceEl.textContent = '₦' + total.toLocaleString();
         }
         if (proceedBtn) { proceedBtn.style.opacity = '1'; proceedBtn.style.pointerEvents = 'auto'; }
+        updateOrderBtn(true);
     } else {
         totalEl.style.display = 'none';
         if (proceedBtn) { proceedBtn.style.opacity = '0.4'; proceedBtn.style.pointerEvents = 'none'; }
+        updateOrderBtn(false);
     }
+}
+
+// Enable/disable the order button based on config completeness
+function updateOrderBtn(enabled) {
+    const btn = document.getElementById('order-btn');
+    if (!btn) return;
+    btn.disabled = !enabled;
+    btn.style.opacity = enabled ? '1' : '0.4';
+    btn.style.pointerEvents = enabled ? 'auto' : 'none';
 }
 
 // Summary line — bundle header (Apple-style checkmark)

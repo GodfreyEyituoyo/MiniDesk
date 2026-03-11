@@ -3,26 +3,35 @@
 -- Run this in your Supabase SQL Editor
 -- ================================================
 
--- 1. Fix keyboard slugs: windows → mk250, mac → pop-icon
-UPDATE products SET 
-    slug = 'mk250', 
-    name = 'Logitech MK250 Compact', 
-    description = 'Compact Bluetooth wireless keyboard & mouse combo',
-    price = 84000,
-    requires_tier = '{}'
-WHERE slug = 'windows';
+-- 1. UPSERT bundles (they may not exist yet)
+INSERT INTO products (category, slug, name, description, price, is_active, sort_order)
+VALUES 
+    ('bundle', 'basic', 'Basic Work Bundle', 'Mac Mini M4 + Monitor + Keyboard & Mouse + USB-C Hub', 1138000, true, 1),
+    ('bundle', 'full', 'Full Workspace Bundle', 'Everything in Basic + Workstation Desk + Chair + Keyboard Mat + Side Light', 1443000, true, 2)
+ON CONFLICT (slug) DO UPDATE SET 
+    price = EXCLUDED.price, 
+    name = EXCLUDED.name, 
+    description = EXCLUDED.description,
+    is_active = true;
 
-UPDATE products SET 
-    slug = 'pop-icon', 
-    name = 'Logitech POP Icon Combo', 
-    description = 'Stylish, compact keyboard & mouse with customizable Action Keys',
-    price = 154000,
-    requires_tier = '{}'
-WHERE slug = 'mac';
+-- 2. Fix keyboard slugs: windows → mk250, mac → pop-icon
+-- First delete old slugs if new ones already exist (avoid unique constraint)
+DELETE FROM products WHERE slug IN ('windows', 'mac') 
+    AND EXISTS (SELECT 1 FROM products WHERE slug IN ('mk250', 'pop-icon'));
 
--- 2. Ensure bundle prices match frontend
-UPDATE products SET price = 1138000, is_active = true WHERE slug = 'basic';
-UPDATE products SET price = 1443000, is_active = true WHERE slug = 'full';
+-- Now upsert keyboards
+INSERT INTO products (category, slug, name, description, price, is_active, sort_order)
+VALUES 
+    ('keyboard', 'mk250', 'Logitech MK250 Compact', 'Compact Bluetooth wireless keyboard & mouse combo', 84000, true, 1),
+    ('keyboard', 'pop-icon', 'Logitech POP Icon Combo', 'Stylish, compact keyboard & mouse with customizable Action Keys', 154000, true, 2)
+ON CONFLICT (slug) DO UPDATE SET 
+    price = EXCLUDED.price, 
+    name = EXCLUDED.name, 
+    description = EXCLUDED.description,
+    is_active = true;
+
+-- Also delete old keyboard slugs if they still exist
+DELETE FROM products WHERE slug IN ('windows', 'mac');
 
 -- 3. Ensure monitor prices match frontend
 UPDATE products SET price = 428400, is_active = true WHERE slug = 'entry';
@@ -34,7 +43,7 @@ UPDATE products SET price = 658000, is_active = true WHERE slug = 'creator';
 UPDATE products SET price = 22000, is_active = true WHERE slug = 'stand';
 UPDATE products SET price = 68000, is_active = true WHERE slug = 'ssd';
 
--- 5. Verify everything
+-- 5. Verify everything — you should see 10 rows including basic + full
 SELECT slug, name, category, price, is_active 
 FROM products 
 WHERE slug IN ('basic', 'full', 'entry', 'mid', 'top', 'creator', 'mk250', 'pop-icon', 'stand', 'ssd')
