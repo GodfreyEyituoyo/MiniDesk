@@ -84,11 +84,10 @@ async function verifyAdmin(event) {
  */
 const PRODUCT_DATA = {
     prices: {
-        bundle: { basic: 450000, full: 950000 },
-        monitor: { entry: 95000, mid: 185000, top: 380000, creator: 280000 },
-        keyboard: { windows: 28000, mac: 72000 },
-        addon: { stand: 22000, ssd: 68000 },
-        included: 45000
+        bundle: { basic: 1138000, full: 1443000 },
+        monitor: { entry: 428400, mid: 540400, top: 658000, creator: 658000 },
+        keyboard: { 'pop-icon': 154000, mk250: 84000 },
+        addon: { stand: 22000, ssd: 68000 }
     },
     names: {
         bundle: { basic: 'Basic Work Bundle', full: 'Full Workspace Bundle' },
@@ -98,7 +97,7 @@ const PRODUCT_DATA = {
             top: 'Dell S2725QS (27" 4K UHD)',
             creator: 'ASUS ProArt PA278CV (27" QHD)'
         },
-        keyboard: { windows: 'Windows Keyboard', mac: 'Apple Magic Keyboard' },
+        keyboard: { 'pop-icon': 'Logitech POP Icon Combo', mk250: 'Logitech MK250 Compact' },
         addon: { stand: 'Laptop Stand', ssd: 'SanDisk 1TB Extreme Portable SSD' }
     }
 };
@@ -117,7 +116,6 @@ function calculateTotal(bundle, monitor, keyboard, addons = []) {
     total += p.bundle[bundle];
     total += p.monitor[monitor];
     total += p.keyboard[keyboard];
-    total += p.included; // mouse + dongle
 
     for (const addon of addons) {
         if (!p.addon[addon]) {
