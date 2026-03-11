@@ -5,6 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Order Confirmed — MiniDesk</title>
+    <meta name="description" content="Your MiniDesk order has been confirmed. We'll reach out within 24 hours.">
+    <meta name="robots" content="noindex">
     <link rel="stylesheet" href="css/styles.css">
     <style>
         .success-wrap {
@@ -16,7 +18,7 @@
         }
 
         .success-card {
-            background: var(--surface);
+            background: var(--card);
             border: 1px solid var(--border);
             border-radius: 24px;
             padding: 48px;
@@ -26,9 +28,32 @@
         }
 
         .success-icon {
-            font-size: 4rem;
-            margin-bottom: 20px;
-            display: block;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 24px;
+            font-size: 36px;
+            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .icon-paid {
+            background: linear-gradient(135deg, #34c759, #30d158);
+        }
+
+        .icon-pending {
+            background: linear-gradient(135deg, #ff9500, #ffb340);
+        }
+
+        .icon-loading {
+            background: var(--border);
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
         }
 
         .success-card h1 {
@@ -37,9 +62,11 @@
             margin-bottom: 12px;
         }
 
-        .success-card p {
+        .success-card .subtitle {
             color: var(--muted);
-            margin-bottom: 8px;
+            margin-bottom: 28px;
+            line-height: 1.6;
+            font-size: 15px;
         }
 
         .order-num {
@@ -49,9 +76,10 @@
             color: var(--accent);
             font-weight: 700;
             font-size: 1.1rem;
+            font-family: 'SF Mono', 'Fira Code', monospace;
             padding: 10px 24px;
             border-radius: 50px;
-            margin: 20px 0;
+            margin: 16px 0;
         }
 
         .status-badge {
@@ -73,16 +101,69 @@
             color: #ff9f0a;
         }
 
-        .back-link {
-            display: inline-block;
-            margin-top: 32px;
-            color: var(--accent);
-            text-decoration: none;
-            font-weight: 600;
+        .success-actions {
+            margin-top: 28px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
         }
 
-        .back-link:hover {
-            text-decoration: underline;
+        .btn-home {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 14px 28px;
+            border-radius: 14px;
+            background: #0071e3;
+            color: #fff;
+            font-size: 15px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-home:hover {
+            background: #0077ed;
+            transform: translateY(-1px);
+        }
+
+        .btn-whatsapp {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 14px 28px;
+            border-radius: 14px;
+            background: transparent;
+            color: #25d366;
+            font-size: 15px;
+            font-weight: 600;
+            text-decoration: none;
+            border: 1px solid #25d366;
+            transition: all 0.2s ease;
+        }
+
+        .btn-whatsapp:hover {
+            background: rgba(37, 211, 102, 0.1);
+        }
+
+        .delivery-note {
+            margin-top: 24px;
+            font-size: 13px;
+            color: var(--muted);
+            line-height: 1.5;
+        }
+
+        @media (max-width: 600px) {
+            .success-card {
+                padding: 36px 24px;
+            }
+            .success-card h1 {
+                font-size: 1.5rem;
+            }
         }
     </style>
 </head>
@@ -92,19 +173,41 @@
     <nav>
         <a href="/" class="logo" style="text-decoration:none;">Mini<span>Desk</span></a>
         <div style="display:flex;align-items:center;gap:28px;">
+            <a href="/#story">The Story</a>
             <a href="/#configurator">Configure</a>
+            <a href="/#order">Order</a>
+            <button class="theme-toggle" id="theme-toggle" onclick="toggleTheme()" title="Toggle light / dark mode">🌙</button>
         </div>
     </nav>
 
     <div class="success-wrap">
         <div class="success-card" id="success-content">
-            <span class="success-icon">⏳</span>
+            <div class="success-icon icon-loading">⏳</div>
             <h1>Checking your order...</h1>
-            <p>Please wait a moment.</p>
+            <p class="subtitle">Please wait a moment.</p>
         </div>
     </div>
 
     <script>
+        // Theme toggle
+        function toggleTheme() {
+            const body = document.body;
+            const btn = document.getElementById('theme-toggle');
+            if (body.getAttribute('data-theme') === 'light') {
+                body.removeAttribute('data-theme');
+                btn.textContent = '🌙';
+                localStorage.setItem('theme', 'dark');
+            } else {
+                body.setAttribute('data-theme', 'light');
+                btn.textContent = '☀️';
+                localStorage.setItem('theme', 'light');
+            }
+        }
+        if (localStorage.getItem('theme') === 'light') {
+            document.body.setAttribute('data-theme', 'light');
+            document.getElementById('theme-toggle').textContent = '☀️';
+        }
+
         (async function () {
             const params = new URLSearchParams(window.location.search);
             const reference = params.get('reference');
@@ -124,13 +227,18 @@
 
                     if (data.status === 'paid') {
                         card.innerHTML = `
-                            <span class="success-icon">🎉</span>
+                            <div class="success-icon icon-paid">🎉</div>
                             <h1>Payment Successful!</h1>
-                            <p>Thank you for your order. We'll be in touch soon.</p>
-                            <div class="order-num">${data.order_number}</div>
+                            <p class="subtitle">Thank you for your order. We'll be in touch within 24 hours to confirm delivery details.</p>
+                            <div class="order-num">${data.order_number || reference}</div>
                             <div><span class="status-badge status-paid">✓ Paid</span></div>
-                            <p style="margin-top:20px;">A confirmation email has been sent to you.</p>
-                            <a href="/" class="back-link">← Back to MiniDesk</a>
+                            <div class="success-actions">
+                                <a href="/" class="btn-home">← Back to MiniDesk</a>
+                                <a href="https://wa.me/2349137338837?text=Hi! I just placed an order (${data.order_number || reference})" target="_blank" class="btn-whatsapp">
+                                    💬 Chat with us on WhatsApp
+                                </a>
+                            </div>
+                            <p class="delivery-note">📦 Delivery across Lagos and beyond · A confirmation email has been sent to you.</p>
                         `;
                         return;
                     }
@@ -142,23 +250,33 @@
             // Order created but payment pending
             if (orderNumber || status === 'pending') {
                 card.innerHTML = `
-                    <span class="success-icon">📋</span>
+                    <div class="success-icon icon-pending">📋</div>
                     <h1>Order Received!</h1>
-                    <p>Your order has been recorded. We'll reach out with payment details.</p>
+                    <p class="subtitle">Your order has been recorded. We'll reach out within 24 hours with payment and delivery details.</p>
                     ${orderNumber ? `<div class="order-num">${orderNumber}</div>` : ''}
                     <div><span class="status-badge status-pending">⏳ Payment Pending</span></div>
-                    <p style="margin-top:20px;">We'll contact you within 24 hours.</p>
-                    <a href="/" class="back-link">← Back to MiniDesk</a>
+                    <div class="success-actions">
+                        <a href="/" class="btn-home">← Back to MiniDesk</a>
+                        <a href="https://wa.me/2349137338837?text=Hi! I just placed an order (${orderNumber || 'pending'})" target="_blank" class="btn-whatsapp">
+                            💬 Chat with us on WhatsApp
+                        </a>
+                    </div>
+                    <p class="delivery-note">📦 Delivery across Lagos and beyond · We respond within 24 hours.</p>
                 `;
                 return;
             }
 
             // Fallback
             card.innerHTML = `
-                <span class="success-icon">📋</span>
+                <div class="success-icon icon-pending">📋</div>
                 <h1>Thank you!</h1>
-                <p>Your order is being processed.</p>
-                <a href="/" class="back-link">← Back to MiniDesk</a>
+                <p class="subtitle">Your order is being processed. We'll be in touch shortly.</p>
+                <div class="success-actions">
+                    <a href="/" class="btn-home">← Back to MiniDesk</a>
+                    <a href="https://wa.me/2349137338837" target="_blank" class="btn-whatsapp">
+                        💬 Chat with us on WhatsApp
+                    </a>
+                </div>
             `;
         })();
     </script>
