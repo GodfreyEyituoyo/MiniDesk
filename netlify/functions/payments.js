@@ -67,7 +67,7 @@ async function initializePayment({ order_id, gateway = 'paystack' }, supabase) {
         return jsonResponse(400, { error: 'Order already paid' });
     }
 
-    const siteUrl = process.env.SITE_URL || 'http://localhost:8888';
+    const siteUrl = process.env.SITE_URL || process.env.URL || 'https://photizominidesknew.netlify.app';
     const reference = `MD-${Date.now()}-${Math.random().toString(36).substring(2, 8)}`;
 
     if (gateway === 'paystack') {
