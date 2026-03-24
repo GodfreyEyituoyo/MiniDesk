@@ -168,7 +168,7 @@
     </style>
 </head>
 
-<body>
+<body style="display:flex;flex-direction:column;min-height:100vh;">
     <!-- NAV -->
     <nav>
         <a href="/" class="logo" style="text-decoration:none;">Mini<span>Desk</span></a>
@@ -180,13 +180,25 @@
         </div>
     </nav>
 
-    <div class="success-wrap">
+    <div class="success-wrap" style="flex:1;">
         <div class="success-card" id="success-content">
             <div class="success-icon icon-loading">⏳</div>
             <h1>Checking your order...</h1>
             <p class="subtitle">Please wait a moment.</p>
         </div>
     </div>
+
+    <!-- FOOTER -->
+    <footer style="margin-top:auto;">
+        <div class="logo" style="margin-bottom:12px;font-size:1.2rem;">Mini<span style="color:var(--accent)">Desk</span></div>
+        <p>Built for Nigerian professionals who deserve world-class tools.</p>
+        <p style="margin-top:16px;"><strong>Minidesk by Photizo Tech</strong></p>
+        <p style="margin-top:8px;">
+            <a href="tel:+2347025166701" style="color:var(--text); text-decoration:none;">📞 +234 70 2516 6701</a><br>
+            <a href="mailto:photizo.techstores@gmail.com" style="color:var(--text); text-decoration:none;">✉️ photizo.techstores@gmail.com</a>
+        </p>
+        <p style="margin-top:24px;color:var(--muted);font-size:0.85rem;">© 2025 MiniDesk. All rights reserved.</p>
+    </footer>
 
     <script>
         // Theme toggle
