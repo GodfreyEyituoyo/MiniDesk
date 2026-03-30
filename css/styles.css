@@ -1238,12 +1238,178 @@
 
         /* FOOTER */
         footer {
-            text-align: center;
-            padding: 40px 24px 60px;
-            color: var(--muted);
-            font-size: 0.85rem;
             border-top: 1px solid var(--border);
             margin-top: 80px;
+            padding: 64px 48px 0;
+            background: var(--surface);
+        }
+
+        .footer-inner {
+            max-width: 1100px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 2fr 1fr 1.8fr 1.6fr;
+            gap: 64px;
+            padding-bottom: 56px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        /* Brand column */
+        .footer-brand {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .footer-logo {
+            font-size: 1.3rem;
+        }
+
+        .footer-tagline {
+            color: var(--muted);
+            font-size: 0.92rem;
+            line-height: 1.6;
+        }
+
+        .footer-sub {
+            font-size: 0.82rem;
+            color: var(--muted);
+            font-weight: 500;
+        }
+
+        /* Generic columns */
+        .footer-col {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .footer-col-title {
+            font-size: 0.78rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--text);
+            margin-bottom: 6px;
+        }
+
+        .footer-col a {
+            color: var(--muted);
+            text-decoration: none;
+            font-size: 0.92rem;
+            transition: color 0.2s;
+        }
+
+        .footer-col a:hover {
+            color: var(--text);
+        }
+
+        /* Contact links with SVG icon */
+        .footer-contact-link {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            white-space: nowrap;
+        }
+
+        .footer-contact-link svg {
+            width: 15px;
+            height: 15px;
+            flex-shrink: 0;
+            opacity: 0.75;
+        }
+
+        .footer-contact-link:hover svg {
+            opacity: 1;
+        }
+
+        .footer-wa-note {
+            font-size: 0.8rem;
+            opacity: 0.55;
+            margin-left: 2px;
+        }
+
+        /* Social column extras */
+        .footer-social-hint {
+            font-size: 0.88rem;
+            color: var(--muted);
+            line-height: 1.5;
+        }
+
+        .footer-social-icons {
+            display: flex;
+            gap: 10px;
+            margin-top: 4px;
+        }
+
+        .footer-icon-btn {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid var(--border);
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s, transform 0.2s, border-color 0.2s;
+            text-decoration: none;
+        }
+
+        .footer-icon-btn svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        .footer-icon-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.25);
+            transform: translateY(-2px);
+            color: var(--text);
+        }
+
+        [data-theme="light"] .footer-icon-btn {
+            background: rgba(0, 0, 0, 0.05);
+        }
+
+        [data-theme="light"] .footer-icon-btn:hover {
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        .footer-instagram-handle {
+            font-size: 0.82rem;
+            color: var(--muted);
+        }
+
+        /* Bottom bar */
+        .footer-bottom {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 20px 0 32px;
+            font-size: 0.82rem;
+            color: var(--muted);
+        }
+
+        /* Responsive footer */
+        @media (max-width: 900px) {
+            footer {
+                padding: 48px 24px 0;
+            }
+
+            .footer-inner {
+                grid-template-columns: 1fr 1fr;
+                gap: 36px;
+            }
+
+            .footer-brand {
+                grid-column: 1 / -1;
+            }
+        }
+
+        @media (max-width: 540px) {
+            .footer-inner {
+                grid-template-columns: 1fr;
+            }
         }
 
         /* SCROLL ANIMATION */
